@@ -1,0 +1,140 @@
+================================================================================
+  HƯỚNG DẪN CÀI ĐẶT DỰ ÁN - NHOM2 WEBSITE XE KHÁCH
+  PROJECT SETUP INSTRUCTIONS
+================================================================================
+
+YÊU CẦU HỆ THỐNG / SYSTEM REQUIREMENTS:
+----------------------------------------
+- PHP >= 8.1
+- Composer
+- MySQL >= 5.7
+- Node.js & NPM (optional, for frontend assets)
+- XAMPP hoặc bất kỳ MySQL server nào / XAMPP or any MySQL server
+
+================================================================================
+BƯỚC 1: CLONE PROJECT / STEP 1: CLONE PROJECT
+================================================================================
+
+git clone <repository-url>
+cd Nhom2_WebsiteXeKhach
+
+================================================================================
+BƯỚC 2: CÀI ĐẶT DEPENDENCIES / STEP 2: INSTALL DEPENDENCIES
+================================================================================
+
+# Cài đặt PHP dependencies
+composer install
+
+# (Tùy chọn) Cài đặt Node dependencies nếu cần build frontend
+# npm install
+
+================================================================================
+BƯỚC 3: CẤU HÌNH ENVIRONMENT / STEP 3: CONFIGURE ENVIRONMENT
+================================================================================
+
+# Copy file .env.example thành .env
+# Windows PowerShell:
+Copy-Item .env.example .env
+
+# Linux/Mac:
+cp .env.example .env
+
+# Mở file .env và cập nhật thông tin database:
+# Open .env file and update database information:
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=nhom2_websitexekhach
+DB_USERNAME=root
+DB_PASSWORD=
+
+# Generate application key
+php artisan key:generate
+
+================================================================================
+BƯỚC 4: TẠO DATABASE / STEP 4: CREATE DATABASE
+================================================================================
+
+Copilot gen guide dài vl. tóm tắt: mang cái file sql lên mysql admin trong xxamp 
+chạy cho lẹ
+
+================================================================================
+BƯỚC 5: CLEAR CACHE / STEP 7: CLEAR CACHE
+================================================================================
+
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+
+================================================================================
+BƯỚC 6: CHẠY SERVER / STEP 8: RUN SERVER
+================================================================================
+
+php artisan serve
+
+# Server sẽ chạy tại: http://localhost:8000
+# Server will run at: http://localhost:8000
+
+================================================================================
+THÔNG TIN ĐĂNG NHẬP MẪU / SAMPLE LOGIN CREDENTIALS
+================================================================================
+
+NHÂN VIÊN / EMPLOYEES:
+----------------------
+Username: NV001  | Password: 123 | Chức vụ: Quản lý
+Username: NV002  | Password: 123 | Chức vụ: Nhân viên bán vé
+Username: NV003  | Password: 123 | Chức vụ: Tài xế
+Username: NV004  | Password: 123 | Chức vụ: Phụ xe
+
+KHÁCH HÀNG / CUSTOMERS:
+-----------------------
+Username: KH001  | Password: 123 | Tên: Trần Văn Bảo
+Username: KH002  | Password: 123 | Tên: Lê Thị Thu Thủy
+Username: KH003  | Password: 123 | Tên: Phạm Minh Tuấn
+
+================================================================================
+XỬ LÝ SỰ CỐ / TROUBLESHOOTING
+================================================================================
+
+1. LỖI TIẾNG VIỆT HIỂN THỊ "????" / VIETNAMESE CHARACTERS SHOWING AS "????"
+   -------------------------------------------------------------------------
+   - Cái này cũng phiền vl, cứ prompt copilot cho nó sửa chứ t chịu =))))
+
+2. LỖI "SQLSTATE[HY000] [1049] Unknown database"
+   -----------------------------------------------
+   - Kiểm tra database đã được tạo chưa
+   - Kiểm tra tên database trong file .env
+
+3. LỖI "No application encryption key has been specified"
+   -------------------------------------------------------
+   - Chạy: php artisan key:generate
+
+4. LỖI PERMISSIONS (Linux/Mac)
+   ----------------------------
+   chmod -R 775 storage bootstrap/cache
+   chown -R www-data:www-data storage bootstrap/cache
+
+5. LỖI COMPOSER DEPENDENCIES
+   --------------------------
+   composer install --ignore-platform-reqs
+   (hoặc cập nhật PHP version)
+
+================================================================================
+CẤU TRÚC DỮ LIỆU / DATABASE STRUCTURE
+================================================================================
+
+Các bảng chính / Main tables:
+- Chucvu: Chức vụ nhân viên (4 records)
+- TinhThanh: Tỉnh thành (6 records: HN, SG, DN, DL, NT, CT)
+- Loaixe: Loại xe (3 records: Giường nằm, Limousine, Ghế ngồi)
+- Thanhtoan: Phương thức thanh toán (4 records: TM, CK, MM, VN)
+- Nhanvien: Nhân viên (4 records)
+- Khach: Khách hàng (3 records)
+- Xe: Danh sách xe (3 records)
+- Chuyendi: Chuyến đi (3 records)
+- Lotrinh: Lộ trình của chuyến đi (7 records)
+- Ve: Vé xe (5 records)
+- Hoadon: Hóa đơn (3 records)
+- CTHD: Chi tiết hóa đơn (5 records)
+

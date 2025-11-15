@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.admin.app')
 
 @section('title', 'Chi tiết Hóa đơn')
 
@@ -6,7 +6,7 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Chi tiết Hóa đơn #{{ $hoadon->mahd }}</h2>
-        <a href="{{ route('admin.hoadon.index') }}" class="btn btn-secondary">
+        <a href="{{ route('quan-ly.hoadon.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Quay lại
         </a>
     </div>
@@ -28,7 +28,7 @@
                     <table class="table table-borderless">
                         <tr>
                             <th width="150">Họ tên:</th>
-                            <td>{{ $hoadon->khach->hoten ?? 'N/A' }}</td>
+                            <td>{{ $hoadon->khach->ten ?? 'N/A' }}</td>
                         </tr>
                         <tr>
                             <th>Số điện thoại:</th>
@@ -56,11 +56,11 @@
                         </tr>
                         <tr>
                             <th>Ngày đặt:</th>
-                            <td>{{ \Carbon\Carbon::parse($hoadon->ngaydat)->format('d/m/Y H:i') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($hoadon->thoigian)->format('d/m/Y H:i') }}</td>
                         </tr>
                         <tr>
                             <th>Nhân viên:</th>
-                            <td>{{ $hoadon->nhanvien->hoten ?? 'N/A' }}</td>
+                            <td>{{ $hoadon->nhanvien->ten ?? 'N/A' }}</td>
                         </tr>
                         <tr>
                             <th>Trạng thái:</th>
@@ -103,8 +103,8 @@
                             <td>{{ $index + 1 }}</td>
                             <td>
                                 @if($ct->ve && $ct->ve->chuyendi)
-                                    Mã: {{ $ct->ve->chuyendi->macd }}<br>
-                                    Xe: {{ $ct->ve->chuyendi->xe->bienso ?? 'N/A' }}
+                                    Mã: {{ $ct->ve->chuyendi->machuyendi }}<br>
+                                    Xe: {{ $ct->ve->chuyendi->xe->soxe ?? 'N/A' }}
                                 @else
                                     N/A
                                 @endif
@@ -123,13 +123,9 @@
                                     N/A
                                 @endif
                             </td>
-                            <td>{{ number_format($ct->giave, 0, ',', '.') }} VNĐ</td>
+                            <td>{{ number_format($ct->dongia ?? $ct->ve->gia ?? 0, 0, ',', '.') }} VNĐ</td>
                             <td>
-                                @if($ct->ve && $ct->ve->thanhtoan)
-                                    {{ $ct->ve->thanhtoan->tentt }}
-                                @else
-                                    N/A
-                                @endif
+                                {{ $hoadon->thanhtoan->ptthanhtoan ?? 'N/A' }}
                             </td>
                         </tr>
                         @endforeach
@@ -137,7 +133,7 @@
                     <tfoot>
                         <tr>
                             <th colspan="4" class="text-end">Tổng cộng:</th>
-                            <th colspan="2">{{ number_format($hoadon->tongtien, 0, ',', '.') }} VNĐ</th>
+                            <th colspan="2">{{ number_format($hoadon->thanhtien, 0, ',', '.') }} VNĐ</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -145,13 +141,13 @@
 
             @if($hoadon->trangthai == 'Chờ duyệt')
             <div class="mt-3 d-flex gap-2">
-                <form action="{{ route('admin.hoadon.approve', $hoadon->mahd) }}" method="POST" class="d-inline">
+                <form action="{{ route('quan-ly.hoadon.duyet', $hoadon->mahd) }}" method="POST" class="d-inline">
                     @csrf
                     <button type="submit" class="btn btn-success" onclick="return confirm('Xác nhận duyệt đơn này?')">
                         <i class="fas fa-check"></i> Duyệt đơn
                     </button>
                 </form>
-                <form action="{{ route('admin.hoadon.cancel', $hoadon->mahd) }}" method="POST" class="d-inline">
+                <form action="{{ route('quan-ly.hoadon.huy', $hoadon->mahd) }}" method="POST" class="d-inline">
                     @csrf
                     <button type="submit" class="btn btn-danger" onclick="return confirm('Xác nhận hủy đơn này?')">
                         <i class="fas fa-times"></i> Hủy đơn

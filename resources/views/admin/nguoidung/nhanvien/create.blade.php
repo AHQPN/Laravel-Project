@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.admin.app')
 
 @section('title', 'Thêm Nhân viên')
 
@@ -6,14 +6,14 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Thêm Nhân viên</h2>
-        <a href="{{ route('admin.nguoidung.nhanvien') }}" class="btn btn-secondary">
+        <a href="{{ route('quan-ly.nguoidung.nhanvien') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Quay lại
         </a>
     </div>
 
     <div class="card">
         <div class="card-body">
-            <form action="{{ route('admin.nguoidung.nhanvien.store') }}" method="POST">
+            <form action="{{ route('quan-ly.nguoidung.nhanvien.store') }}" method="POST">
                 @csrf
                 <div class="row">
                     <div class="col-md-6">
@@ -42,7 +42,7 @@
                             <label for="macv" class="form-label">Chức vụ <span class="text-danger">*</span></label>
                             <select class="form-select @error('macv') is-invalid @enderror" id="macv" name="macv" required>
                                 <option value="">-- Chọn chức vụ --</option>
-                                @foreach($chucvu as $cv)
+                                @foreach($chucvus as $cv)
                                     <option value="{{ $cv->macv }}" {{ old('macv') == $cv->macv ? 'selected' : '' }}>
                                         {{ $cv->tencv }}
                                     </option>
@@ -94,7 +94,7 @@
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Lưu
                     </button>
-                    <a href="{{ route('admin.nguoidung.nhanvien') }}" class="btn btn-secondary">
+                    <a href="{{ route('quan-ly.nguoidung.nhanvien') }}" class="btn btn-secondary">
                         <i class="fas fa-times"></i> Hủy
                     </a>
                 </div>

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('loaixe', function (Blueprint $table) {
+        Schema::create('Loaixe', function (Blueprint $table) {
             $table->string('maloai', 3)->primary();
             $table->string('tenloai', 100)->nullable()->charset('utf8mb4')->collation('utf8mb4_unicode_ci');
             $table->integer('soghe')->nullable();
@@ -23,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('loaixe');
+        Schema::dropIfExists('Loaixe');
     }
 };

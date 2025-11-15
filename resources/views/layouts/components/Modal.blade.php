@@ -1,0 +1,5 @@
+<div>
+    @stack('modals')
+</div>
+
+

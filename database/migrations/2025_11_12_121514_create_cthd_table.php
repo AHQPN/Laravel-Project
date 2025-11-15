@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cthd', function (Blueprint $table) {
+        Schema::create('CTHD', function (Blueprint $table) {
             $table->string('mahd', 10);
             $table->string('mave', 10);
             $table->integer('dongia')->nullable();
             
             $table->primary(['mahd', 'mave']);
-            $table->foreign('mahd')->references('mahd')->on('hoadon');
-            $table->foreign('mave')->references('mave')->on('ve');
+            $table->foreign('mahd')->references('mahd')->on('Hoadon');
+            $table->foreign('mave')->references('mave')->on('Ve');
         });
     }
 
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cthd');
+        Schema::dropIfExists('CTHD');
     }
 };

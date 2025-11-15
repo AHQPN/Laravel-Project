@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('chucvu', function (Blueprint $table) {
-            $table->string('macv', 3)->primary();
+        Schema::create('Chucvu', function (Blueprint $table) {
+            $table->string('macv', 10)->primary();
             $table->string('chucvu', 100)->nullable()->charset('utf8mb4')->collation('utf8mb4_unicode_ci');
         });
     }
@@ -22,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('chucvu');
+        Schema::dropIfExists('Chucvu');
     }
 };

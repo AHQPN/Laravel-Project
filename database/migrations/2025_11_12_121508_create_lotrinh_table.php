@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('lotrinh', function (Blueprint $table) {
+        Schema::create('Lotrinh', function (Blueprint $table) {
             $table->string('machuyendi', 15);
             $table->string('matinh', 4);
             $table->integer('trinhtu')->nullable();
             
             $table->primary(['machuyendi', 'matinh']);
-            $table->foreign('machuyendi')->references('machuyendi')->on('chuyendi');
-            $table->foreign('matinh')->references('matinh')->on('tinhthanh');
+            $table->foreign('machuyendi')->references('machuyendi')->on('Chuyendi');
+            $table->foreign('matinh')->references('matinh')->on('TinhThanh');
         });
     }
 
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('lotrinh');
+        Schema::dropIfExists('Lotrinh');
     }
 };

@@ -40,6 +40,26 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        'quanly' => [
+            'driver' => 'session',
+            'provider' => 'nhanviens',
+        ],
+
+        'nhanvien_banve' => [
+            'driver' => 'session',
+            'provider' => 'nhanviens',
+        ],
+
+        'taixe' => [
+            'driver' => 'session',
+            'provider' => 'nhanviens',
+        ],
+
+        'phuxe' => [
+            'driver' => 'session',
+            'provider' => 'nhanviens',
+        ],
     ],
 
     /*
@@ -62,7 +82,12 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' => env('AUTH_MODEL', App\Models\Nhanvien::class),
+        ],
+
+        'nhanviens' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Nhanvien::class,
         ],
 
         // 'users' => [

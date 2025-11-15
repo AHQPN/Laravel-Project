@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.admin.app')
 
 @section('title', 'Thống kê doanh thu')
 
@@ -8,7 +8,7 @@
 
     <div class="card mb-4">
         <div class="card-header">
-            <form action="{{ route('admin.thongke.index') }}" method="GET" class="row g-3">
+            <form action="{{ route('quan-ly.thongke.index') }}" method="GET" class="row g-3">
                 <div class="col-md-3">
                     <label for="start_date" class="form-label">Từ ngày</label>
                     <input type="date" name="start_date" id="start_date" class="form-control" value="{{ request('start_date', date('Y-m-01')) }}">

@@ -16,12 +16,12 @@ class TinhThanhController extends Controller
                         ->orWhere('ten', 'like', "%{$search}%");
         })->paginate(10);
 
-        return view('admin.tinhthanh.index', compact('tinhThanhs', 'search'));
+        return view('admin.TinhThanh.Index', compact('tinhThanhs', 'search'));
     }
 
     public function create()
     {
-        return view('admin.tinhthanh.create');
+        return view('admin.TinhThanh.Create');
     }
 
     public function store(Request $request)
@@ -37,14 +37,14 @@ class TinhThanhController extends Controller
 
         TinhThanh::create($request->all());
 
-        return redirect()->route('admin.tinhthanh.index')
+        return redirect()->route('quan-ly.tinhthanh.index')
             ->with('success', 'Thêm tỉnh thành thành công!');
     }
 
     public function edit($id)
     {
         $tinhThanh = TinhThanh::findOrFail($id);
-        return view('admin.tinhthanh.edit', compact('tinhThanh'));
+        return view('admin.TinhThanh.Edit', compact('tinhThanh'));
     }
 
     public function update(Request $request, $id)
@@ -58,7 +58,7 @@ class TinhThanhController extends Controller
         $tinhThanh = TinhThanh::findOrFail($id);
         $tinhThanh->update($request->only('ten'));
 
-        return redirect()->route('admin.tinhthanh.index')
+        return redirect()->route('quan-ly.tinhthanh.index')
             ->with('success', 'Cập nhật tỉnh thành thành công!');
     }
 
@@ -67,10 +67,10 @@ class TinhThanhController extends Controller
         try {
             $tinhThanh = TinhThanh::findOrFail($id);
             $tinhThanh->delete();
-            return redirect()->route('admin.tinhthanh.index')
+            return redirect()->route('quan-ly.tinhthanh.index')
                 ->with('success', 'Xóa tỉnh thành thành công!');
         } catch (\Exception $e) {
-            return redirect()->route('admin.tinhthanh.index')
+            return redirect()->route('quan-ly.tinhthanh.index')
                 ->with('error', 'Không thể xóa tỉnh thành này!');
         }
     }

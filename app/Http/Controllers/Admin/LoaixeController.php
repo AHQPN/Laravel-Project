@@ -16,12 +16,12 @@ class LoaixeController extends Controller
                         ->orWhere('tenloai', 'like', "%{$search}%");
         })->paginate(10);
 
-        return view('admin.loaixe.index', compact('loaixe', 'search'));
+        return view('admin.LoaiXe.Index', compact('loaixe', 'search'));
     }
 
     public function create()
     {
-        return view('admin.loaixe.create');
+        return view('admin.LoaiXe.Create');
     }
 
     public function store(Request $request)
@@ -40,14 +40,14 @@ class LoaixeController extends Controller
 
         Loaixe::create($request->all());
 
-        return redirect()->route('admin.loaixe.index')
+        return redirect()->route('quan-ly.loaixe.index')
             ->with('success', 'Thêm loại xe thành công!');
     }
 
     public function edit($loaixe)
     {
         $loaixe = Loaixe::findOrFail($loaixe);
-        return view('admin.loaixe.edit', compact('loaixe'));
+        return view('admin.LoaiXe.Edit', compact('loaixe'));
     }
 
     public function update(Request $request, $loaixe)
@@ -64,7 +64,7 @@ class LoaixeController extends Controller
         $loaixe = Loaixe::findOrFail($loaixe);
         $loaixe->update($request->only(['tenloai', 'soghe']));
 
-        return redirect()->route('admin.loaixe.index')
+        return redirect()->route('quan-ly.loaixe.index')
             ->with('success', 'Cập nhật loại xe thành công!');
     }
 
@@ -73,10 +73,10 @@ class LoaixeController extends Controller
         try {
             $loaixe = Loaixe::findOrFail($loaixe);
             $loaixe->delete();
-            return redirect()->route('admin.loaixe.index')
+            return redirect()->route('quan-ly.loaixe.index')
                 ->with('success', 'Xóa loại xe thành công!');
         } catch (\Exception $e) {
-            return redirect()->route('admin.loaixe.index')
+            return redirect()->route('quan-ly.loaixe.index')
                 ->with('error', 'Không thể xóa loại xe này!');
         }
     }

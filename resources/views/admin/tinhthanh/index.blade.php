@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.admin.app')
 
 @section('title', 'Quản lý Tỉnh Thành')
 @section('page-title', 'Quản lý Tỉnh Thành')
@@ -7,7 +7,7 @@
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
         <span><i class="fas fa-map-marker-alt me-2"></i>Danh sách Tỉnh Thành</span>
-        <a href="{{ route('admin.tinhthanh.create') }}" class="btn btn-light btn-sm">
+        <a href="{{ route('quan-ly.tinhthanh.create') }}" class="btn btn-light btn-sm">
             <i class="fas fa-plus me-1"></i>Thêm mới
         </a>
     </div>
@@ -22,7 +22,7 @@
                             <i class="fas fa-search"></i>
                         </button>
                         @if($search)
-                            <a href="{{ route('admin.tinhthanh.index') }}" class="btn btn-secondary">
+                            <a href="{{ route('quan-ly.tinhthanh.index') }}" class="btn btn-secondary">
                                 <i class="fas fa-times"></i>
                             </a>
                         @endif
@@ -33,11 +33,13 @@
 
         <!-- Table -->
         <div class="table-responsive">
-            <table class="table table-hover">
+            <table class="table table-hover sortable-table" 
+                   data-sort-column="{{ $sortParams['sort'] ?? 'matinh' }}"
+                   data-sort-direction="{{ $sortParams['direction'] ?? 'asc' }}">
                 <thead>
                     <tr>
-                        <th width="15%">Mã tỉnh</th>
-                        <th>Tên tỉnh thành</th>
+                        <th width="15%" data-sort="matinh">Mã tỉnh <i class="fas fa-sort"></i></th>
+                        <th data-sort="ten">Tên tỉnh thành <i class="fas fa-sort"></i></th>
                         <th width="20%" class="text-center">Thao tác</th>
                     </tr>
                 </thead>
@@ -47,10 +49,10 @@
                         <td><strong>{{ $tinhThanh->matinh }}</strong></td>
                         <td>{{ $tinhThanh->ten }}</td>
                         <td class="text-center">
-                            <a href="{{ route('admin.tinhthanh.edit', $tinhThanh->matinh) }}" class="btn btn-sm btn-warning">
+                            <a href="{{ route('quan-ly.tinhthanh.edit', $tinhThanh->matinh) }}" class="btn btn-sm btn-warning">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <form action="{{ route('admin.tinhthanh.destroy', $tinhThanh->matinh) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa?')">
+                            <form action="{{ route('quan-ly.tinhthanh.destroy', $tinhThanh->matinh) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-danger">
@@ -72,9 +74,20 @@
         </div>
 
         <!-- Pagination -->
-        <div class="d-flex justify-content-center">
-            {{ $tinhThanhs->links() }}
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="pagination-info">
+                @if($tinhThanhs->total() > 0)
+                    Hiển thị {{ $tinhThanhs->firstItem() }} - {{ $tinhThanhs->lastItem() }} trong {{ $tinhThanhs->total() }} kết quả
+                @endif
+            </div>
+            <div>
+                {{ $tinhThanhs->appends(request()->query())->links() }}
+            </div>
         </div>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/table-sort.js') }}"></script>
+@endpush

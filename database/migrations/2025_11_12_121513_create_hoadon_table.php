@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('hoadon', function (Blueprint $table) {
+        Schema::create('Hoadon', function (Blueprint $table) {
             $table->string('mahd', 10)->primary();
             $table->dateTime('thoigian')->nullable();
             $table->string('makh', 10)->nullable();
@@ -21,9 +21,9 @@ return new class extends Migration
             $table->integer('thanhtien')->nullable();
             $table->string('trangthai', 20)->default('Chờ duyệt');
             
-            $table->foreign('makh')->references('makh')->on('khach');
-            $table->foreign('manv')->references('manv')->on('nhanvien');
-            $table->foreign('matt')->references('matt')->on('thanhtoan');
+            $table->foreign('makh')->references('makh')->on('Khach');
+            $table->foreign('manv')->references('manv')->on('Nhanvien');
+            $table->foreign('matt')->references('matt')->on('Thanhtoan');
         });
     }
 
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('hoadon');
+        Schema::dropIfExists('Hoadon');
     }
 };

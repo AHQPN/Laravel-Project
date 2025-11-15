@@ -73,7 +73,7 @@ class ThongKeController extends Controller
             ->groupBy('thanhtoan.matt', 'thanhtoan.ptthanhtoan')
             ->get();
 
-        return view('admin.thongke.index', compact(
+        return view('admin.ThongKe.Index', compact(
             'startDate',
             'endDate',
             'totalRevenue',

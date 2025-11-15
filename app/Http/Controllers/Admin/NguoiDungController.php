@@ -10,23 +10,28 @@ use App\Models\Chucvu;
 
 class NguoiDungController extends Controller
 {
+
     // Quản lý khách hàng
     public function khach(Request $request)
     {
         $search = $request->get('search');
-        $khachs = Khach::when($search, function($query, $search) {
-            return $query->where('makh', 'like', "%{$search}%")
-                        ->orWhere('ten', 'like', "%{$search}%")
-                        ->orWhere('sdt', 'like', "%{$search}%");
-        })->paginate(10);
+        
+        $query = Khach::query()
+            ->when($search, function($query, $search) {
+                return $query->where('makh', 'like', "%{$search}%")
+                            ->orWhere('ten', 'like', "%{$search}%")
+                            ->orWhere('sdt', 'like', "%{$search}%");
+            });
 
-        return view('admin.nguoidung.index', compact('khachs', 'search'));
+        $khachs = $query->orderBy('makh', 'desc')->paginate(10);
+
+        return view('admin.NguoiDung.Index', compact('khachs', 'search'));
     }
 
     public function khachEdit($id)
     {
         $khach = Khach::findOrFail($id);
-        return view('admin.nguoidung.khach.edit', compact('khach'));
+        return view('admin.NguoiDung.Khach.Edit', compact('khach'));
     }
 
     public function khachUpdate(Request $request, $id)
@@ -42,7 +47,7 @@ class NguoiDungController extends Controller
         $khach = Khach::findOrFail($id);
         $khach->update($request->only(['ten', 'sdt', 'diachi', 'ngaysinh', 'gioitinh']));
 
-        return redirect()->route('admin.nguoidung.khach')
+        return redirect()->route('quan-ly.nguoidung.khach')
             ->with('success', 'Cập nhật khách hàng thành công!');
     }
 
@@ -51,10 +56,10 @@ class NguoiDungController extends Controller
         try {
             $khach = Khach::findOrFail($id);
             $khach->delete();
-            return redirect()->route('admin.nguoidung.khach')
+            return redirect()->route('quan-ly.nguoidung.khach')
                 ->with('success', 'Xóa khách hàng thành công!');
         } catch (\Exception $e) {
-            return redirect()->route('admin.nguoidung.khach')
+            return redirect()->route('quan-ly.nguoidung.khach')
                 ->with('error', 'Không thể xóa khách hàng này!');
         }
     }
@@ -63,20 +68,23 @@ class NguoiDungController extends Controller
     public function nhanvien(Request $request)
     {
         $search = $request->get('search');
-        $nhanviens = Nhanvien::with('chucvu')
+        
+        $query = Nhanvien::with('chucvu')
             ->when($search, function($query, $search) {
                 return $query->where('manv', 'like', "%{$search}%")
                             ->orWhere('ten', 'like', "%{$search}%")
                             ->orWhere('sdt', 'like', "%{$search}%");
-            })->paginate(10);
+            });
 
-        return view('admin.nguoidung.index', compact('nhanviens', 'search'));
+        $nhanviens = $query->orderBy('manv', 'desc')->paginate(10);
+
+        return view('admin.NguoiDung.Index', compact('nhanviens', 'search'));
     }
 
     public function nhanvienCreate()
     {
         $chucvus = Chucvu::all();
-        return view('admin.nguoidung.nhanvien.create', compact('chucvus'));
+        return view('admin.NguoiDung.NhanVien.Create', compact('chucvus'));
     }
 
     public function nhanvienStore(Request $request)
@@ -94,7 +102,7 @@ class NguoiDungController extends Controller
 
         Nhanvien::create($request->all());
 
-        return redirect()->route('admin.nguoidung.nhanvien')
+        return redirect()->route('quan-ly.nguoidung.nhanvien')
             ->with('success', 'Thêm nhân viên thành công!');
     }
 
@@ -102,7 +110,7 @@ class NguoiDungController extends Controller
     {
         $nhanvien = Nhanvien::findOrFail($id);
         $chucvus = Chucvu::all();
-        return view('admin.nguoidung.nhanvien.edit', compact('nhanvien', 'chucvus'));
+        return view('admin.NguoiDung.NhanVien.Edit', compact('nhanvien', 'chucvus'));
     }
 
     public function nhanvienUpdate(Request $request, $id)
@@ -126,7 +134,7 @@ class NguoiDungController extends Controller
 
         $nhanvien->update($data);
 
-        return redirect()->route('admin.nguoidung.nhanvien')
+        return redirect()->route('quan-ly.nguoidung.nhanvien')
             ->with('success', 'Cập nhật nhân viên thành công!');
     }
 
@@ -135,10 +143,10 @@ class NguoiDungController extends Controller
         try {
             $nhanvien = Nhanvien::findOrFail($id);
             $nhanvien->delete();
-            return redirect()->route('admin.nguoidung.nhanvien')
+            return redirect()->route('quan-ly.nguoidung.nhanvien')
                 ->with('success', 'Xóa nhân viên thành công!');
         } catch (\Exception $e) {
-            return redirect()->route('admin.nguoidung.nhanvien')
+            return redirect()->route('quan-ly.nguoidung.nhanvien')
                 ->with('error', 'Không thể xóa nhân viên này!');
         }
     }

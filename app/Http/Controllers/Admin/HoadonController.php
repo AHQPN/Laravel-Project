@@ -14,7 +14,7 @@ class HoadonController extends Controller
         $search = $request->get('search');
         $status = $request->get('status');
         
-        $hoadons = Hoadon::with(['khach', 'nhanvien', 'thanhtoan', 'cthds.ve.chuyendi'])
+        $query = Hoadon::with(['khach', 'nhanvien', 'thanhtoan', 'cthds.ve.chuyendi'])
             ->when($search, function($query, $search) {
                 return $query->where('mahd', 'like', "%{$search}%")
                             ->orWhereHas('khach', function($q) use ($search) {
@@ -23,18 +23,18 @@ class HoadonController extends Controller
             })
             ->when($status, function($query, $status) {
                 return $query->where('trangthai', $status);
-            })
-            ->orderBy('thoigian', 'desc')
-            ->paginate(10);
+            });
 
-        return view('admin.hoadon.index', compact('hoadons', 'search', 'status'));
+        $hoadons = $query->orderBy('thoigian', 'desc')->paginate(10);
+
+        return view('admin.HoaDon.Index', compact('hoadons', 'search', 'status'));
     }
 
     public function show($id)
     {
         $hoadon = Hoadon::with(['khach', 'nhanvien', 'thanhtoan', 'cthds.ve.chuyendi'])
             ->findOrFail($id);
-        return view('admin.hoadon.show', compact('hoadon'));
+        return view('admin.HoaDon.Show', compact('hoadon'));
     }
 
     public function approve($id)
@@ -42,7 +42,7 @@ class HoadonController extends Controller
         $hoadon = Hoadon::findOrFail($id);
         $hoadon->update(['trangthai' => 'Đã duyệt']);
         
-        return redirect()->route('admin.hoadon.index')
+        return redirect()->route('quan-ly.hoadon.index')
             ->with('success', 'Duyệt đơn hàng thành công!');
     }
 
@@ -59,7 +59,7 @@ class HoadonController extends Controller
             }
         }
         
-        return redirect()->route('admin.hoadon.index')
+        return redirect()->route('quan-ly.hoadon.index')
             ->with('success', 'Hủy đơn hàng thành công!');
     }
 
@@ -69,10 +69,10 @@ class HoadonController extends Controller
             $hoadon = Hoadon::findOrFail($id);
             CTHD::where('mahd', $id)->delete();
             $hoadon->delete();
-            return redirect()->route('admin.hoadon.index')
+            return redirect()->route('quan-ly.hoadon.index')
                 ->with('success', 'Xóa đơn hàng thành công!');
         } catch (\Exception $e) {
-            return redirect()->route('admin.hoadon.index')
+            return redirect()->route('quan-ly.hoadon.index')
                 ->with('error', 'Không thể xóa đơn hàng này!');
         }
     }

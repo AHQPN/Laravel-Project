@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('nhanvien', function (Blueprint $table) {
+        Schema::create('Nhanvien', function (Blueprint $table) {
             $table->string('manv', 5)->primary();
-            $table->string('macv', 3)->nullable();
+            $table->string('macv', 10)->nullable();
             $table->string('password', 255)->nullable();
             $table->string('ten', 100)->nullable()->charset('utf8mb4')->collation('utf8mb4_unicode_ci');
             $table->string('sdt', 15)->nullable();
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('hinhanh', 255)->nullable();
             $table->boolean('trangthai')->default(1);
             
-            $table->foreign('macv')->references('macv')->on('chucvu');
+            $table->foreign('macv')->references('macv')->on('Chucvu');
         });
     }
 
@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('nhanvien');
+        Schema::dropIfExists('Nhanvien');
     }
 };

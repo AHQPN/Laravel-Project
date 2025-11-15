@@ -6,11 +6,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class Lotrinh extends Model
 {
-    protected $table = 'lotrinh';
+    protected $table = 'Lotrinh';
     public $incrementing = false;
     public $timestamps = false;
 
-    protected $fillable = ['machuyendi', 'matinh', 'trinhtu'];
+    protected $fillable = [
+        'machuyendi',
+        'matinh',
+        'trinhtu',
+    ];
+
+    protected $casts = [
+        'trinhtu' => 'integer',
+    ];
+
+    // ==================== RELATIONSHIPS ====================
 
     public function chuyendi()
     {

@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.admin.app')
 
 @section('title', 'Sửa Tỉnh Thành')
 @section('page-title', 'Sửa Tỉnh Thành')
@@ -9,7 +9,7 @@
         <i class="fas fa-edit me-2"></i>Sửa Tỉnh Thành
     </div>
     <div class="card-body">
-        <form action="{{ route('admin.tinhthanh.update', $tinhThanh->matinh) }}" method="POST">
+        <form action="{{ route('quan-ly.tinhthanh.update', $tinhThanh->matinh) }}" method="POST">
             @csrf
             @method('PUT')
             
@@ -31,8 +31,8 @@
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save me-1"></i>Cập nhật
                 </button>
-                <a href="{{ route('admin.tinhthanh.index') }}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left me-1"></i>Quay lại
+                <a href="{{ route('quan-ly.tinhthanh.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Quay lại
                 </a>
             </div>
         </form>

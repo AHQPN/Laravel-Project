@@ -1,0 +1,112 @@
+/**
+ * Custom Table Styles
+ * Extends Bootstrap table styles với sorting features
+ */
+
+/* Sortable table headers */
+.sortable-table th[data-sort] {
+    user-select: none;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+}
+
+.sortable-table th[data-sort]:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.sortable-table th[data-sort] i {
+    margin-left: 5px;
+    font-size: 0.85em;
+    transition: color 0.2s ease;
+}
+
+/* Active sort column */
+.sortable-table th.text-primary {
+    background-color: rgba(102, 126, 234, 0.05);
+}
+
+/* Compact table variant */
+.table-compact td,
+.table-compact th {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+}
+
+/* Responsive table wrapper */
+.table-responsive-custom {
+    border-radius: 0.5rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Per-page selector */
+.per-page-selector {
+    width: auto;
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.9rem;
+}
+
+/* Pagination info */
+.pagination-info {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+/* Status badges in tables */
+.table .badge {
+    min-width: 70px;
+}
+
+/* Action buttons in tables */
+.table .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.85rem;
+}
+
+/* Hover effect on table rows */
+.table-hover tbody tr:hover {
+    background-color: rgba(102, 126, 234, 0.03);
+    cursor: pointer;
+}
+
+/* Empty state */
+.table-empty-state {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: #6c757d;
+}
+
+.table-empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+/* Loading state */
+.table-loading {
+    position: relative;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.table-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}

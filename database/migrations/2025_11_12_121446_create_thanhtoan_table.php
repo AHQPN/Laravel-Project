@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('thanhtoan', function (Blueprint $table) {
+        Schema::create('Thanhtoan', function (Blueprint $table) {
             $table->string('matt', 2)->primary();
             $table->string('ptthanhtoan', 50)->nullable()->charset('utf8mb4')->collation('utf8mb4_unicode_ci');
         });
@@ -22,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('thanhtoan');
+        Schema::dropIfExists('Thanhtoan');
     }
 };

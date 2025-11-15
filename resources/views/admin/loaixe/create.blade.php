@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.admin.app')
 
 @section('title', 'Thêm Loại xe')
 
@@ -6,14 +6,14 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Thêm Loại xe</h2>
-        <a href="{{ route('admin.loaixe.index') }}" class="btn btn-secondary">
+        <a href="{{ route('quan-ly.loaixe.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Quay lại
         </a>
     </div>
 
     <div class="card">
         <div class="card-body">
-            <form action="{{ route('admin.loaixe.store') }}" method="POST">
+            <form action="{{ route('quan-ly.loaixe.store') }}" method="POST">
                 @csrf
                 <div class="mb-3">
                     <label for="maloai" class="form-label">Mã Loại xe <span class="text-danger">*</span></label>
@@ -43,7 +43,7 @@
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Lưu
                     </button>
-                    <a href="{{ route('admin.loaixe.index') }}" class="btn btn-secondary">
+                    <a href="{{ route('quan-ly.loaixe.index') }}" class="btn btn-secondary">
                         <i class="fas fa-times"></i> Hủy
                     </a>
                 </div>

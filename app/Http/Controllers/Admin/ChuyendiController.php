@@ -11,25 +11,27 @@ use App\Models\Lotrinh;
 
 class ChuyendiController extends Controller
 {
+
     public function index(Request $request)
     {
         $search = $request->get('search');
-        $chuyendis = Chuyendi::with(['xe.loaixe', 'lotrinhs.tinhthanh'])
+        
+        $query = Chuyendi::with(['xe.loaixe', 'lotrinhs.tinhthanh'])
             ->when($search, function($query, $search) {
                 return $query->where('machuyendi', 'like', "%{$search}%")
                             ->orWhere('tenchuyen', 'like', "%{$search}%");
-            })
-            ->orderBy('thoigiandi', 'desc')
-            ->paginate(10);
+            });
 
-        return view('admin.chuyendi.index', compact('chuyendis', 'search'));
+        $chuyendis = $query->orderBy('thoigiandi', 'desc')->paginate(10);
+
+        return view('admin.ChuyenDi.Index', compact('chuyendis', 'search'));
     }
 
     public function create()
     {
         $xes = Xe::with('loaixe')->get();
         $tinhThanhs = TinhThanh::all();
-        return view('admin.chuyendi.create', compact('xes', 'tinhThanhs'));
+        return view('admin.ChuyenDi.Create', compact('xes', 'tinhThanhs'));
     }
 
     public function store(Request $request)
@@ -73,7 +75,7 @@ class ChuyendiController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.chuyendi.index')
+        return redirect()->route('quan-ly.chuyendi.index')
             ->with('success', 'Thêm chuyến đi thành công!');
     }
 
@@ -82,7 +84,7 @@ class ChuyendiController extends Controller
         $chuyendi = Chuyendi::with('lotrinhs')->findOrFail($id);
         $xes = Xe::with('loaixe')->get();
         $tinhThanhs = TinhThanh::all();
-        return view('admin.chuyendi.edit', compact('chuyendi', 'xes', 'tinhThanhs'));
+        return view('admin.ChuyenDi.Edit', compact('chuyendi', 'xes', 'tinhThanhs'));
     }
 
     public function update(Request $request, $id)
@@ -109,7 +111,7 @@ class ChuyendiController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.chuyendi.index')
+        return redirect()->route('quan-ly.chuyendi.index')
             ->with('success', 'Cập nhật chuyến đi thành công!');
     }
 
@@ -119,10 +121,10 @@ class ChuyendiController extends Controller
             $chuyendi = Chuyendi::findOrFail($id);
             Lotrinh::where('machuyendi', $id)->delete();
             $chuyendi->delete();
-            return redirect()->route('admin.chuyendi.index')
+            return redirect()->route('quan-ly.chuyendi.index')
                 ->with('success', 'Xóa chuyến đi thành công!');
         } catch (\Exception $e) {
-            return redirect()->route('admin.chuyendi.index')
+            return redirect()->route('quan-ly.chuyendi.index')
                 ->with('error', 'Không thể xóa chuyến đi này!');
         }
     }

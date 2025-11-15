@@ -13,20 +13,23 @@ class XeController extends Controller
     public function index(Request $request)
     {
         $search = $request->get('search');
-        $xes = Xe::with(['loaixe', 'taixe'])
+        
+        $query = Xe::with(['loaixe', 'taixe'])
             ->when($search, function($query, $search) {
                 return $query->where('maxe', 'like', "%{$search}%")
                             ->orWhere('soxe', 'like', "%{$search}%");
-            })->paginate(10);
+            });
 
-        return view('admin.xe.index', compact('xes', 'search'));
+        $xes = $query->orderBy('maxe', 'asc')->paginate(10);
+
+        return view('admin.Xe.Index', compact('xes', 'search'));
     }
 
     public function create()
     {
         $loaixes = Loaixe::all();
         $taixe = Nhanvien::where('macv', 'TX')->where('trangthai', 1)->get();
-        return view('admin.xe.create', compact('loaixes', 'taixe'));
+        return view('admin.Xe.Create', compact('loaixes', 'taixe'));
     }
 
     public function store(Request $request)
@@ -46,7 +49,7 @@ class XeController extends Controller
 
         Xe::create($request->all());
 
-        return redirect()->route('admin.xe.index')
+        return redirect()->route('quan-ly.xe.index')
             ->with('success', 'Thêm xe thành công!');
     }
 
@@ -55,7 +58,7 @@ class XeController extends Controller
         $xe = Xe::findOrFail($id);
         $loaixes = Loaixe::all();
         $taixe = Nhanvien::where('macv', 'TX')->where('trangthai', 1)->get();
-        return view('admin.xe.edit', compact('xe', 'loaixes', 'taixe'));
+        return view('admin.Xe.Edit', compact('xe', 'loaixes', 'taixe'));
     }
 
     public function update(Request $request, $id)
@@ -73,7 +76,7 @@ class XeController extends Controller
         $xe = Xe::findOrFail($id);
         $xe->update($request->only(['maloai', 'soxe', 'manv']));
 
-        return redirect()->route('admin.xe.index')
+        return redirect()->route('quan-ly.xe.index')
             ->with('success', 'Cập nhật xe thành công!');
     }
 
@@ -82,10 +85,10 @@ class XeController extends Controller
         try {
             $xe = Xe::findOrFail($id);
             $xe->delete();
-            return redirect()->route('admin.xe.index')
+            return redirect()->route('quan-ly.xe.index')
                 ->with('success', 'Xóa xe thành công!');
         } catch (\Exception $e) {
-            return redirect()->route('admin.xe.index')
+            return redirect()->route('quan-ly.xe.index')
                 ->with('error', 'Không thể xóa xe này!');
         }
     }

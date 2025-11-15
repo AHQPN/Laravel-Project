@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.admin.app')
 
 @section('title', 'Thêm Chuyến đi')
 
@@ -6,14 +6,14 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Thêm Chuyến đi</h2>
-        <a href="{{ route('admin.chuyendi.index') }}" class="btn btn-secondary">
+        <a href="{{ route('quan-ly.chuyendi.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Quay lại
         </a>
     </div>
 
     <div class="card">
         <div class="card-body">
-            <form action="{{ route('admin.chuyendi.store') }}" method="POST">
+            <form action="{{ route('quan-ly.chuyendi.store') }}" method="POST">
                 @csrf
                 <div class="row">
                     <div class="col-md-6">
@@ -114,7 +114,7 @@
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Lưu
                     </button>
-                    <a href="{{ route('admin.chuyendi.index') }}" class="btn btn-secondary">
+                    <a href="{{ route('quan-ly.chuyendi.index') }}" class="btn btn-secondary">
                         <i class="fas fa-times"></i> Hủy
                     </a>
                 </div>

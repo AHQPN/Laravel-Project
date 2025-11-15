@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('chuyendi', function (Blueprint $table) {
+        Schema::create('Chuyendi', function (Blueprint $table) {
             $table->string('machuyendi', 15)->primary();
             $table->string('tenchuyen', 100)->nullable()->charset('utf8mb4')->collation('utf8mb4_unicode_ci');
             $table->string('maxe', 5)->nullable();
@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('thoigiandichuyen')->nullable();
             $table->integer('gia')->nullable();
             
-            $table->foreign('maxe')->references('maxe')->on('xe');
+            $table->foreign('maxe')->references('maxe')->on('Xe');
         });
     }
 
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('chuyendi');
+        Schema::dropIfExists('Chuyendi');
     }
 };

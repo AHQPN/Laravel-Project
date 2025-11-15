@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.admin.app')
 
 @section('title', 'Sửa Xe')
 
@@ -6,14 +6,14 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Sửa Xe</h2>
-        <a href="{{ route('admin.xe.index') }}" class="btn btn-secondary">
+        <a href="{{ route('quan-ly.xe.index') }}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Quay lại
         </a>
     </div>
 
     <div class="card">
         <div class="card-body">
-            <form action="{{ route('admin.xe.update', $xe->maxe) }}" method="POST">
+            <form action="{{ route('quan-ly.xe.update', $xe->maxe) }}" method="POST">
                 @csrf
                 @method('PUT')
                 
@@ -74,7 +74,7 @@
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Cập nhật
                     </button>
-                    <a href="{{ route('admin.xe.index') }}" class="btn btn-secondary">
+                    <a href="{{ route('quan-ly.xe.index') }}" class="btn btn-secondary">
                         <i class="fas fa-times"></i> Hủy
                     </a>
                 </div>

@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.admin.app')
 
 @section('title', 'Quản lý Loại xe')
 
@@ -6,7 +6,7 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Quản lý Loại xe</h2>
-        <a href="{{ route('admin.loaixe.create') }}" class="btn btn-primary">
+        <a href="{{ route('quan-ly.loaixe.create') }}" class="btn btn-primary">
             <i class="fas fa-plus"></i> Thêm Loại xe
         </a>
     </div>
@@ -20,7 +20,7 @@
 
     <div class="card">
         <div class="card-header">
-            <form action="{{ route('admin.loaixe.index') }}" method="GET" class="row g-3">
+            <form action="{{ route('quan-ly.loaixe.index') }}" method="GET" class="row g-3">
                 <div class="col-md-4">
                     <input type="text" name="search" class="form-control" placeholder="Tìm kiếm loại xe..." value="{{ request('search') }}">
                 </div>
@@ -33,12 +33,14 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-striped table-hover">
+                <table class="table table-striped table-hover sortable-table" 
+                       data-sort-column="{{ $sortParams['sort'] ?? 'maloai' }}"
+                       data-sort-direction="{{ $sortParams['direction'] ?? 'asc' }}">
                     <thead>
                         <tr>
-                            <th>Mã Loại xe</th>
-                            <th>Tên Loại xe</th>
-                            <th>Số ghế</th>
+                            <th data-sort="maloai">Mã Loại xe <i class="fas fa-sort"></i></th>
+                            <th data-sort="tenloai">Tên Loại xe <i class="fas fa-sort"></i></th>
+                            <th data-sort="soghe">Số ghế <i class="fas fa-sort"></i></th>
                             <th class="text-center">Thao tác</th>
                         </tr>
                     </thead>
@@ -49,10 +51,10 @@
                             <td>{{ $item->tenloai }}</td>
                             <td>{{ $item->soghe }}</td>
                             <td class="text-center">
-                                <a href="{{ route('admin.loaixe.edit', $item->maloai) }}" class="btn btn-sm btn-warning">
+                                <a href="{{ route('quan-ly.loaixe.edit', $item->maloai) }}" class="btn btn-sm btn-warning">
                                     <i class="fas fa-edit"></i> Sửa
                                 </a>
-                                <form action="{{ route('admin.loaixe.destroy', $item->maloai) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?')">
+                                <form action="{{ route('quan-ly.loaixe.destroy', $item->maloai) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-danger">
@@ -69,10 +71,21 @@
                     </tbody>
                 </table>
             </div>
-            <div class="mt-3">
-                {{ $loaixe->links() }}
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div class="pagination-info">
+                    @if($loaixe->total() > 0)
+                        Hiển thị {{ $loaixe->firstItem() }} - {{ $loaixe->lastItem() }} trong {{ $loaixe->total() }} kết quả
+                    @endif
+                </div>
+                <div>
+                    {{ $loaixe->appends(request()->query())->links() }}
+                </div>
             </div>
         </div>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/table-sort.js') }}"></script>
+@endpush

@@ -57,9 +57,6 @@ class TicketController extends Controller
         return view('ticket.book_ticket', compact('trip', 'userInfo', 'takenSeats'));
     }
 
-    /**
-     * ✅ Xử lý đặt vé - LƯU VÀO SESSION PERSISTENT
-     */
     public function handleBookTicket(Request $request)
     {
         try {
@@ -118,6 +115,9 @@ class TicketController extends Controller
                                 'pending_expires_at' => $pendingTime
                             ]
                         );
+                        
+                        event(new \App\Events\SeatBooked($tripID, $seat, 'Pending'));
+                        
                         $bookedSeats[] = $seat;
                     }
                 }
@@ -129,14 +129,13 @@ class TicketController extends Controller
                     ->with('messageType', 'danger');
             }
 
-            // Nếu có ghế đặt thất bại
+
             if (!empty($failedSeats)) {
                 return redirect()->route('ticket.book', ['tripID' => $tripID])
                     ->with('message', 'Ghế: ' . implode(', ', $failedSeats) . ' đã bị đặt. Vui lòng chọn lại.')
                     ->with('messageType', 'danger');
             }
 
-            //  LƯU VÀO SESSION (PERSISTENT)
             if (!empty($bookedSeats)) {
                 // Lưu session với save() để đảm bảo dữ liệu được ghi
                 session([
@@ -150,7 +149,7 @@ class TicketController extends Controller
                     ]
                 ]);
 
-                session()->save(); // Force save session
+                session()->save();
 
                 return redirect()->route('ticket.thanhToan');
             }
@@ -170,22 +169,15 @@ class TicketController extends Controller
         }
     }
 
-    /**
-     * ✅ Hiển thị trang thanh toán - LẤY TỪ SESSION PERSISTENT
-     */
     public function thanhToan(Request $request)
     {
-        // Lấy data từ session persistent
         $bookingData = session('booking_temp');
-
-        // Kiểm tra có data không
         if (!$bookingData) {
             return redirect()->route('ticket.find')
                 ->with('message', 'Phiên đặt vé đã hết hạn. Vui lòng đặt lại.')
                 ->with('messageType', 'danger');
         }
 
-        // Kiểm tra thời gian hết hạn
         if (isset($bookingData['expires_at']) && Carbon::now()->timestamp > $bookingData['expires_at']) {
             session()->forget('booking_temp');
             return redirect()->route('ticket.find')
@@ -202,7 +194,6 @@ class TicketController extends Controller
             $trip = Chuyendi::with(['xe.loaixe'])->findOrFail($tripID);
             $seatList = explode(',', $seats);
 
-            // Kiểm tra vé còn pending không
             $bookedTickets = Ve::where('machuyendi', $trip->machuyendi)
                 ->whereIn('maghe', $seatList)
                 ->where('trangthai', 'Pending')
@@ -233,9 +224,6 @@ class TicketController extends Controller
         }
     }
 
-    /**
-     * ✅ Xử lý xác nhận thanh toán hoặc hủy
-     */
     public function paymentConfirm(Request $request)
     {
         $tripID = $request->input('tripID');
@@ -246,7 +234,6 @@ class TicketController extends Controller
         try {
             $trip = Chuyendi::findOrFail($tripID);
 
-            // --- 1. LOGIC HỦY ĐẶT VÉ ---
             if ($action == 'cancel') {
                 Ve::where('machuyendi', $tripID)
                     ->whereIn('maghe', $seatList)
@@ -261,7 +248,6 @@ class TicketController extends Controller
                     ->with('messageType', 'info');
             }
 
-            // --- 2. LOGIC XÁC NHẬN THANH TOÁN ---
             DB::beginTransaction();
             try {
                 $tickets = Ve::where('machuyendi', $tripID)
@@ -278,8 +264,10 @@ class TicketController extends Controller
                         ->with('messageType', 'danger');
                 }
 
-                Ve::whereIn('mave', $tickets->pluck('mave'))
-                    ->update(['trangthai' => 'Booked', 'pending_expires_at' => null]);
+                foreach ($tickets as $ticket) {
+                    $ticket->update(['trangthai' => 'Booked', 'pending_expires_at' => null]);
+                    event(new \App\Events\SeatBooked($tripID, $ticket->maghe, 'Booked'));
+                }
 
                 $trip->decrement('SLgheconlai', $tickets->count());
 
@@ -324,9 +312,6 @@ class TicketController extends Controller
         }
     }
 
-    /**
-     * ✅ Trang thành công
-     */
     public function paymentSuccess(Request $request)
     {
         $billID = $request->input('billID');
@@ -349,7 +334,6 @@ class TicketController extends Controller
         }
     }
 
-    // --- CÁC HÀM CŨ ---
     public function bookingResult(Request $request)
     {
         $bookingResult = Session::get('bookingResult');

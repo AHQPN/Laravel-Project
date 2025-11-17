@@ -67,7 +67,7 @@
                     <i class="fas fa-receipt"></i>
                 </div>
                 <div class="stat-content">
-                    <div class="stat-value">{{ $hoadons->total() }}</div>
+                    <div class="stat-value"><span data-pagination-info="hoadon-table">{{ $hoadons->count() }}</span></div>
                     <div class="stat-label">Tổng đơn</div>
                 </div>
             </div>
@@ -114,14 +114,24 @@
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+                <table class="table table-hover align-middle mb-0" id="hoadon-table">
                     <thead class="table-light">
                         <tr>
-                            <th class="px-3 py-3" style="width: 120px;">Mã HĐ</th>
-                            <th class="px-3 py-3" style="width: 200px;">Khách hàng</th>
-                            <th class="px-3 py-3 d-none d-md-table-cell" style="width: 130px;">Ngày đặt</th>
-                            <th class="px-3 py-3 text-end" style="width: 140px;">Tổng tiền</th>
-                            <th class="px-3 py-3 text-center" style="width: 130px;">Trạng thái</th>
+                            <th class="px-3 py-3 sortable" data-sort="mahd" style="width: 120px; cursor: pointer;">
+                                Mã HĐ <i class="fas fa-sort ms-1 text-muted"></i>
+                            </th>
+                            <th class="px-3 py-3 sortable" data-sort="ten" style="width: 200px; cursor: pointer;">
+                                Khách hàng <i class="fas fa-sort ms-1 text-muted"></i>
+                            </th>
+                            <th class="px-3 py-3 sortable d-none d-md-table-cell" data-sort="thoigian" style="width: 130px; cursor: pointer;">
+                                Ngày đặt <i class="fas fa-sort ms-1 text-muted"></i>
+                            </th>
+                            <th class="px-3 py-3 sortable text-end" data-sort="thanhtien" style="width: 140px; cursor: pointer;">
+                                Tổng tiền <i class="fas fa-sort ms-1 text-muted"></i>
+                            </th>
+                            <th class="px-3 py-3 sortable text-center" data-sort="trangthai" style="width: 130px; cursor: pointer;">
+                                Trạng thái <i class="fas fa-sort ms-1 text-muted"></i>
+                            </th>
                             <th class="px-3 py-3 text-center" style="width: 180px;">Thao tác</th>
                         </tr>
                     </thead>
@@ -290,91 +300,7 @@
         </div>
         
         <!-- Pagination Footer -->
-        @if($hoadons->total() > 0)
-        <div class="card-footer bg-white border-top py-3">
-            <div class="row align-items-center g-3">
-                <div class="col-md-6">
-                    <div class="text-muted small">
-                        Hiển thị <strong>{{ $hoadons->firstItem() }}</strong> - <strong>{{ $hoadons->lastItem() }}</strong> 
-                        trong tổng số <strong>{{ $hoadons->total() }}</strong> kết quả
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination pagination-sm justify-content-md-end justify-content-center mb-0">
-                            {{-- Previous Button --}}
-                            @if ($hoadons->onFirstPage())
-                                <li class="page-item disabled">
-                                    <span class="page-link"><i class="fas fa-chevron-left"></i></span>
-                                </li>
-                            @else
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ $hoadons->appends(request()->query())->previousPageUrl() }}">
-                                        <i class="fas fa-chevron-left"></i>
-                                    </a>
-                                </li>
-                            @endif
-
-                            {{-- Page Numbers --}}
-                            @php
-                                $start = max($hoadons->currentPage() - 2, 1);
-                                $end = min($start + 4, $hoadons->lastPage());
-                                $start = max($end - 4, 1);
-                            @endphp
-
-                            {{-- First Page --}}
-                            @if($start > 1)
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ $hoadons->appends(request()->query())->url(1) }}">1</a>
-                                </li>
-                                @if($start > 2)
-                                    <li class="page-item disabled"><span class="page-link">...</span></li>
-                                @endif
-                            @endif
-
-                            {{-- Page Range --}}
-                            @for ($i = $start; $i <= $end; $i++)
-                                @if ($i == $hoadons->currentPage())
-                                    <li class="page-item active">
-                                        <span class="page-link">{{ $i }}</span>
-                                    </li>
-                                @else
-                                    <li class="page-item">
-                                        <a class="page-link" href="{{ $hoadons->appends(request()->query())->url($i) }}">{{ $i }}</a>
-                                    </li>
-                                @endif
-                            @endfor
-
-                            {{-- Last Page --}}
-                            @if($end < $hoadons->lastPage())
-                                @if($end < $hoadons->lastPage() - 1)
-                                    <li class="page-item disabled"><span class="page-link">...</span></li>
-                                @endif
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ $hoadons->appends(request()->query())->url($hoadons->lastPage()) }}">
-                                        {{ $hoadons->lastPage() }}
-                                    </a>
-                                </li>
-                            @endif
-
-                            {{-- Next Button --}}
-                            @if ($hoadons->hasMorePages())
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ $hoadons->appends(request()->query())->nextPageUrl() }}">
-                                        <i class="fas fa-chevron-right"></i>
-                                    </a>
-                                </li>
-                            @else
-                                <li class="page-item disabled">
-                                    <span class="page-link"><i class="fas fa-chevron-right"></i></span>
-                                </li>
-                            @endif
-                        </ul>
-                    </nav>
-                </div>
-            </div>
-        </div>
-        @endif
+        <div class="card-footer bg-white border-top py-3" id="hoadon-pagination"></div>
     </div>
 </div>
 
@@ -456,6 +382,21 @@
         color: #495057;
         border-bottom: 2px solid #dee2e6;
     }
+    .table thead th.sortable {
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.2s ease;
+    }
+    .table thead th.sortable:hover {
+        background-color: #e9ecef;
+        color: #667eea;
+    }
+    .table thead th.sort-asc,
+    .table thead th.sort-desc {
+        background-color: #e9ecef;
+        color: #667eea;
+        font-weight: 600;
+    }
     .order-row:hover {
         background-color: #f8f9fa;
     }
@@ -520,7 +461,98 @@
 @endsection
 
 @push('scripts')
+<script src="{{ asset('js/pagination.js') }}"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize JS Pagination
+        const hoadonPagination = new Pagination({
+            tableId: 'hoadon-table',
+            paginationId: 'hoadon-pagination',
+            itemsPerPage: 10
+        });
+
+        // Table Sorting
+        const table = document.getElementById('hoadon-table');
+        const headers = table.querySelectorAll('th.sortable');
+        let currentSort = { column: null, direction: 'asc' };
+
+        headers.forEach(header => {
+            header.addEventListener('click', () => {
+                const sortType = header.getAttribute('data-sort');
+                const tbody = table.querySelector('tbody');
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+
+                if (currentSort.column === sortType) {
+                    currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSort.column = sortType;
+                    currentSort.direction = 'asc';
+                }
+
+                // Remove previous sort indicators
+                headers.forEach(h => {
+                    h.classList.remove('sort-asc', 'sort-desc');
+                    const icon = h.querySelector('i');
+                    if (icon) {
+                        icon.className = 'fas fa-sort ms-1 text-muted';
+                    }
+                });
+
+                // Add sort indicator to current header
+                header.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+                const icon = header.querySelector('i');
+                if (icon) {
+                    icon.className = `fas fa-sort-${currentSort.direction === 'asc' ? 'up' : 'down'} ms-1 text-primary`;
+                }
+
+                // Sort rows
+                rows.sort((a, b) => {
+                    let aValue, bValue;
+
+                    switch(sortType) {
+                        case 'mahd':
+                            aValue = a.cells[0]?.textContent.trim() || '';
+                            bValue = b.cells[0]?.textContent.trim() || '';
+                            break;
+                        case 'ten':
+                            aValue = a.cells[1]?.querySelector('.fw-medium')?.textContent.trim() || '';
+                            bValue = b.cells[1]?.querySelector('.fw-medium')?.textContent.trim() || '';
+                            break;
+                        case 'thoigian':
+                            aValue = new Date(a.cells[2]?.textContent || '').getTime();
+                            bValue = new Date(b.cells[2]?.textContent || '').getTime();
+                            break;
+                        case 'thanhtien':
+                            aValue = parseInt(a.cells[3]?.textContent.replace(/\D/g, '')) || 0;
+                            bValue = parseInt(b.cells[3]?.textContent.replace(/\D/g, '')) || 0;
+                            break;
+                        case 'trangthai':
+                            aValue = a.cells[4]?.textContent.trim() || '';
+                            bValue = b.cells[4]?.textContent.trim() || '';
+                            break;
+                        default:
+                            return 0;
+                    }
+
+                    if (typeof aValue === 'string') {
+                        return currentSort.direction === 'asc'
+                            ? aValue.localeCompare(bValue, 'vi')
+                            : bValue.localeCompare(aValue, 'vi');
+                    } else {
+                        return currentSort.direction === 'asc' ? aValue - bValue : bValue - aValue;
+                    }
+                });
+
+                // Re-render table
+                rows.forEach(row => tbody.appendChild(row));
+
+                // Reset pagination
+                hoadonPagination.currentPage = 1;
+                hoadonPagination.render();
+            });
+        });
+    });
+
     // Auto dismiss alerts after 5 seconds
     setTimeout(function() {
         const alerts = document.querySelectorAll('.alert');

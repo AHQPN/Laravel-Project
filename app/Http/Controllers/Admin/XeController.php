@@ -20,7 +20,7 @@ class XeController extends Controller
                             ->orWhere('soxe', 'like', "%{$search}%");
             });
 
-        $xes = $query->orderBy('maxe', 'asc')->paginate(10);
+        $xes = $query->orderBy('maxe', 'asc')->get();
 
         return view('admin.Xe.Index', compact('xes', 'search'));
     }

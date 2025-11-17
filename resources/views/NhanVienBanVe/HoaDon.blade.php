@@ -65,7 +65,7 @@
                     Danh sách hóa đơn
                 </h5>
                 <span class="badge bg-primary-subtle text-primary px-3 py-2">
-                    <i class="fas fa-list me-1"></i> Tổng: {{ $hoadons->total() }} hóa đơn
+                    <i class="fas fa-list me-1"></i> Tổng: <span data-pagination-info="invoice-table">{{ $hoadons->count() }} hóa đơn</span>
                 </span>
             </div>
         </div>
@@ -178,98 +178,7 @@
         </div>
 
         {{-- ====== PAGINATION ====== --}}
-        @if($hoadons->hasPages())
-        <div class="card-footer bg-white border-top">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 py-2">
-                <!-- Thông tin hiển thị -->
-                <div class="text-muted small">
-                    Hiển thị
-                    <span class="fw-semibold text-primary">{{ $hoadons->firstItem() ?? 0 }}</span>
-                    –
-                    <span class="fw-semibold text-primary">{{ $hoadons->lastItem() ?? 0 }}</span>
-                    trong tổng số
-                    <span class="fw-semibold text-primary">{{ $hoadons->total() }}</span> hóa đơn
-                </div>
-
-                <!-- Pagination controls -->
-                <nav aria-label="Pagination Navigation">
-                    <!-- Mobile pagination -->
-                    <div class="d-flex d-sm-none gap-2">
-                        @if ($hoadons->onFirstPage())
-                            <span class="btn btn-sm btn-outline-secondary disabled">
-                                <i class="fas fa-chevron-left me-1"></i> Trước
-                            </span>
-                        @else
-                            <a href="{{ $hoadons->previousPageUrl() }}" class="btn btn-sm btn-outline-primary">
-                                <i class="fas fa-chevron-left me-1"></i> Trước
-                            </a>
-                        @endif
-
-                        @if ($hoadons->hasMorePages())
-                            <a href="{{ $hoadons->nextPageUrl() }}" class="btn btn-sm btn-outline-primary">
-                                Sau <i class="fas fa-chevron-right ms-1"></i>
-                            </a>
-                        @else
-                            <span class="btn btn-sm btn-outline-secondary disabled">
-                                Sau <i class="fas fa-chevron-right ms-1"></i>
-                            </span>
-                        @endif
-                    </div>
-
-                    <!-- Desktop pagination -->
-                    <div class="d-none d-sm-flex align-items-center gap-3">
-                        <div class="text-sm text-muted me-2">
-                            Trang
-                            <span class="fw-semibold text-primary">{{ $hoadons->currentPage() }}</span>
-                            /
-                            <span class="fw-semibold text-primary">{{ $hoadons->lastPage() }}</span>
-                        </div>
-
-                        <ul class="pagination pagination-sm mb-0">
-                            <!-- Previous button -->
-                            @if ($hoadons->onFirstPage())
-                                <li class="page-item disabled">
-                                    <span class="page-link"><i class="fas fa-chevron-left"></i></span>
-                                </li>
-                            @else
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ $hoadons->previousPageUrl() }}" rel="prev">
-                                        <i class="fas fa-chevron-left"></i>
-                                    </a>
-                                </li>
-                            @endif
-
-                            <!-- Page Numbers -->
-                            @foreach ($hoadons->getUrlRange(1, $hoadons->lastPage()) as $page => $url)
-                                @if ($page == $hoadons->currentPage())
-                                    <li class="page-item active">
-                                        <span class="page-link">{{ $page }}</span>
-                                    </li>
-                                @else
-                                    <li class="page-item">
-                                        <a class="page-link" href="{{ $url }}">{{ $page }}</a>
-                                    </li>
-                                @endif
-                            @endforeach
-
-                            <!-- Next button -->
-                            @if ($hoadons->hasMorePages())
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ $hoadons->nextPageUrl() }}" rel="next">
-                                        <i class="fas fa-chevron-right"></i>
-                                    </a>
-                                </li>
-                            @else
-                                <li class="page-item disabled">
-                                    <span class="page-link"><i class="fas fa-chevron-right"></i></span>
-                                </li>
-                            @endif
-                        </ul>
-                    </div>
-                </nav>
-            </div>
-        </div>
-        @endif
+        <div class="card-footer bg-white border-top" id="invoice-pagination"></div>
     </div>
 </div>
 @endsection
@@ -470,8 +379,16 @@
 @endpush
 
 @push('scripts')
+<script src="{{ asset('js/pagination.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize JS Pagination
+    const invoicePagination = new Pagination({
+        tableId: 'invoice-table',
+        paginationId: 'invoice-pagination',
+        itemsPerPage: 10
+    });
+
     // Table sorting functionality
     const table = document.getElementById('invoice-table');
     const headers = table.querySelectorAll('thead th');

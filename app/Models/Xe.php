@@ -12,7 +12,7 @@ class Xe extends Model
     protected $keyType = 'string';
     public $timestamps = false;
 
-    protected $fillable = ['maxe', 'maloai', 'soxe', 'manv', 'manvpx', 'trangthai'];
+    protected $fillable = ['maxe', 'maloai', 'soxe', 'manv', 'trangthai'];
 
     protected $casts = [
         'trangthai' => 'boolean',
@@ -30,11 +30,6 @@ class Xe extends Model
     public function taixe()
     {
         return $this->belongsTo(Nhanvien::class, 'manv', 'manv');
-    }
-
-    public function phuxe()
-    {
-        return $this->belongsTo(Nhanvien::class, 'manvpx', 'manv');
     }
 
     public function chuyendis()

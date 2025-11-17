@@ -81,14 +81,11 @@
         <div class="card-header bg-white border-bottom py-3">
             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
                 <h5 class="mb-0 fw-semibold">
-                    <i class="fas fa-list me-2 text-info"></i>Danh sách chuyến đi
+                    <i class="fas fa-route me-2 text-primary"></i>Danh sách chuyến đi
                 </h5>
-                @if($chuyendis->total() > 0)
-                    <span class="badge bg-primary-subtle text-primary px-3 py-2">
-                        <i class="fas fa-database me-1"></i>
-                        Tổng: {{ $chuyendis->total() }} chuyến
-                    </span>
-                @endif
+                <span class="badge bg-primary-subtle text-primary px-3 py-2">
+                    <i class="fas fa-list me-1"></i> <span data-pagination-info="chuyendi-table">{{ $chuyendis->count() }} chuyến</span>
+                </span>
             </div>
         </div>
 
@@ -252,113 +249,7 @@
         </div>
 
         <!-- Pagination Footer -->
-        @if($chuyendis->hasPages())
-        <div class="card-footer bg-white border-top">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 py-2">
-                <!-- Pagination Info -->
-                <div class="pagination-info text-muted small">
-                    @if($chuyendis->total() > 0)
-                        Hiển thị 
-                        <span class="fw-semibold text-primary">{{ $chuyendis->firstItem() }}</span>
-                        -
-                        <span class="fw-semibold text-primary">{{ $chuyendis->lastItem() }}</span>
-                        trong tổng số
-                        <span class="fw-semibold text-primary">{{ $chuyendis->total() }}</span>
-                        chuyến đi
-                    @endif
-                </div>
-
-                <!-- Pagination Links -->
-                <nav aria-label="Pagination">
-                    @php
-                        $currentPage = $chuyendis->currentPage();
-                        $lastPage = $chuyendis->lastPage();
-                        
-                        if ($lastPage <= 7) {
-                            $startPage = 1;
-                            $endPage = $lastPage;
-                        } else {
-                            if ($currentPage <= 3) {
-                                $startPage = 1;
-                                $endPage = 5;
-                            } elseif ($currentPage >= $lastPage - 2) {
-                                $startPage = $lastPage - 4;
-                                $endPage = $lastPage;
-                            } else {
-                                $startPage = $currentPage - 2;
-                                $endPage = $currentPage + 2;
-                            }
-                        }
-                    @endphp
-
-                    <ul class="pagination pagination-sm mb-0">
-                        <!-- Previous Button -->
-                        @if ($chuyendis->onFirstPage())
-                            <li class="page-item disabled">
-                                <span class="page-link"><i class="fas fa-chevron-left"></i></span>
-                            </li>
-                        @else
-                            <li class="page-item">
-                                <a class="page-link" href="{{ $chuyendis->appends(request()->query())->previousPageUrl() }}">
-                                    <i class="fas fa-chevron-left"></i>
-                                </a>
-                            </li>
-                        @endif
-
-                        <!-- First Page -->
-                        @if ($startPage > 1)
-                            <li class="page-item">
-                                <a class="page-link" href="{{ $chuyendis->appends(request()->query())->url(1) }}">1</a>
-                            </li>
-                            @if ($startPage > 2)
-                                <li class="page-item disabled">
-                                    <span class="page-link">...</span>
-                                </li>
-                            @endif
-                        @endif
-
-                        <!-- Page Numbers -->
-                        @for ($page = $startPage; $page <= $endPage; $page++)
-                            @if ($page == $currentPage)
-                                <li class="page-item active">
-                                    <span class="page-link">{{ $page }}</span>
-                                </li>
-                            @else
-                                <li class="page-item">
-                                    <a class="page-link" href="{{ $chuyendis->appends(request()->query())->url($page) }}">{{ $page }}</a>
-                                </li>
-                            @endif
-                        @endfor
-
-                        <!-- Last Page -->
-                        @if ($endPage < $lastPage)
-                            @if ($endPage < $lastPage - 1)
-                                <li class="page-item disabled">
-                                    <span class="page-link">...</span>
-                                </li>
-                            @endif
-                            <li class="page-item">
-                                <a class="page-link" href="{{ $chuyendis->appends(request()->query())->url($lastPage) }}">{{ $lastPage }}</a>
-                            </li>
-                        @endif
-
-                        <!-- Next Button -->
-                        @if ($chuyendis->hasMorePages())
-                            <li class="page-item">
-                                <a class="page-link" href="{{ $chuyendis->appends(request()->query())->nextPageUrl() }}">
-                                    <i class="fas fa-chevron-right"></i>
-                                </a>
-                            </li>
-                        @else
-                            <li class="page-item disabled">
-                                <span class="page-link"><i class="fas fa-chevron-right"></i></span>
-                            </li>
-                        @endif
-                    </ul>
-                </nav>
-            </div>
-        </div>
-        @endif
+        <div class="card-footer bg-white border-top" id="chuyendi-pagination"></div>
     </div>
 </div>
 
@@ -515,6 +406,14 @@ html, body {
 #chuyendi-table thead th.sortable:hover {
     background: #e9ecef;
     color: #667eea;
+    transition: all 0.2s ease;
+}
+
+#chuyendi-table thead th.sort-asc,
+#chuyendi-table thead th.sort-desc {
+    background-color: #e9ecef;
+    color: #667eea;
+    font-weight: 600;
 }
 
 #chuyendi-table tbody td {
@@ -669,9 +568,97 @@ html, body {
 @endpush
 
 @push('scripts')
-<script src="{{ asset('js/table-sort.js') }}"></script>
+<script src="{{ asset('js/pagination.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize JS Pagination
+    const chuyendiPagination = new Pagination({
+        tableId: 'chuyendi-table',
+        paginationId: 'chuyendi-pagination',
+        itemsPerPage: 10
+    });
+
+    // Table Sorting
+    const table = document.getElementById('chuyendi-table');
+    const headers = table.querySelectorAll('th.sortable');
+    let currentSort = { column: null, direction: 'asc' };
+
+    headers.forEach(header => {
+        header.addEventListener('click', () => {
+            const sortType = header.getAttribute('data-sort');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            if (currentSort.column === sortType) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = sortType;
+                currentSort.direction = 'asc';
+            }
+
+            // Remove previous sort indicators
+            headers.forEach(h => {
+                h.classList.remove('sort-asc', 'sort-desc');
+                const icon = h.querySelector('i');
+                if (icon) {
+                    icon.className = 'fas fa-sort ms-1 text-muted';
+                }
+            });
+
+            // Add sort indicator to current header
+            header.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+            const icon = header.querySelector('i');
+            if (icon) {
+                icon.className = `fas fa-sort-${currentSort.direction === 'asc' ? 'up' : 'down'} ms-1 text-primary`;
+            }
+
+            // Sort rows
+            rows.sort((a, b) => {
+                let aValue, bValue;
+
+                switch(sortType) {
+                    case 'machuyendi':
+                        aValue = a.cells[0].textContent.trim();
+                        bValue = b.cells[0].textContent.trim();
+                        break;
+                    case 'maxe':
+                        aValue = a.cells[1].textContent.trim();
+                        bValue = b.cells[1].textContent.trim();
+                        break;
+                    case 'thoigiandi':
+                        aValue = new Date(a.cells[2]?.querySelector('.fw-semibold')?.textContent || '').getTime();
+                        bValue = new Date(b.cells[2]?.querySelector('.fw-semibold')?.textContent || '').getTime();
+                        break;
+                    case 'gia':
+                        aValue = parseInt(a.cells[3]?.textContent.replace(/\D/g, '')) || 0;
+                        bValue = parseInt(b.cells[3]?.textContent.replace(/\D/g, '')) || 0;
+                        break;
+                    case 'SLgheconlai':
+                        aValue = parseInt(a.cells[4]?.querySelector('.fw-bold')?.textContent) || 0;
+                        bValue = parseInt(b.cells[4]?.querySelector('.fw-bold')?.textContent) || 0;
+                        break;
+                    default:
+                        return 0;
+                }
+
+                if (typeof aValue === 'string') {
+                    return currentSort.direction === 'asc'
+                        ? aValue.localeCompare(bValue, 'vi')
+                        : bValue.localeCompare(aValue, 'vi');
+                } else {
+                    return currentSort.direction === 'asc' ? aValue - bValue : bValue - aValue;
+                }
+            });
+
+            // Re-render table
+            rows.forEach(row => tbody.appendChild(row));
+
+            // Reset pagination
+            chuyendiPagination.currentPage = 1;
+            chuyendiPagination.render();
+        });
+    });
+
     let deleteId = null;
     const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
     

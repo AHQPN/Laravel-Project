@@ -33,13 +33,11 @@
 
         <!-- Table -->
         <div class="table-responsive">
-            <table class="table table-hover sortable-table" 
-                   data-sort-column="{{ $sortParams['sort'] ?? 'matinh' }}"
-                   data-sort-direction="{{ $sortParams['direction'] ?? 'asc' }}">
+            <table class="table table-hover" id="tinhthanh-table">
                 <thead>
                     <tr>
-                        <th width="15%" data-sort="matinh">Mã tỉnh <i class="fas fa-sort"></i></th>
-                        <th data-sort="ten">Tên tỉnh thành <i class="fas fa-sort"></i></th>
+                        <th width="15%" class="sortable" data-sort="matinh" style="cursor: pointer;">Mã tỉnh <i class="fas fa-sort ms-1 text-muted"></i></th>
+                        <th class="sortable" data-sort="ten" style="cursor: pointer;">Tên tỉnh thành <i class="fas fa-sort ms-1 text-muted"></i></th>
                         <th width="20%" class="text-center">Thao tác</th>
                     </tr>
                 </thead>
@@ -74,20 +72,105 @@
         </div>
 
         <!-- Pagination -->
-        <div class="d-flex justify-content-between align-items-center mt-3">
-            <div class="pagination-info">
-                @if($tinhThanhs->total() > 0)
-                    Hiển thị {{ $tinhThanhs->firstItem() }} - {{ $tinhThanhs->lastItem() }} trong {{ $tinhThanhs->total() }} kết quả
-                @endif
-            </div>
-            <div>
-                {{ $tinhThanhs->appends(request()->query())->links() }}
-            </div>
-        </div>
+        <div class="mt-3" id="tinhthanh-pagination"></div>
     </div>
 </div>
 @endsection
 
+@push('styles')
+<style>
+    #tinhthanh-table thead th.sortable {
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.2s ease;
+    }
+    #tinhthanh-table thead th.sortable:hover {
+        background-color: #e9ecef;
+        color: #667eea;
+    }
+    #tinhthanh-table thead th.sort-asc,
+    #tinhthanh-table thead th.sort-desc {
+        background-color: #e9ecef;
+        color: #667eea;
+        font-weight: 600;
+    }
+</style>
+@endpush
+
 @push('scripts')
-<script src="{{ asset('js/table-sort.js') }}"></script>
+<script src="{{ asset('js/pagination.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tinthanPagination = new Pagination({
+        tableId: 'tinhthanh-table',
+        paginationId: 'tinhthanh-pagination',
+        itemsPerPage: 10
+    });
+
+    // Table Sorting
+    const table = document.getElementById('tinhthanh-table');
+    const headers = table.querySelectorAll('th.sortable');
+    let currentSort = { column: null, direction: 'asc' };
+
+    headers.forEach(header => {
+        header.addEventListener('click', () => {
+            const sortType = header.getAttribute('data-sort');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            if (currentSort.column === sortType) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = sortType;
+                currentSort.direction = 'asc';
+            }
+
+            // Remove previous sort indicators
+            headers.forEach(h => {
+                h.classList.remove('sort-asc', 'sort-desc');
+                const icon = h.querySelector('i');
+                if (icon) {
+                    icon.className = 'fas fa-sort ms-1 text-muted';
+                }
+            });
+
+            // Add sort indicator to current header
+            header.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+            const icon = header.querySelector('i');
+            if (icon) {
+                icon.className = `fas fa-sort-${currentSort.direction === 'asc' ? 'up' : 'down'} ms-1 text-primary`;
+            }
+
+            // Sort rows
+            rows.sort((a, b) => {
+                let aValue, bValue;
+
+                switch(sortType) {
+                    case 'matinh':
+                        aValue = a.cells[0]?.textContent.trim() || '';
+                        bValue = b.cells[0]?.textContent.trim() || '';
+                        break;
+                    case 'ten':
+                        aValue = a.cells[1]?.textContent.trim() || '';
+                        bValue = b.cells[1]?.textContent.trim() || '';
+                        break;
+                    default:
+                        return 0;
+                }
+
+                return currentSort.direction === 'asc'
+                    ? aValue.localeCompare(bValue, 'vi')
+                    : bValue.localeCompare(aValue, 'vi');
+            });
+
+            // Re-render table
+            rows.forEach(row => tbody.appendChild(row));
+
+            // Reset pagination
+            tinthanPagination.currentPage = 1;
+            tinthanPagination.render();
+        });
+    });
+});
+</script>
 @endpush

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| Admin Controllers
+| Controllers
 |--------------------------------------------------------------------------
 */
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
@@ -22,10 +22,17 @@ use App\Http\Controllers\TaiXe\BaoCaoController;
 use App\Http\Controllers\TaiXe\ChuyenController;
 use App\Http\Controllers\TaiXe\HanhKhachController;
 use App\Http\Controllers\TaiXe\ProfileController;
-use App\Http\Controllers\PhuXe\AuthPhuXeController;
-use App\Http\Controllers\PhuXe\DashboardController as PhuXeDashboardController;
-use App\Http\Controllers\PhuXe\HanhKhachController as PhuXeHanhKhachController;
-use App\Http\Controllers\PhuXe\ProfileController as PhuXeProfileController;
+use App\Http\Controllers\Customer\HomeController;
+use App\Http\Controllers\Customer\TicketController;
+use App\Http\Controllers\Customer\TripController;
+use App\Http\Controllers\Customer\BillController;
+use App\Http\Controllers\Customer\AuthController;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
     return view('landing');
@@ -36,42 +43,12 @@ Route::get('/test-suite', function () {
     return view('test-suite');
 })->name('test.suite');
 
-// Admin Authentication Routes (Quản lý)
-Route::prefix('quan-ly')->name('quan-ly.')->group(function () {
-    Route::get('dang-nhap', [AuthController::class, 'showLogin'])->name('dang-nhap');
-    Route::post('dang-nhap', [AuthController::class, 'login'])->name('dang-nhap.post');
-    Route::post('dang-xuat', [AuthController::class, 'logout'])->name('dang-xuat');
-
-    // Protected Admin Routes
-    Route::middleware(['admin.auth'])->group(function () {
-        // Dashboard
-        Route::get('tong-quan', [DashboardController::class, 'index'])->name('tong-quan');
-        
-        // Tỉnh Thành (Tuyến đường) - UC-12
-/*
-|--------------------------------------------------------------------------
-| Customer Controllers (KHÁCH HÀNG)
-|--------------------------------------------------------------------------
-*/
-use App\Http\Controllers\Customer\HomeController;
-use App\Http\Controllers\Customer\TicketController;
-use App\Http\Controllers\Customer\TripController;
-use App\Http\Controllers\Customer\BillController;
-use App\Http\Controllers\Customer\AuthController;
-
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
-
 /*
 |-------------------------
 | CUSTOMER ROUTES (TRANG NGƯỜI DÙNG)
 |-------------------------
 */
-Route::get('/', [HomeController::class, 'index'])->name('home.index');
+Route::get('/home', [HomeController::class, 'index'])->name('home.index');
 
 // Customer Auth (ĐĂNG NHẬP / ĐĂNG KÝ)
 Route::prefix('auth')->name('auth.')->group(function () {
@@ -105,32 +82,29 @@ Route::prefix('bill')->name('bill.')->group(function () {
     Route::get('detail/{id}', [BillController::class, 'chiTietHoaDon'])->name('detail');
 });
 
-
 /*
 |-------------------------
 | ADMIN ROUTES (TRANG QUẢN TRỊ)
 |-------------------------
 */
-Route::prefix('admin')->name('admin.')->group(function () {
-    // Đổi tên AuthController của Admin để tránh trùng lặp
-    Route::get('login', [AdminAuthController::class, 'showLogin'])->name('login');
-    Route::post('login', [AdminAuthController::class, 'login'])->name('login.post');
-    Route::post('logout', [AdminAuthController::class, 'logout'])->name('logout');
+Route::prefix('quan-ly')->name('quan-ly.')->group(function () {
+    Route::get('dang-nhap', [AdminAuthController::class, 'showLogin'])->name('dang-nhap');
+    Route::post('dang-nhap', [AdminAuthController::class, 'login'])->name('dang-nhap.post');
+    Route::post('dang-xuat', [AdminAuthController::class, 'logout'])->name('dang-xuat');
 
     // Protected Admin Routes
     Route::middleware(['admin.auth'])->group(function () {
-        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('tong-quan', [DashboardController::class, 'index'])->name('tong-quan');
         Route::resource('tinhthanh', TinhThanhController::class);
         Route::resource('loaixe', LoaixeController::class);
         Route::resource('xe', XeController::class);
         Route::resource('chuyendi', ChuyendiController::class);
         Route::resource('hoadon', HoadonController::class)->except(['create', 'store', 'edit', 'update']);
+        
+        // Invoice approval/cancellation routes (unified)
         Route::post('hoadon/{id}/duyet', [HoadonController::class, 'approve'])->name('hoadon.duyet');
         Route::post('hoadon/{id}/huy', [HoadonController::class, 'cancel'])->name('hoadon.huy');
         
-        // Người dùng - UC-17
-        Route::post('hoadon/{id}/approve', [HoadonController::class, 'approve'])->name('hoadon.approve');
-        Route::post('hoadon/{id}/cancel', [HoadonController::class, 'cancel'])->name('hoadon.cancel');
         Route::prefix('nguoidung')->name('nguoidung.')->group(function () {
             Route::get('khach', [NguoiDungController::class, 'khach'])->name('khach');
             Route::get('khach/{id}/edit', [NguoiDungController::class, 'khachEdit'])->name('khach.edit');
@@ -149,45 +123,60 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
 // NhanVienBanVe Routes
 Route::prefix('nhan-vien-ban-ve')->name('nhan-vien-ban-ve.')->group(function () {
-    // Authentication
-    Route::get('dang-nhap', [AuthController::class, 'showNhanVienLogin'])->name('dang-nhap');
-    Route::post('dang-nhap', [AuthController::class, 'nhanvienLogin'])->name('dang-nhap.post');
-    Route::post('dang-xuat', [AuthController::class, 'nhanvienLogout'])->name('dang-xuat');
+    Route::get('dang-nhap', [AdminAuthController::class, 'showNhanVienLogin'])->name('dang-nhap');
+    Route::post('dang-nhap', [AdminAuthController::class, 'nhanvienLogin'])->name('dang-nhap.post');
+    Route::post('dang-xuat', [AdminAuthController::class, 'nhanvienLogout'])->name('dang-xuat');
 
-    // Protected Routes for NhanVienBanVe
     Route::middleware(['nhanvien.auth'])->group(function () {
         Route::get('tong-quan', [NhanVienBanVeController::class, 'dashboard'])->name('tong-quan');
         
-        // (A) Trang "Thông tin cá nhân"
         Route::get('profile', [NhanVienBanVeController::class, 'profile'])->name('ho-so');
         Route::get('profile/edit', [NhanVienBanVeController::class, 'editProfile'])->name('ho-so.edit');
         Route::post('profile/update', [NhanVienBanVeController::class, 'updateProfile'])->name('ho-so.update');
         Route::post('profile/avatar', [NhanVienBanVeController::class, 'uploadAvatar'])->name('ho-so.avatar');
         Route::post('password/update', [NhanVienBanVeController::class, 'updatePassword'])->name('mat-khau.update');
 
-        // (B) Trang "Đặt vé offline"
         Route::get('dat-ve', [NhanVienBanVeController::class, 'createDatVe'])->name('dat-ve.create');
         Route::post('dat-ve', [NhanVienBanVeController::class, 'storeDatVe'])->name('dat-ve.store');
 
-        // (C) Trang "Quản lý vé offline"
         Route::get('ve', [NhanVienBanVeController::class, 'indexVe'])->name('ve.index');
         Route::get('ve/{id}', [NhanVienBanVeController::class, 'showVe'])->name('ve.show');
         Route::delete('ve/{id}', [NhanVienBanVeController::class, 'destroyVe'])->name('ve.destroy');
         
-        // (D) Trang "Theo dõi chuyến đi"
         Route::get('chuyen-di', [NhanVienBanVeController::class, 'indexChuyenDi'])->name('chuyen-di.index');
         Route::get('chuyen-di/{machuyendi}', [NhanVienBanVeController::class, 'getChuyenDiDetails'])->name('chuyen-di.details');
 
-        // (E) Trang "Hóa đơn" cho NV bán vé
         Route::get('hoa-don', [NhanVienBanVeController::class, 'indexHoadon'])->name('hoa-don.index');
 
-        // API endpoints for dynamic data
         Route::get('api/chuyen-di', [NhanVienBanVeController::class, 'getChuyenDiApi'])->name('api.chuyen-di');
         Route::get('api/xe-by-chuyendi', [NhanVienBanVeController::class, 'getXeApi'])->name('api.xe');
         Route::get('api/gio-khoi-hanh', [NhanVienBanVeController::class, 'getGioKhoiHanhApi'])->name('api.gio-khoi-hanh');
         Route::get('api/vehicles', [NhanVienBanVeController::class, 'getVehiclesApi'])->name('api.vehicles');
         Route::get('api/so-do-ghe', [NhanVienBanVeController::class, 'getSoDoGheApi'])->name('api.so-do-ghe');
     });
+});
+
+// Check seeder stats (Development)
+Route::get('/check-seeder-stats', function () {
+    $stats = [
+        'total_trips' => DB::table('Chuyendi')->count(),
+        'total_tickets' => DB::table('Ve')->count(),
+        'total_invoices' => DB::table('Hoadon')->count(),
+        'trips_by_date' => [],
+    ];
+
+    for ($d = 10; $d <= 22; $d++) {
+        $date = '2025-11-' . str_pad($d, 2, '0', STR_PAD_LEFT);
+        $count = DB::table('Chuyendi')->whereDate('thoigiandi', $date)->count();
+        $stats['trips_by_date'][$date] = $count;
+    }
+
+    $stats['sample_trips_nov17'] = DB::table('Chuyendi')
+        ->whereDate('thoigiandi', '2025-11-17')
+        ->select('machuyendi', 'tenchuyen', 'thoigiandi', 'gia', 'SLgheconlai', 'trangthai')
+        ->get();
+
+    return response()->json($stats, 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 });
 
 // Tài xế Routes
@@ -212,24 +201,5 @@ Route::prefix('tai-xe')->name('tai-xe.')->group(function () {
 
         Route::get('ho-so', [ProfileController::class, 'show'])->name('ho-so');
         Route::post('ho-so/doi-mat-khau', [ProfileController::class, 'updatePassword'])->name('ho-so.password');
-    });
-});
-
-// Phụ xe Routes
-Route::prefix('phu-xe')->name('phu-xe.')->group(function () {
-    Route::get('dang-nhap', [AuthPhuXeController::class, 'showLogin'])->name('dang-nhap');
-    Route::post('dang-nhap', [AuthPhuXeController::class, 'login'])->name('dang-nhap.post');
-    Route::post('dang-xuat', [AuthPhuXeController::class, 'logout'])->name('dang-xuat');
-
-    Route::middleware(['phuxe.auth'])->group(function () {
-        Route::get('/', fn () => redirect()->route('phu-xe.tong-quan'));
-        Route::get('dashboard', [PhuXeDashboardController::class, 'index'])->name('tong-quan');
-
-        Route::get('hanh-khach', [PhuXeHanhKhachController::class, 'index'])->name('hanh-khach');
-        Route::get('hanh-khach/{machuyendi}', [PhuXeHanhKhachController::class, 'show'])->name('hanh-khach.show');
-        Route::post('hanh-khach/{mave}/trang-thai', [PhuXeHanhKhachController::class, 'togglePickup'])->name('hanh-khach.toggle');
-
-        Route::get('ho-so', [PhuXeProfileController::class, 'show'])->name('ho-so');
-        Route::post('ho-so/doi-mat-khau', [PhuXeProfileController::class, 'updatePassword'])->name('ho-so.password');
     });
 });

@@ -55,11 +55,6 @@ return [
             'driver' => 'session',
             'provider' => 'nhanviens',
         ],
-
-        'phuxe' => [
-            'driver' => 'session',
-            'provider' => 'nhanviens',
-        ],
     ],
 
     /*

@@ -113,7 +113,7 @@ class NhanVienBanVeController extends Controller
             $query->whereDate('thoigian', $request->ngay_lap);
         }
 
-        $hoadons = $query->orderByDesc('thoigian')->paginate(10);
+        $hoadons = $query->orderByDesc('thoigian')->get();
 
         return view('NhanVienBanVe.HoaDon', compact('hoadons'));
     }
@@ -198,21 +198,21 @@ class NhanVienBanVeController extends Controller
             // Step 5: Create tickets and CTHD
             $createdTickets = [];
             foreach ($selectedSeats as $seatNumber) {
-                // Tạo mã vé 10 ký tự: VE + yymmdd + 2 base36
                 $datePartVe = now()->format('ymd');
                 $randVe = strtoupper(substr(base_convert(rand(0,1295),10,36),0,2));
-                $mave = 'VE' . $datePartVe . $randVe; // 10
+                $mave = 'VE' . $datePartVe . $randVe;
 
-                // Lưu nguyên mã ghế được chọn (string) để không mất prefix
                 $seatCode = trim($seatNumber);
 
                 $ve = Ve::create([
                     'mave' => $mave,
                     'machuyendi' => $chuyendi->machuyendi,
                     'maghe' => $seatCode,
+                    'trangthai' => 'Booked',
                 ]);
 
-                // Create CTHD entry
+                event(new \App\Events\SeatBooked($chuyendi->machuyendi, $seatCode, 'Booked'));
+
                 \App\Models\CTHD::create([
                     'mahd' => $hoadon->mahd,
                     'mave' => $ve->mave,
@@ -233,9 +233,6 @@ class NhanVienBanVeController extends Controller
         }
     }
 
-    /**
-     * (C) Show the list of offline tickets.
-     */
     public function indexVe(Request $request)
     {
         $query = Ve::with(['chuyendi.lotrinhs.tinhthanh', 'chuyendi.xe', 'hoadon.khach']);
@@ -267,7 +264,7 @@ class NhanVienBanVeController extends Controller
             });
         }
 
-        $ves = $query->latest('mave')->paginate(10);
+        $ves = $query->latest('mave')->get();
 
         // Data for filters
         $chuyenDis = Chuyendi::with('lotrinhs.tinhthanh')
@@ -357,11 +354,16 @@ class NhanVienBanVeController extends Controller
             });
         }
         
-        $chuyenDis = $query->get()->map(function ($chuyen) {
+        // Get all and process
+        $chuyenDis = $query->get();
+        
+        // Map through items to add computed properties
+        $chuyenDis->transform(function ($chuyen) {
             $firstPoint = $chuyen->lotrinhs->sortBy('trinhtu')->first();
             $lastPoint = $chuyen->lotrinhs->sortBy('trinhtu')->last();
             $chuyen->tuyen_duong = ($firstPoint->tinhthanh->ten ?? 'N/A') . ' → ' . ($lastPoint->tinhthanh->ten ?? 'N/A');
-            // Số ghế đã đặt tính từ bảng Ve, bỏ qua vé đã hủy nếu có cột trạngthai
+            
+            // Số ghế đã đặt tính từ bảng Ve, bỏ qua vé đã hủy
             $chuyen->so_ghe_da_dat = $chuyen->ves
                 ->filter(function ($ve) {
                     return !isset($ve->trangthai) || $ve->trangthai !== 'Đã hủy';
@@ -383,12 +385,13 @@ class NhanVienBanVeController extends Controller
 
             return $chuyen;
         });
-
-        // Apply status filter after mapping
+        
+        // Filter by status if provided
         if ($request->filled('status')) {
-            $chuyenDis = $chuyenDis->filter(function($chuyen) use ($request) {
-                return $chuyen->status_key === $request->status;
-            });
+            $statusFilter = $request->status;
+            $chuyenDis = $chuyenDis->filter(function($chuyen) use ($statusFilter) {
+                return $chuyen->status_key === $statusFilter;
+            })->values();
         }
 
         // Get unique routes for filter dropdown

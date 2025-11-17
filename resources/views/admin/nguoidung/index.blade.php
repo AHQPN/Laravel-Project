@@ -29,7 +29,7 @@
                 <a class="nav-link active" data-bs-toggle="tab" href="#khachhang" role="tab">
                     <i class="fas fa-users me-2"></i>Khách hàng
                     @if(isset($khachs))
-                        <span class="badge bg-light text-dark ms-1">{{ $khachs->total() }}</span>
+                        <span class="badge bg-light text-dark ms-1">{{ $khachs->count() }}</span>
                     @endif
                 </a>
             </li>
@@ -37,7 +37,7 @@
                 <a class="nav-link" data-bs-toggle="tab" href="#nhanvien" role="tab">
                     <i class="fas fa-user-tie me-2"></i>Nhân viên
                     @if(isset($nhanviens))
-                        <span class="badge bg-light text-dark ms-1">{{ $nhanviens->total() }}</span>
+                        <span class="badge bg-light text-dark ms-1">{{ $nhanviens->count() }}</span>
                     @endif
                 </a>
             </li>
@@ -69,14 +69,14 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
+                            <table class="table table-hover align-middle mb-0" id="khach-table">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="px-3 py-3" style="width: 100px;">Mã KH</th>
-                                        <th class="px-3 py-3" style="width: 180px;">Họ tên</th>
-                                        <th class="px-3 py-3" style="width: 130px;">Số điện thoại</th>
-                                        <th class="px-3 py-3 d-none d-lg-table-cell">Email</th>
-                                        <th class="px-3 py-3 d-none d-xl-table-cell">Địa chỉ</th>
+                                        <th class="px-3 py-3 sortable" data-sort="makh" style="width: 100px; cursor: pointer;">Mã KH <i class="fas fa-sort ms-1 text-muted"></i></th>
+                                        <th class="px-3 py-3 sortable" data-sort="ten" style="width: 180px; cursor: pointer;">Họ tên <i class="fas fa-sort ms-1 text-muted"></i></th>
+                                        <th class="px-3 py-3 sortable" data-sort="sdt" style="width: 130px; cursor: pointer;">Số điện thoại <i class="fas fa-sort ms-1 text-muted"></i></th>
+                                        <th class="px-3 py-3 sortable d-none d-lg-table-cell" data-sort="email" style="cursor: pointer;">Email <i class="fas fa-sort ms-1 text-muted"></i></th>
+                                        <th class="px-3 py-3 d-none d-xl-table-cell" style="width: auto;">Địa chỉ</th>
                                         <th class="px-3 py-3 text-center" style="width: 150px;">Thao tác</th>
                                     </tr>
                                 </thead>
@@ -198,91 +198,7 @@
                     </div>
 
                     <!-- Pagination Footer -->
-                    @if(isset($khachs) && $khachs->total() > 0)
-                        <div class="card-footer bg-white border-top py-3">
-                            <div class="row align-items-center g-3">
-                                <div class="col-md-6">
-                                    <div class="text-muted small">
-                                        Hiển thị <strong>{{ $khachs->firstItem() }}</strong> -
-                                        <strong>{{ $khachs->lastItem() }}</strong>
-                                        trong tổng số <strong>{{ $khachs->total() }}</strong> kết quả
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <nav aria-label="Page navigation">
-                                        <ul class="pagination pagination-sm justify-content-md-end justify-content-center mb-0">
-                                            @if ($khachs->onFirstPage())
-                                                <li class="page-item disabled">
-                                                    <span class="page-link"><i class="fas fa-chevron-left"></i></span>
-                                                </li>
-                                            @else
-                                                <li class="page-item">
-                                                    <a class="page-link"
-                                                        href="{{ $khachs->appends(request()->query())->previousPageUrl() }}">
-                                                        <i class="fas fa-chevron-left"></i>
-                                                    </a>
-                                                </li>
-                                            @endif
-
-                                            @php
-                                                $start = max($khachs->currentPage() - 2, 1);
-                                                $end = min($start + 4, $khachs->lastPage());
-                                                $start = max($end - 4, 1);
-                                            @endphp
-
-                                            @if($start > 1)
-                                                <li class="page-item">
-                                                    <a class="page-link"
-                                                        href="{{ $khachs->appends(request()->query())->url(1) }}">1</a>
-                                                </li>
-                                                @if($start > 2)
-                                                    <li class="page-item disabled"><span class="page-link">...</span></li>
-                                                @endif
-                                            @endif
-
-                                            @for ($i = $start; $i <= $end; $i++)
-                                                @if ($i == $khachs->currentPage())
-                                                    <li class="page-item active">
-                                                        <span class="page-link">{{ $i }}</span>
-                                                    </li>
-                                                @else
-                                                    <li class="page-item">
-                                                        <a class="page-link"
-                                                            href="{{ $khachs->appends(request()->query())->url($i) }}">{{ $i }}</a>
-                                                    </li>
-                                                @endif
-                                            @endfor
-
-                                            @if($end < $khachs->lastPage())
-                                                @if($end < $khachs->lastPage() - 1)
-                                                    <li class="page-item disabled"><span class="page-link">...</span></li>
-                                                @endif
-                                                <li class="page-item">
-                                                    <a class="page-link"
-                                                        href="{{ $khachs->appends(request()->query())->url($khachs->lastPage()) }}">
-                                                        {{ $khachs->lastPage() }}
-                                                    </a>
-                                                </li>
-                                            @endif
-
-                                            @if ($khachs->hasMorePages())
-                                                <li class="page-item">
-                                                    <a class="page-link"
-                                                        href="{{ $khachs->appends(request()->query())->nextPageUrl() }}">
-                                                        <i class="fas fa-chevron-right"></i>
-                                                    </a>
-                                                </li>
-                                            @else
-                                                <li class="page-item disabled">
-                                                    <span class="page-link"><i class="fas fa-chevron-right"></i></span>
-                                                </li>
-                                            @endif
-                                        </ul>
-                                    </nav>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
+                    <div class="card-footer bg-white border-top py-3" id="khach-pagination"></div>
                 </div>
             </div>
 
@@ -316,14 +232,14 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
+                            <table class="table table-hover align-middle mb-0" id="nhanvien-table">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="px-3 py-3" style="width: 100px;">Mã NV</th>
-                                        <th class="px-3 py-3" style="width: 180px;">Họ tên</th>
-                                        <th class="px-3 py-3" style="width: 140px;">Chức vụ</th>
-                                        <th class="px-3 py-3" style="width: 130px;">Số điện thoại</th>
-                                        <th class="px-3 py-3 d-none d-lg-table-cell">Email</th>
+                                        <th class="px-3 py-3 sortable" data-sort="manv" style="width: 100px; cursor: pointer;">Mã NV <i class="fas fa-sort ms-1 text-muted"></i></th>
+                                        <th class="px-3 py-3 sortable" data-sort="ten" style="width: 180px; cursor: pointer;">Họ tên <i class="fas fa-sort ms-1 text-muted"></i></th>
+                                        <th class="px-3 py-3 sortable" data-sort="chucvu" style="width: 140px; cursor: pointer;">Chức vụ <i class="fas fa-sort ms-1 text-muted"></i></th>
+                                        <th class="px-3 py-3 sortable" data-sort="sdt" style="width: 130px; cursor: pointer;">Số điện thoại <i class="fas fa-sort ms-1 text-muted"></i></th>
+                                        <th class="px-3 py-3 sortable d-none d-lg-table-cell" data-sort="email" style="cursor: pointer;">Email <i class="fas fa-sort ms-1 text-muted"></i></th>
                                         <th class="px-3 py-3 text-center" style="width: 150px;">Thao tác</th>
                                     </tr>
                                 </thead>
@@ -449,91 +365,7 @@
                     </div>
 
                     <!-- Pagination Footer -->
-                    @if(isset($nhanviens) && $nhanviens->total() > 0)
-                        <div class="card-footer bg-white border-top py-3">
-                            <div class="row align-items-center g-3">
-                                <div class="col-md-6">
-                                    <div class="text-muted small">
-                                        Hiển thị <strong>{{ $nhanviens->firstItem() }}</strong> -
-                                        <strong>{{ $nhanviens->lastItem() }}</strong>
-                                        trong tổng số <strong>{{ $nhanviens->total() }}</strong> kết quả
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <nav aria-label="Page navigation">
-                                        <ul class="pagination pagination-sm justify-content-md-end justify-content-center mb-0">
-                                            @if ($nhanviens->onFirstPage())
-                                                <li class="page-item disabled">
-                                                    <span class="page-link"><i class="fas fa-chevron-left"></i></span>
-                                                </li>
-                                            @else
-                                                <li class="page-item">
-                                                    <a class="page-link"
-                                                        href="{{ $nhanviens->appends(request()->query())->previousPageUrl() }}">
-                                                        <i class="fas fa-chevron-left"></i>
-                                                    </a>
-                                                </li>
-                                            @endif
-
-                                            @php
-                                                $start_nv = max($nhanviens->currentPage() - 2, 1);
-                                                $end_nv = min($start_nv + 4, $nhanviens->lastPage());
-                                                $start_nv = max($end_nv - 4, 1);
-                                            @endphp
-
-                                            @if($start_nv > 1)
-                                                <li class="page-item">
-                                                    <a class="page-link"
-                                                        href="{{ $nhanviens->appends(request()->query())->url(1) }}">1</a>
-                                                </li>
-                                                @if($start_nv > 2)
-                                                    <li class="page-item disabled"><span class="page-link">...</span></li>
-                                                @endif
-                                            @endif
-
-                                            @for ($i = $start_nv; $i <= $end_nv; $i++)
-                                                @if ($i == $nhanviens->currentPage())
-                                                    <li class="page-item active">
-                                                        <span class="page-link">{{ $i }}</span>
-                                                    </li>
-                                                @else
-                                                    <li class="page-item">
-                                                        <a class="page-link"
-                                                            href="{{ $nhanviens->appends(request()->query())->url($i) }}">{{ $i }}</a>
-                                                    </li>
-                                                @endif
-                                            @endfor
-
-                                            @if($end_nv < $nhanviens->lastPage())
-                                                @if($end_nv < $nhanviens->lastPage() - 1)
-                                                    <li class="page-item disabled"><span class="page-link">...</span></li>
-                                                @endif
-                                                <li class="page-item">
-                                                    <a class="page-link"
-                                                        href="{{ $nhanviens->appends(request()->query())->url($nhanviens->lastPage()) }}">
-                                                        {{ $nhanviens->lastPage() }}
-                                                    </a>
-                                                </li>
-                                            @endif
-
-                                            @if ($nhanviens->hasMorePages())
-                                                <li class="page-item">
-                                                    <a class="page-link"
-                                                        href="{{ $nhanviens->appends(request()->query())->nextPageUrl() }}">
-                                                        <i class="fas fa-chevron-right"></i>
-                                                    </a>
-                                                </li>
-                                            @else
-                                                <li class="page-item disabled">
-                                                    <span class="page-link"><i class="fas fa-chevron-right"></i></span>
-                                                </li>
-                                            @endif
-                                        </ul>
-                                    </nav>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
+                    <div class="card-footer bg-white border-top py-3" id="nhanvien-pagination"></div>
                 </div>
             </div>
         </div>
@@ -670,8 +502,132 @@
     </style>
 @endsection
 
+@push('styles')
+<style>
+    #khach-table thead th.sortable,
+    #nhanvien-table thead th.sortable {
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.2s ease;
+    }
+    #khach-table thead th.sortable:hover,
+    #nhanvien-table thead th.sortable:hover {
+        background-color: #e9ecef;
+        color: #667eea;
+    }
+    #khach-table thead th.sort-asc,
+    #khach-table thead th.sort-desc,
+    #nhanvien-table thead th.sort-asc,
+    #nhanvien-table thead th.sort-desc {
+        background-color: #e9ecef;
+        color: #667eea;
+        font-weight: 600;
+    }
+</style>
+@endpush
+
 @push('scripts')
+    <script src="{{ asset('js/pagination.js') }}"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize JS Pagination for both tables
+            const khachPagination = new Pagination({
+                tableId: 'khach-table',
+                paginationId: 'khach-pagination',
+                itemsPerPage: 10
+            });
+            
+            const nhanvienPagination = new Pagination({
+                tableId: 'nhanvien-table',
+                paginationId: 'nhanvien-pagination',
+                itemsPerPage: 10
+            });
+
+            // Sorting for Khach table
+            initTableSorting('khach-table', khachPagination);
+            
+            // Sorting for Nhanvien table
+            initTableSorting('nhanvien-table', nhanvienPagination);
+
+            function initTableSorting(tableId, pagination) {
+                const table = document.getElementById(tableId);
+                const headers = table.querySelectorAll('th.sortable');
+                let currentSort = { column: null, direction: 'asc' };
+
+                headers.forEach(header => {
+                    header.addEventListener('click', () => {
+                        const sortType = header.getAttribute('data-sort');
+                        const tbody = table.querySelector('tbody');
+                        const rows = Array.from(tbody.querySelectorAll('tr'));
+
+                        if (currentSort.column === sortType) {
+                            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                        } else {
+                            currentSort.column = sortType;
+                            currentSort.direction = 'asc';
+                        }
+
+                        // Remove previous sort indicators
+                        headers.forEach(h => {
+                            h.classList.remove('sort-asc', 'sort-desc');
+                            const icon = h.querySelector('i');
+                            if (icon) {
+                                icon.className = 'fas fa-sort ms-1 text-muted';
+                            }
+                        });
+
+                        // Add sort indicator to current header
+                        header.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+                        const icon = header.querySelector('i');
+                        if (icon) {
+                            icon.className = `fas fa-sort-${currentSort.direction === 'asc' ? 'up' : 'down'} ms-1 text-primary`;
+                        }
+
+                        // Sort rows
+                        rows.sort((a, b) => {
+                            let aValue, bValue;
+                            let cellIndex = 0;
+
+                            switch(sortType) {
+                                case 'makh':
+                                case 'manv':
+                                    cellIndex = 0;
+                                    break;
+                                case 'ten':
+                                    cellIndex = 1;
+                                    break;
+                                case 'sdt':
+                                    cellIndex = tableId === 'khach-table' ? 2 : 3;
+                                    break;
+                                case 'chucvu':
+                                    cellIndex = 2;
+                                    break;
+                                case 'email':
+                                    cellIndex = tableId === 'khach-table' ? 3 : 4;
+                                    break;
+                                default:
+                                    return 0;
+                            }
+
+                            aValue = a.cells[cellIndex]?.textContent.trim() || '';
+                            bValue = b.cells[cellIndex]?.textContent.trim() || '';
+
+                            return currentSort.direction === 'asc'
+                                ? aValue.localeCompare(bValue, 'vi')
+                                : bValue.localeCompare(aValue, 'vi');
+                        });
+
+                        // Re-render table
+                        rows.forEach(row => tbody.appendChild(row));
+
+                        // Reset pagination
+                        pagination.currentPage = 1;
+                        pagination.render();
+                    });
+                });
+            }
+        });
+
         // Auto dismiss alerts after 5 seconds
         setTimeout(function () {
             const alerts = document.querySelectorAll('.alert');

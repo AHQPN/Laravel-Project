@@ -82,10 +82,9 @@ THÔNG TIN ĐĂNG NHẬP MẪU / SAMPLE LOGIN CREDENTIALS
 
 NHÂN VIÊN / EMPLOYEES:
 ----------------------
-Username: NV001  | Password: 123 | Chức vụ: Quản lý
-Username: NV002  | Password: 123 | Chức vụ: Nhân viên bán vé
-Username: NV003  | Password: 123 | Chức vụ: Tài xế
-Username: NV004  | Password: 123 | Chức vụ: Phụ xe
+Username: NV001  | Password: 123456 | Chức vụ: Quản lý
+Username: NV002  | Password: 123456 | Chức vụ: Nhân viên bán vé
+Username: NV003  | Password: 123456 | Chức vụ: Tài xế
 
 KHÁCH HÀNG / CUSTOMERS:
 -----------------------

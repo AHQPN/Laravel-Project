@@ -22,7 +22,7 @@ class ChuyendiController extends Controller
                             ->orWhere('tenchuyen', 'like', "%{$search}%");
             });
 
-        $chuyendis = $query->orderBy('thoigiandi', 'desc')->paginate(10);
+        $chuyendis = $query->orderBy('thoigiandi', 'desc')->get();
 
         return view('admin.ChuyenDi.Index', compact('chuyendis', 'search'));
     }

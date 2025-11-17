@@ -14,7 +14,7 @@ class TinhThanhController extends Controller
         $tinhThanhs = TinhThanh::when($search, function($query, $search) {
             return $query->where('matinh', 'like', "%{$search}%")
                         ->orWhere('ten', 'like', "%{$search}%");
-        })->paginate(10);
+        })->get();
 
         return view('admin.TinhThanh.Index', compact('tinhThanhs', 'search'));
     }

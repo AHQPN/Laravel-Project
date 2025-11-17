@@ -87,7 +87,7 @@
                     Danh sách chuyến đi
                 </h5>
                 <span class="badge bg-primary-subtle text-primary px-3 py-2">
-                    <i class="fas fa-list me-1"></i> Tổng: {{ $chuyenDis->count() }} chuyến
+                    <i class="fas fa-list me-1"></i> Tổng: <span data-pagination-info="trips-table">{{ $chuyenDis->count() }} chuyến</span>
                 </span>
             </div>
         </div>
@@ -207,6 +207,9 @@
                 </table>
             </div>
         </div>
+
+        {{-- ====== PAGINATION ====== --}}
+        <div class="card-footer bg-white border-top" id="trips-pagination"></div>
     </div>
 </div>
 
@@ -488,8 +491,16 @@
 @endpush
 
 @push('scripts')
+<script src="{{ asset('js/pagination.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // Initialize JS Pagination
+    const tripsPagination = new Pagination({
+        tableId: 'trips-table',
+        paginationId: 'trips-pagination',
+        itemsPerPage: 15
+    });
+
     // Table sorting functionality
     const table = document.getElementById('trips-table');
     const headers = table.querySelectorAll('th.sortable');

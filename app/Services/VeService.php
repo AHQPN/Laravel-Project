@@ -64,7 +64,7 @@ class VeService
     }
 
     /**
-     * Validate if seats are available
+     * Validate if seats are available with pessimistic locking
      *
      * @param Chuyendi $chuyendi
      * @param array $seats
@@ -72,10 +72,11 @@ class VeService
      */
     protected function validateSeatsAvailable(Chuyendi $chuyendi, array $seats): void
     {
-        // Check if seats are already booked
+        // Check if seats are already booked using scope with locking
         $bookedSeats = Ve::where('machuyendi', $chuyendi->machuyendi)
             ->whereIn('soghe', $seats)
-            ->whereIn('trangthai', ['approved', 'pending'])
+            ->unavailable()
+            ->lockForUpdate()
             ->pluck('soghe')
             ->toArray();
 

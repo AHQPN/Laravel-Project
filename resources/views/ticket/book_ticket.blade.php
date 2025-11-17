@@ -76,7 +76,7 @@
                                     $pending = isPending($seat, $allTickets);
                                     $isDisabled = $booked || $pending;
                                 @endphp
-                                <div class="ghe col-3">
+                                <div class="ghe col-3" data-seat="{{ $seat }}" data-status="{{ $isDisabled ? 'booked' : 'available' }}">
                                     <img src="{{ asset('images/' . ($isDisabled ? 'seat_disabled.svg' : 'seat_active.svg')) }}"
                                          alt="{{ $isDisabled ? 'seat_disabled' : 'seat_active' }}" />
                                     <span class="seat-label">{{ $seat }}</span>
@@ -95,7 +95,7 @@
                                     $pending = isPending($seat, $allTickets);
                                     $isDisabled = $booked || $pending;
                                 @endphp
-                                <div class="ghe col-3">
+                                <div class="ghe col-3" data-seat="{{ $seat }}" data-status="{{ $isDisabled ? 'booked' : 'available' }}">
                                     <img src="{{ asset('images/' . ($isDisabled ? 'seat_disabled.svg' : 'seat_active.svg')) }}"
                                          alt="{{ $isDisabled ? 'seat_disabled' : 'seat_active' }}" />
                                     <span class="seat-label">{{ $seat }}</span>
@@ -120,12 +120,12 @@
                                             $isDisabled1 = $booked1 || $pending1;
                                             $isDisabled2 = $booked2 || $pending2;
                                         @endphp
-                                        <div class="ghe">
+                                        <div class="ghe" data-seat="{{ $seat1 }}" data-status="{{ $isDisabled1 ? 'booked' : 'available' }}">
                                             <img src="{{ asset('images/' . ($isDisabled1 ? 'seat_disabled.svg' : 'seat_active.svg')) }}"
                                                  alt="{{ $isDisabled1 ? 'seat_disabled' : 'seat_active' }}" />
                                             <span class="seat-label">{{ $seat1 }}</span>
                                         </div>
-                                        <div class="ghe">
+                                        <div class="ghe" data-seat="{{ $seat2 }}" data-status="{{ $isDisabled2 ? 'booked' : 'available' }}">
                                             <img src="{{ asset('images/' . ($isDisabled2 ? 'seat_disabled.svg' : 'seat_active.svg')) }}"
                                                  alt="{{ $isDisabled2 ? 'seat_disabled' : 'seat_active' }}" />
                                             <span class="seat-label">{{ $seat2 }}</span>
@@ -143,12 +143,12 @@
                                             $isDisabled3 = $booked3 || $pending3;
                                             $isDisabled4 = $booked4 || $pending4;
                                         @endphp
-                                        <div class="ghe">
+                                        <div class="ghe" data-seat="{{ $seat3 }}" data-status="{{ $isDisabled3 ? 'booked' : 'available' }}">
                                             <img src="{{ asset('images/' . ($isDisabled3 ? 'seat_disabled.svg' : 'seat_active.svg')) }}"
                                                  alt="{{ $isDisabled3 ? 'seat_disabled' : 'seat_active' }}" />
                                             <span class="seat-label">{{ $seat3 }}</span>
                                         </div>
-                                        <div class="ghe">
+                                        <div class="ghe" data-seat="{{ $seat4 }}" data-status="{{ $isDisabled4 ? 'booked' : 'available' }}">
                                             <img src="{{ asset('images/' . ($isDisabled4 ? 'seat_disabled.svg' : 'seat_active.svg')) }}"
                                                  alt="{{ $isDisabled4 ? 'seat_disabled' : 'seat_active' }}" />
                                             <span class="seat-label">{{ $seat4 }}</span>
@@ -381,4 +381,13 @@ document.addEventListener("DOMContentLoaded", function () {
     @endif
 });
 </script>
+
+{{-- Real-time seat updates --}}
+<script src="{{ asset('js/real-time-seat-updates.js') }}"></script>
+<script>
+    @if(isset($trip))
+        initSeatUpdates('{{ $trip->machuyendi }}');
+    @endif
+</script>
+
 @endsection

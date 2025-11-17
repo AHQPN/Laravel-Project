@@ -22,10 +22,14 @@ class Chuyendi extends Model
         'thoigiandichuyen',
         'gia',
         'trangthai',
+        'batdau_luc',
+        'ketthuc_luc',
     ];
 
     protected $casts = [
         'thoigiandi' => 'datetime',
+        'batdau_luc' => 'datetime',
+        'ketthuc_luc' => 'datetime',
         'gia' => 'integer',
         'SLgheconlai' => 'integer',
     ];

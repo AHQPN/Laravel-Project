@@ -33,14 +33,12 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-striped table-hover sortable-table" 
-                       data-sort-column="{{ $sortParams['sort'] ?? 'maloai' }}"
-                       data-sort-direction="{{ $sortParams['direction'] ?? 'asc' }}">
+                <table class="table table-striped table-hover" id="loaixe-table">
                     <thead>
                         <tr>
-                            <th data-sort="maloai">Mã Loại xe <i class="fas fa-sort"></i></th>
-                            <th data-sort="tenloai">Tên Loại xe <i class="fas fa-sort"></i></th>
-                            <th data-sort="soghe">Số ghế <i class="fas fa-sort"></i></th>
+                            <th class="sortable" data-sort="maloai" style="cursor: pointer;">Mã Loại xe <i class="fas fa-sort ms-1 text-muted"></i></th>
+                            <th class="sortable" data-sort="tenloai" style="cursor: pointer;">Tên Loại xe <i class="fas fa-sort ms-1 text-muted"></i></th>
+                            <th class="sortable" data-sort="soghe" style="cursor: pointer;">Số ghế <i class="fas fa-sort ms-1 text-muted"></i></th>
                             <th class="text-center">Thao tác</th>
                         </tr>
                     </thead>
@@ -71,21 +69,105 @@
                     </tbody>
                 </table>
             </div>
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <div class="pagination-info">
-                    @if($loaixe->total() > 0)
-                        Hiển thị {{ $loaixe->firstItem() }} - {{ $loaixe->lastItem() }} trong {{ $loaixe->total() }} kết quả
-                    @endif
-                </div>
-                <div>
-                    {{ $loaixe->appends(request()->query())->links() }}
-                </div>
-            </div>
+            <div class="mt-3" id="loaixe-pagination"></div>
         </div>
     </div>
 </div>
 @endsection
 
+@push('styles')
+<style>
+    #loaixe-table thead th.sortable {
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.2s ease;
+    }
+    #loaixe-table thead th.sortable:hover {
+        background-color: #e9ecef;
+        color: #667eea;
+    }
+    #loaixe-table thead th.sort-asc,
+    #loaixe-table thead th.sort-desc {
+        background-color: #e9ecef;
+        color: #667eea;
+        font-weight: 600;
+    }
+</style>
+@endpush
+
 @push('scripts')
-<script src="{{ asset('js/table-sort.js') }}"></script>
+<script src="{{ asset('js/pagination.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const loaixePagination = new Pagination({
+        tableId: 'loaixe-table',
+        paginationId: 'loaixe-pagination',
+        itemsPerPage: 10
+    });
+
+    // Table Sorting
+    const table = document.getElementById('loaixe-table');
+    const headers = table.querySelectorAll('th.sortable');
+    let currentSort = { column: null, direction: 'asc' };
+
+    headers.forEach(header => {
+        header.addEventListener('click', () => {
+            const sortType = header.getAttribute('data-sort');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            if (currentSort.column === sortType) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = sortType;
+                currentSort.direction = 'asc';
+            }
+
+            // Remove previous sort indicators
+            headers.forEach(h => {
+                h.classList.remove('sort-asc', 'sort-desc');
+                const icon = h.querySelector('i');
+                if (icon) {
+                    icon.className = 'fas fa-sort ms-1 text-muted';
+                }
+            });
+
+            // Add sort indicator to current header
+            header.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+            const icon = header.querySelector('i');
+            if (icon) {
+                icon.className = `fas fa-sort-${currentSort.direction === 'asc' ? 'up' : 'down'} ms-1 text-primary`;
+            }
+
+            // Sort rows
+            rows.sort((a, b) => {
+                let aValue, bValue;
+
+                switch(sortType) {
+                    case 'maloai':
+                    case 'tenloai':
+                        aValue = a.cells[sortType === 'maloai' ? 0 : 1]?.textContent.trim() || '';
+                        bValue = b.cells[sortType === 'maloai' ? 0 : 1]?.textContent.trim() || '';
+                        return currentSort.direction === 'asc'
+                            ? aValue.localeCompare(bValue, 'vi')
+                            : bValue.localeCompare(aValue, 'vi');
+                    case 'soghe':
+                        aValue = parseInt(a.cells[2]?.textContent) || 0;
+                        bValue = parseInt(b.cells[2]?.textContent) || 0;
+                        return currentSort.direction === 'asc' ? aValue - bValue : bValue - aValue;
+                    default:
+                        return 0;
+                }
+            });
+
+            // Re-render table
+            rows.forEach(row => tbody.appendChild(row));
+
+            // Reset pagination
+            loaixePagination.currentPage = 1;
+            loaixePagination.render();
+        });
+    });
+});
+</script>
 @endpush

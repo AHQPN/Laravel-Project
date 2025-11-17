@@ -23,9 +23,10 @@ class NguoiDungController extends Controller
                             ->orWhere('sdt', 'like', "%{$search}%");
             });
 
-        $khachs = $query->orderBy('makh', 'desc')->paginate(10);
+        $khachs = $query->orderBy('makh', 'desc')->get();
+        $nhanviens = Nhanvien::with('chucvu')->orderBy('manv')->get();
 
-        return view('admin.NguoiDung.Index', compact('khachs', 'search'));
+        return view('admin.NguoiDung.Index', compact('khachs', 'nhanviens', 'search'));
     }
 
     public function khachEdit($id)
@@ -76,9 +77,10 @@ class NguoiDungController extends Controller
                             ->orWhere('sdt', 'like', "%{$search}%");
             });
 
-        $nhanviens = $query->orderBy('manv', 'desc')->paginate(10);
+        $nhanviens = $query->orderBy('manv', 'desc')->get();
+        $khachs = Khach::paginate(10);
 
-        return view('admin.NguoiDung.Index', compact('nhanviens', 'search'));
+        return view('admin.NguoiDung.Index', compact('nhanviens', 'khachs', 'search'));
     }
 
     public function nhanvienCreate()
@@ -90,8 +92,8 @@ class NguoiDungController extends Controller
     public function nhanvienStore(Request $request)
     {
         $request->validate([
-            'manv' => 'required|max:5|unique:nhanvien,manv',
-            'macv' => 'required|exists:chucvu,macv',
+            'manv' => 'required|max:5|unique:Nhanvien,manv',
+            'macv' => 'required|exists:Chucvu,macv',
             'password' => 'required',
             'ten' => 'required|max:100',
             'sdt' => 'required|max:15',

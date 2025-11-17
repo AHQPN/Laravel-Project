@@ -1008,6 +1008,34 @@ document.addEventListener('DOMContentLoaded', function () {
     function number_format(number) {
         return new Intl.NumberFormat('vi-VN').format(number);
     }
+
+    window.currentTripIdForRealtime = currentMachuyendi;
 });
+</script>
+
+<script>
+if (typeof window.currentTripIdForRealtime !== 'undefined' && window.currentTripIdForRealtime) {
+    if (typeof window.Echo !== 'undefined') {
+        window.Echo.channel('trip.' + window.currentTripIdForRealtime)
+            .listen('.seat.booked', (event) => {
+                const seatElement = document.querySelector(`[data-seat-code="${event.seat_number}"]`);
+                if (seatElement && seatElement.classList.contains('available')) {
+                    seatElement.classList.remove('available');
+                    seatElement.classList.add('sold');
+                    seatElement.style.cursor = 'not-allowed';
+                    
+                    if (window.Toastify) {
+                        Toastify({
+                            text: `Ghế ${event.seat_number} vừa được đặt`,
+                            duration: 3000,
+                            gravity: 'top',
+                            position: 'right',
+                            backgroundColor: 'linear-gradient(to right, #ff5f6d, #ffc371)',
+                        }).showToast();
+                    }
+                }
+            });
+    }
+}
 </script>
 @endpush

@@ -32,17 +32,12 @@ class AppServiceProvider extends ServiceProvider
 
         // Gate cho Nhân viên bán vé
         Gate::define('access-nhanvien-banve', function (?Nhanvien $nhanvien) {
-            return $nhanvien && $nhanvien->macv === 'NVBV' && $nhanvien->isActive();
+            return $nhanvien && $nhanvien->macv === 'BV' && $nhanvien->isActive();
         });
 
         // Gate cho Tài xế
         Gate::define('access-taixe', function (?Nhanvien $nhanvien) {
             return $nhanvien && $nhanvien->macv === 'TX' && $nhanvien->isActive();
-        });
-
-        // Gate cho Nhân viên kiểm soát
-        Gate::define('access-kiemsoat', function (?Nhanvien $nhanvien) {
-            return $nhanvien && in_array($nhanvien->macv, ['NVKS', 'KS']) && $nhanvien->isActive();
         });
         // Cung cấp $cities cho view 'layouts.khach'
         View::composer('layouts.khach', CityComposer::class);

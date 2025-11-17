@@ -145,7 +145,7 @@ class Nhanvien extends Model
      */
     public function isNhanVienBanVe(): bool
     {
-        return $this->macv === 'NVBV';
+        return $this->macv === 'BV';
     }
 
     /**
@@ -154,13 +154,5 @@ class Nhanvien extends Model
     public function isTaiXe(): bool
     {
         return $this->macv === 'TX';
-    }
-
-    /**
-     * Kiểm tra nhân viên có phải Nhân viên kiểm soát không.
-     */
-    public function isNhanVienKiemSoat(): bool
-    {
-        return $this->macv === 'NVKS';
     }
 }

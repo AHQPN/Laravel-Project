@@ -193,6 +193,19 @@
             <div class="login-body">
                 <h5 class="mb-4 text-center text-muted">Chọn vai trò để đăng nhập</h5>
 
+                <a href="{{ route('home.index') }}" class="role-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border: none;">
+                    <div class="role-icon" style="background: rgba(255, 255, 255, 0.3);">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <div class="role-info">
+                        <div class="role-title" style="color: white;">Khách Hàng</div>
+                        <p class="role-desc" style="color: rgba(255, 255, 255, 0.9);">Tìm chuyến, đặt vé, tra cứu</p>
+                    </div>
+                    <div class="role-arrow" style="color: white;">
+                        <i class="bi bi-arrow-right"></i>
+                    </div>
+                </a>
+
                 <a href="{{ route('quan-ly.dang-nhap') }}" class="role-card role-admin">
                     <div class="role-icon">
                         <i class="bi bi-shield-check"></i>
@@ -232,18 +245,6 @@
                     </div>
                 </a>
 
-                <a href="{{ route('phu-xe.dang-nhap') }}" class="role-card role-kiemsoat">
-                    <div class="role-icon">
-                        <i class="bi bi-person-heart"></i>
-                    </div>
-                    <div class="role-info">
-                        <div class="role-title">Phụ Xe</div>
-                        <p class="role-desc">Hỗ trợ tài xế, chăm sóc hành khách</p>
-                    </div>
-                    <div class="role-arrow">
-                        <i class="bi bi-arrow-right"></i>
-                    </div>
-                </a>
             </div>
 
             <div class="login-footer">

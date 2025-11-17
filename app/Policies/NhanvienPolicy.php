@@ -19,7 +19,7 @@ class NhanvienPolicy
      */
     public function isNhanVienBanVe(?Nhanvien $nhanvien): bool
     {
-        return $nhanvien && $nhanvien->macv === 'NVBV' && $nhanvien->isActive();
+        return $nhanvien && $nhanvien->macv === 'BV' && $nhanvien->isActive();
     }
 
     /**
@@ -28,14 +28,6 @@ class NhanvienPolicy
     public function isTaiXe(?Nhanvien $nhanvien): bool
     {
         return $nhanvien && $nhanvien->macv === 'TX' && $nhanvien->isActive();
-    }
-
-    /**
-     * Determine if the user is a Nhân viên kiểm soát.
-     */
-    public function isKiemSoat(?Nhanvien $nhanvien): bool
-    {
-        return $nhanvien && in_array($nhanvien->macv, ['NVKS', 'KS']) && $nhanvien->isActive();
     }
 
     /**
@@ -68,14 +60,6 @@ class NhanvienPolicy
     public function driveTrips(?Nhanvien $nhanvien): bool
     {
         return $this->isTaiXe($nhanvien);
-    }
-
-    /**
-     * Determine if the user can inspect trips (Kiểm soát only).
-     */
-    public function inspectTrips(?Nhanvien $nhanvien): bool
-    {
-        return $this->isKiemSoat($nhanvien);
     }
 
     /**

@@ -33,14 +33,12 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-striped table-hover sortable-table" 
-                       data-sort-column="{{ $sortParams['sort'] ?? 'maxe' }}"
-                       data-sort-direction="{{ $sortParams['direction'] ?? 'asc' }}">
+                <table class="table table-striped table-hover" id="xe-table">
                     <thead>
                         <tr>
-                            <th data-sort="soxe">Biển số <i class="fas fa-sort"></i></th>
-                            <th data-sort="maloai">Loại xe <i class="fas fa-sort"></i></th>
-                            <th data-sort="manv">Tài xế <i class="fas fa-sort"></i></th>
+                            <th class="sortable" data-sort="soxe" style="cursor: pointer;">Biển số <i class="fas fa-sort ms-1 text-muted"></i></th>
+                            <th class="sortable" data-sort="maloai" style="cursor: pointer;">Loại xe <i class="fas fa-sort ms-1 text-muted"></i></th>
+                            <th class="sortable" data-sort="manv" style="cursor: pointer;">Tài xế <i class="fas fa-sort ms-1 text-muted"></i></th>
                             <th>Số ghế</th>
                             <th>Trạng thái</th>
                             <th class="text-center">Thao tác</th>
@@ -77,21 +75,110 @@
                     </tbody>
                 </table>
             </div>
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <div class="pagination-info">
-                    @if($xes->total() > 0)
-                        Hiển thị {{ $xes->firstItem() }} - {{ $xes->lastItem() }} trong {{ $xes->total() }} kết quả
-                    @endif
-                </div>
-                <div>
-                    {{ $xes->appends(request()->query())->links() }}
-                </div>
-            </div>
+            <div class="mt-3" id="xe-pagination"></div>
         </div>
     </div>
 </div>
 @endsection
 
+@push('styles')
+<style>
+    #xe-table thead th.sortable {
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.2s ease;
+    }
+    #xe-table thead th.sortable:hover {
+        background-color: #e9ecef;
+        color: #667eea;
+    }
+    #xe-table thead th.sort-asc,
+    #xe-table thead th.sort-desc {
+        background-color: #e9ecef;
+        color: #667eea;
+        font-weight: 600;
+    }
+</style>
+@endpush
+
 @push('scripts')
-<script src="{{ asset('js/table-sort.js') }}"></script>
+<script src="{{ asset('js/pagination.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const xePagination = new Pagination({
+        tableId: 'xe-table',
+        paginationId: 'xe-pagination',
+        itemsPerPage: 10
+    });
+
+    // Table Sorting
+    const table = document.getElementById('xe-table');
+    const headers = table.querySelectorAll('th.sortable');
+    let currentSort = { column: null, direction: 'asc' };
+
+    headers.forEach(header => {
+        header.addEventListener('click', () => {
+            const sortType = header.getAttribute('data-sort');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            if (currentSort.column === sortType) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = sortType;
+                currentSort.direction = 'asc';
+            }
+
+            // Remove previous sort indicators
+            headers.forEach(h => {
+                h.classList.remove('sort-asc', 'sort-desc');
+                const icon = h.querySelector('i');
+                if (icon) {
+                    icon.className = 'fas fa-sort ms-1 text-muted';
+                }
+            });
+
+            // Add sort indicator to current header
+            header.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+            const icon = header.querySelector('i');
+            if (icon) {
+                icon.className = `fas fa-sort-${currentSort.direction === 'asc' ? 'up' : 'down'} ms-1 text-primary`;
+            }
+
+            // Sort rows
+            rows.sort((a, b) => {
+                let aValue, bValue;
+
+                switch(sortType) {
+                    case 'soxe':
+                        aValue = a.cells[0]?.textContent.trim() || '';
+                        bValue = b.cells[0]?.textContent.trim() || '';
+                        break;
+                    case 'maloai':
+                        aValue = a.cells[1]?.textContent.trim() || '';
+                        bValue = b.cells[1]?.textContent.trim() || '';
+                        break;
+                    case 'manv':
+                        aValue = a.cells[2]?.textContent.trim() || '';
+                        bValue = b.cells[2]?.textContent.trim() || '';
+                        break;
+                    default:
+                        return 0;
+                }
+
+                return currentSort.direction === 'asc'
+                    ? aValue.localeCompare(bValue, 'vi')
+                    : bValue.localeCompare(aValue, 'vi');
+            });
+
+            // Re-render table
+            rows.forEach(row => tbody.appendChild(row));
+
+            // Reset pagination
+            xePagination.currentPage = 1;
+            xePagination.render();
+        });
+    });
+});
+</script>
 @endpush

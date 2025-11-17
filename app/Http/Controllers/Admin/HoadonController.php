@@ -25,7 +25,7 @@ class HoadonController extends Controller
                 return $query->where('trangthai', $status);
             });
 
-        $hoadons = $query->orderBy('thoigian', 'desc')->paginate(10);
+        $hoadons = $query->orderBy('thoigian', 'desc')->get();
 
         return view('admin.HoaDon.Index', compact('hoadons', 'search', 'status'));
     }

@@ -33,9 +33,8 @@
                     $trip = $tripVm->Trip;
                     $departure = 
                         ($trip->thoigiandi ?? null) ? 
-                        
                         \Carbon\Carbon::parse($trip->thoigiandi)->setTimezone(config('app.timezone')) : null;
-                    $arrival = ($trip->thoigiend?) ?? null;
+                    $arrival = ($trip->thoigiend ?? null);
                     // compute road map
                     $roadMap = is_array($tripVm->RoadMapCities) ? implode(' → ', $tripVm->RoadMapCities) : (is_string($tripVm->RoadMapCities)? $tripVm->RoadMapCities : '');
                     $emptySeats = $tripVm->EmptySeats ?? 0;

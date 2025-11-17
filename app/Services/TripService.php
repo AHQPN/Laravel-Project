@@ -14,12 +14,9 @@ class TripService
      */
     public function releaseExpiredPendingSeats(string $tripId): int
     {
-        $now = Carbon::now();
-
+        // Sử dụng scope ExpiredPending để tìm vé pending hết hạn
         $expired = Ve::where('machuyendi', $tripId)
-            ->where('trangthai', 'Pending')
-            ->whereNotNull('pending_expires_at')
-            ->where('pending_expires_at', '<', $now)
+            ->expiredPending()
             ->get();
 
         if ($expired->isEmpty()) return 0;
@@ -43,27 +40,34 @@ class TripService
      */
     public function markSeatsPending(string $tripId, array $seatNums, int $minutes = 15): array
     {
-        $now = Carbon::now();
-        $expires = $now->addMinutes($minutes);
+        return DB::transaction(function () use ($tripId, $seatNums, $minutes) {
+            $now = Carbon::now();
+            $expires = $now->addMinutes($minutes);
 
-        $booked = [];
+            $booked = [];
 
-        foreach ($seatNums as $seatNum) {
-            $seat = Ve::where('machuyendi', $tripId)->where('maghe', $seatNum)->first();
-            if (!$seat) continue;
+            foreach ($seatNums as $seatNum) {
+                // Sử dụng lockForUpdate để tránh race condition
+                $seat = Ve::where('machuyendi', $tripId)
+                    ->where('maghe', $seatNum)
+                    ->lockForUpdate()
+                    ->first();
+                    
+                if (!$seat) continue;
 
-            // only mark if available
-            if (is_null($seat->trangthai) || $seat->trangthai === 'Available') {
-                $seat->trangthai = 'Pending';
-                $seat->pending_expires_at = $expires;
-                $seat->save();
-                $booked[] = $seatNum;
-                // decrement remaining seats
-                Chuyendi::where('machuyendi', $tripId)->decrement('SLgheconlai', 1);
+                // only mark if available using scope
+                if ($seat->trangthai === 'Available' || is_null($seat->trangthai)) {
+                    $seat->trangthai = 'Pending';
+                    $seat->pending_expires_at = $expires;
+                    $seat->save();
+                    $booked[] = $seatNum;
+                    // decrement remaining seats
+                    Chuyendi::where('machuyendi', $tripId)->decrement('SLgheconlai', 1);
+                }
             }
-        }
 
-        return $booked;
+            return $booked;
+        });
     }
 
     /**

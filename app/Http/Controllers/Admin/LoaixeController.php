@@ -14,7 +14,7 @@ class LoaixeController extends Controller
         $loaixe = Loaixe::when($search, function($query, $search) {
             return $query->where('maloai', 'like', "%{$search}%")
                         ->orWhere('tenloai', 'like', "%{$search}%");
-        })->paginate(10);
+        })->get();
 
         return view('admin.LoaiXe.Index', compact('loaixe', 'search'));
     }

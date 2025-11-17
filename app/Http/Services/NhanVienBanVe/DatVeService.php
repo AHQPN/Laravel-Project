@@ -52,9 +52,12 @@ class DatVeService
                     'machuyendi' => $data['machuyendi'],
                     'soghe' => $soghe,
                     'gia' => $chuyendi->giave,
-                    'trangthai' => 'Đã đặt',
+                    'trangthai' => 'Booked',
                     'pickup_status' => 0,
                 ]);
+                
+                // Dispatch event for real-time seat update
+                event(new \App\Events\SeatBooked($data['machuyendi'], $soghe, 'Booked'));
 
                 // 5. Create CTHD (chi tiet hoa don)
                 CTHD::create([
@@ -96,33 +99,35 @@ class DatVeService
     }
 
     /**
-     * Get available seats for a trip.
+     * Get available seats for a trip with optimized query using scopes.
      *
      * @param string $machuyendi
      * @return array
      */
     public function getAvailableSeats(string $machuyendi): array
     {
-        $chuyendi = Chuyendi::with('xe.loaixe')->findOrFail($machuyendi);
-        $sogheToiDa = $chuyendi->xe->loaixe->soghe ?? 40;
+        return DB::transaction(function () use ($machuyendi) {
+            $chuyendi = Chuyendi::with('xe.loaixe')->lockForUpdate()->findOrFail($machuyendi);
+            $sogheToiDa = $chuyendi->xe->loaixe->soghe ?? 40;
 
-        // Get booked seats
-        $bookedSeats = Ve::where('machuyendi', $machuyendi)
-            ->whereIn('trangthai', ['Đã đặt', 'Đã thanh toán'])
-            ->pluck('soghe')
-            ->toArray();
+            // Get unavailable seats using scope (Pending, Booked, approved, pending)
+            $bookedSeats = Ve::where('machuyendi', $machuyendi)
+                ->unavailable()
+                ->pluck('soghe')
+                ->toArray();
 
-        // Generate seat map
-        $seats = [];
-        for ($i = 1; $i <= $sogheToiDa; $i++) {
-            $seatNumber = str_pad($i, 2, '0', STR_PAD_LEFT);
-            $seats[] = [
-                'number' => $seatNumber,
-                'available' => !in_array($seatNumber, $bookedSeats),
-            ];
-        }
+            // Generate seat map
+            $seats = [];
+            for ($i = 1; $i <= $sogheToiDa; $i++) {
+                $seatNumber = str_pad($i, 2, '0', STR_PAD_LEFT);
+                $seats[] = [
+                    'number' => $seatNumber,
+                    'available' => !in_array($seatNumber, $bookedSeats),
+                ];
+            }
 
-        return $seats;
+            return $seats;
+        });
     }
 
     /**

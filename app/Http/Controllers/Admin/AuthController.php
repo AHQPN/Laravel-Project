@@ -51,12 +51,12 @@ class AuthController extends Controller
         return view('NhanVienBanVe.DangNhap');
     }
 
-    // Xử lý đăng nhập nhân viên bán vé (chỉ cho chức vụ NVBV)
+    // Xử lý đăng nhập nhân viên bán vé (chỉ cho chức vụ BV)
     public function nhanvienLogin(LoginRequest $request)
     {
         $nhanvien = Nhanvien::with('chucvu')
             ->where('manv', $request->manv)
-            ->where('macv', 'NVBV')
+            ->where('macv', 'BV')
             ->where('trangthai', 1)
             ->first();
 

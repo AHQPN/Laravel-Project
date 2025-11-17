@@ -15,13 +15,21 @@ class Ve extends Model
     /**
      * SỬA LỖI: Thêm 'trangthai' và 'pending_expires_at' vào đây
      * để cho phép Controller có quyền ghi vào 2 cột này.
+     * Thêm 'trangthai_don' và 'thoidiem_don' cho tài xế đánh dấu đón khách.
      */
     protected $fillable = [
         'mave',
         'machuyendi',
         'maghe',
         'trangthai',
-        'pending_expires_at'
+        'pending_expires_at',
+        'trangthai_don',
+        'thoidiem_don'
+    ];
+
+    protected $casts = [
+        'pending_expires_at' => 'datetime',
+        'thoidiem_don' => 'datetime',
     ];
 
     public function chuyendi()
@@ -49,6 +57,26 @@ class Ve extends Model
     // ==================== SCOPES ====================
 
     /**
+     * Scope lọc ghế available (chưa đặt).
+     * Ghế available là ghế có trạng thái 'Available'.
+     */
+    public function scopeAvailable($query)
+    {
+        return $query->where('trangthai', 'Available');
+    }
+
+    /**
+     * Scope lọc ghế unavailable (đã đặt hoặc đang pending).
+     * Bao gồm: 'Pending', 'Booked', 'approved', 'pending'.
+     */
+    public function scopeUnavailable($query)
+    {
+        return $query->whereIn('trangthai', [
+            'Pending', 'Booked', 'approved', 'pending'
+        ]);
+    }
+
+    /**
      * Scope lọc vé theo trạng thái.
      */
     public function scopeByStatus($query, $trangthai)
@@ -57,19 +85,19 @@ class Ve extends Model
     }
 
     /**
-     * Scope lọc vé đã đặt.
+     * Scope lọc vé đã đặt (Booked).
      */
     public function scopeBooked($query)
     {
-        return $query->where('trangthai', 'Đã đặt');
+        return $query->where('trangthai', 'Booked');
     }
 
     /**
-     * Scope lọc vé đã thanh toán.
+     * Scope lọc vé đã thanh toán (approved).
      */
     public function scopePaid($query)
     {
-        return $query->where('trangthai', 'Đã thanh toán');
+        return $query->where('trangthai', 'approved');
     }
 
     /**
@@ -82,18 +110,33 @@ class Ve extends Model
 
     /**
      * Scope lọc vé đã đón khách.
+     * Sử dụng cột trangthai_don với giá trị 'da_don'.
      */
     public function scopePickedUp($query)
     {
-        return $query->where('pickup_status', 1);
+        return $query->where('trangthai_don', 'da_don');
     }
 
     /**
      * Scope lọc vé chưa đón khách.
+     * Bao gồm 'chua_don' và NULL.
      */
     public function scopeNotPickedUp($query)
     {
-        return $query->where('pickup_status', 0);
+        return $query->where(function($q) {
+            $q->where('trangthai_don', 'chua_don')
+              ->orWhereNull('trangthai_don');
+        });
+    }
+
+    /**
+     * Scope lọc vé với pending đã hết hạn.
+     */
+    public function scopeExpiredPending($query)
+    {
+        return $query->where('trangthai', 'Pending')
+            ->whereNotNull('pending_expires_at')
+            ->where('pending_expires_at', '<', now());
     }
 
     // ==================== ACCESSORS ====================
@@ -104,8 +147,11 @@ class Ve extends Model
     public function getTrangThaiBadgeAttribute()
     {
         return match($this->trangthai) {
-            'Đã đặt' => 'warning',
-            'Đã thanh toán' => 'success',
+            'Pending' => 'info',
+            'Booked' => 'warning',
+            'approved' => 'success',
+            'pending' => 'info',
+            'Available' => 'secondary',
             'Đã hủy' => 'danger',
             default => 'secondary',
         };
@@ -126,7 +172,7 @@ class Ve extends Model
      */
     public function canCancel(): bool
     {
-        return in_array($this->trangthai, ['Đã đặt', 'Đã thanh toán']);
+        return in_array($this->trangthai, ['Pending', 'Booked', 'approved', 'pending']);
     }
 
     /**

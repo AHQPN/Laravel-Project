@@ -36,7 +36,7 @@ class Chucvu extends Model
      */
     public function scopeTicketSeller($query)
     {
-        return $query->where('macv', 'NVBV');
+        return $query->where('macv', 'BV');
     }
 
     /**
@@ -45,14 +45,6 @@ class Chucvu extends Model
     public function scopeDriver($query)
     {
         return $query->where('macv', 'TX');
-    }
-
-    /**
-     * Scope lọc chức vụ nhân viên kiểm soát.
-     */
-    public function scopeInspector($query)
-    {
-        return $query->where('macv', 'NVKS');
     }
 
     // ==================== ACCESSORS ====================

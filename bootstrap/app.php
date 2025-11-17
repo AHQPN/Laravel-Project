@@ -15,7 +15,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin.auth' => \App\Http\Middleware\AdminAuth::class,
             'nhanvien.auth' => \App\Http\Middleware\NhanVienAuth::class,
             'taixe.auth' => \App\Http\Middleware\TaiXeAuth::class,
-            'phuxe.auth' => \App\Http\Middleware\PhuXeAuth::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

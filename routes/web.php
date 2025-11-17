@@ -1,7 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\AuthController;
+
+/*
+|--------------------------------------------------------------------------
+| Admin Controllers
+|--------------------------------------------------------------------------
+*/
+use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\TinhThanhController;
 use App\Http\Controllers\Admin\LoaixeController;
@@ -11,47 +17,90 @@ use App\Http\Controllers\Admin\HoadonController;
 use App\Http\Controllers\Admin\NguoiDungController;
 use App\Http\Controllers\Admin\ThongKeController;
 
-Route::get('/', function () {
-    return redirect()->route('admin.login');
+/*
+|--------------------------------------------------------------------------
+| Customer Controllers (KHÁCH HÀNG)
+|--------------------------------------------------------------------------
+*/
+use App\Http\Controllers\Customer\HomeController;
+use App\Http\Controllers\Customer\TicketController;
+use App\Http\Controllers\Customer\TripController;
+use App\Http\Controllers\Customer\BillController;
+use App\Http\Controllers\Customer\AuthController;
+
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+/*
+|-------------------------
+| CUSTOMER ROUTES (TRANG NGƯỜI DÙNG)
+|-------------------------
+*/
+Route::get('/', [HomeController::class, 'index'])->name('home.index');
+
+// Customer Auth (ĐĂNG NHẬP / ĐĂNG KÝ)
+Route::prefix('auth')->name('auth.')->group(function () {
+    Route::post('login', [AuthController::class, 'login'])->name('login');
+    Route::post('signup', [AuthController::class, 'signup'])->name('signup');
+    Route::get('logout', [AuthController::class, 'logout'])->name('logout');
 });
 
-// Admin Authentication Routes
+// Trip Controller
+Route::prefix('trip')->name('trip.')->group(function () {
+    Route::get('find', [TripController::class, 'gFindTrip'])->name('gfind');
+    Route::post('find', [TripController::class, 'findTrip'])->name('find');
+});
+
+// Ticket Controller
+Route::prefix('ticket')->name('ticket.')->group(function () {
+    Route::get('find', [TicketController::class, 'findTicket'])->name('find');
+    Route::get('book/{tripID}', [TicketController::class, 'bookTicket'])->name('book');
+    Route::post('handle-booking', [TicketController::class, 'handleBookTicket'])->name('handleBooking');
+
+    Route::get('payment', [TicketController::class, 'thanhToan'])->name('thanhToan');
+    Route::post('payment-confirm', [TicketController::class, 'paymentConfirm'])->name('paymentConfirm');
+    Route::get('payment-success', [TicketController::class, 'paymentSuccess'])->name('paymentSuccess');
+    Route::post('rollback', [TicketController::class, 'rollbackBooking'])->name('rollback');
+});
+
+// Bill Controller
+Route::prefix('bill')->name('bill.')->group(function () {
+    Route::get('search', [BillController::class, 'index'])->name('index');
+    Route::post('search', [BillController::class, 'search'])->name('search');
+    Route::get('detail/{id}', [BillController::class, 'chiTietHoaDon'])->name('detail');
+});
+
+
+/*
+|-------------------------
+| ADMIN ROUTES (TRANG QUẢN TRỊ)
+|-------------------------
+*/
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('login', [AuthController::class, 'login'])->name('login.post');
-    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+    // Đổi tên AuthController của Admin để tránh trùng lặp
+    Route::get('login', [AdminAuthController::class, 'showLogin'])->name('login');
+    Route::post('login', [AdminAuthController::class, 'login'])->name('login.post');
+    Route::post('logout', [AdminAuthController::class, 'logout'])->name('logout');
 
     // Protected Admin Routes
     Route::middleware(['admin.auth'])->group(function () {
-        // Dashboard
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-        
-        // Tỉnh Thành (Tuyến đường) - UC-12
         Route::resource('tinhthanh', TinhThanhController::class);
-        
-        // Loại xe - UC-13
         Route::resource('loaixe', LoaixeController::class);
-        
-        // Xe - UC-14
         Route::resource('xe', XeController::class);
-        
-        // Chuyến đi - UC-15
         Route::resource('chuyendi', ChuyendiController::class);
-        
-        // Đơn đặt vé - UC-16
         Route::resource('hoadon', HoadonController::class)->except(['create', 'store', 'edit', 'update']);
         Route::post('hoadon/{id}/approve', [HoadonController::class, 'approve'])->name('hoadon.approve');
         Route::post('hoadon/{id}/cancel', [HoadonController::class, 'cancel'])->name('hoadon.cancel');
-        
-        // Người dùng - UC-17
         Route::prefix('nguoidung')->name('nguoidung.')->group(function () {
-            // Khách hàng
             Route::get('khach', [NguoiDungController::class, 'khach'])->name('khach');
             Route::get('khach/{id}/edit', [NguoiDungController::class, 'khachEdit'])->name('khach.edit');
             Route::put('khach/{id}', [NguoiDungController::class, 'khachUpdate'])->name('khach.update');
             Route::delete('khach/{id}', [NguoiDungController::class, 'khachDestroy'])->name('khach.destroy');
-            
-            // Nhân viên
             Route::get('nhanvien', [NguoiDungController::class, 'nhanvien'])->name('nhanvien');
             Route::get('nhanvien/create', [NguoiDungController::class, 'nhanvienCreate'])->name('nhanvien.create');
             Route::post('nhanvien', [NguoiDungController::class, 'nhanvienStore'])->name('nhanvien.store');
@@ -59,8 +108,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::put('nhanvien/{id}', [NguoiDungController::class, 'nhanvienUpdate'])->name('nhanvien.update');
             Route::delete('nhanvien/{id}', [NguoiDungController::class, 'nhanvienDestroy'])->name('nhanvien.destroy');
         });
-        
-        // Thống kê - UC-18
         Route::get('thongke', [ThongKeController::class, 'index'])->name('thongke.index');
     });
 });

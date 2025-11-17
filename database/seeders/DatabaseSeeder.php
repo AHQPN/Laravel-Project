@@ -2,24 +2,36 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
      * Seed the application's database.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Tắt foreign key check để insert dữ liệu
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Seed từng bảng theo thứ tự dependencies
+        $this->call([
+            ChucvuSeeder::class,
+            TinhtanhSeeder::class,
+            LoaixeSeeder::class,
+            ThanhtoanSeeder::class,
+            NhanvienSeeder::class,
+            KhachSeeder::class,
+            XeSeeder::class,
+            ChuyendiSeeder::class,
+            LotrinhSeeder::class,
+            VeSeeder::class,
+            HoadonSeeder::class,
+            CthddSeeder::class,
         ]);
+
+        // Bật lại foreign key check
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 }

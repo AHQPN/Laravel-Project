@@ -12,7 +12,17 @@ class Ve extends Model
     protected $keyType = 'string';
     public $timestamps = false;
 
-    protected $fillable = ['mave', 'machuyendi', 'maghe'];
+    /**
+     * SỬA LỖI: Thêm 'trangthai' và 'pending_expires_at' vào đây
+     * để cho phép Controller có quyền ghi vào 2 cột này.
+     */
+    protected $fillable = [
+        'mave',
+        'machuyendi',
+        'maghe',
+        'trangthai',
+        'pending_expires_at'
+    ];
 
     public function chuyendi()
     {

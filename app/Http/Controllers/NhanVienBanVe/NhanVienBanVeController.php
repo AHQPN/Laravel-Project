@@ -579,8 +579,6 @@ class NhanVienBanVeController extends Controller
         $xe = Xe::with('loaixe')->where('maxe', $chuyendi->maxe)->first();
         $ves = Ve::where('machuyendi', $chuyendi->machuyendi)->get();
 
-        // booked_seats: lấy từ Ve.maghe, bỏ qua vé đã hủy nếu có cột trangthai
-        // Chuẩn hóa về dạng A01..An để khớp với sơ đồ ghế A01..An trên FE
         $rawBookedSeats = $ves
             ->filter(function ($ve) {
                 return !isset($ve->trangthai) || $ve->trangthai !== 'Đã hủy';
@@ -617,6 +615,9 @@ class NhanVienBanVeController extends Controller
             }
         }
 
+        // Lọc ra các ghế chưa được bán
+        $unbookedSeatCodes = array_diff($allSeatCodes, $bookedSeats);
+
         // Chuẩn hóa danh sách ghế trả về cho FE
         $seats = array_map(function ($code) use ($bookedSeats) {
             return [
@@ -632,6 +633,8 @@ class NhanVienBanVeController extends Controller
                 'tong_so_ghe' => $totalSeats,
             ],
             'booked_seats' => $bookedSeats,
+            // Trả về danh sách các ghế còn trống
+            'unbooked_seats' => array_values($unbookedSeatCodes),
             'seats' => $seats,
         ]);
     }

@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Http\View\Composers\CityComposer;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Nhanvien;
@@ -42,5 +44,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('access-kiemsoat', function (?Nhanvien $nhanvien) {
             return $nhanvien && in_array($nhanvien->macv, ['NVKS', 'KS']) && $nhanvien->isActive();
         });
+        // Cung cấp $cities cho view 'layouts.khach'
+        View::composer('layouts.khach', CityComposer::class);
     }
 }

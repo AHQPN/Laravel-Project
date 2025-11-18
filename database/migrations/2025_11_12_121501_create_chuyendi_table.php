@@ -19,6 +19,9 @@ return new class extends Migration
             $table->dateTime('thoigiandi')->nullable();
             $table->integer('thoigiandichuyen')->nullable();
             $table->integer('gia')->nullable();
+            $table->string('trangthai', 20)->default('sap_chay');
+            $table->dateTime('batdau_luc')->nullable();
+            $table->dateTime('ketthuc_luc')->nullable();
             
             $table->foreign('maxe')->references('maxe')->on('xe');
         });

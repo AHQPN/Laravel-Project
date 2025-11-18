@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('chucvu', function (Blueprint $table) {
-            $table->string('macv', 3)->primary();
+            $table->string('macv', 10)->primary();
             $table->string('chucvu', 100)->nullable()->charset('utf8mb4')->collation('utf8mb4_unicode_ci');
         });
     }

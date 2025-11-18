@@ -3,6 +3,39 @@
 @section('title', 'Quản lý Người dùng')
 
 @section('content')
+<style>
+    /* Smaller pagination buttons */
+    .pagination .page-link {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+    }
+    
+    /* Make tabs more prominent and always visible */
+    .nav-tabs .nav-link {
+        font-size: 1.1rem;
+        font-weight: 500;
+        padding: 0.75rem 1.5rem;
+        color: #495057 !important;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+    }
+    
+    .nav-tabs .nav-link:hover {
+        color: #0056b3 !important;
+        background-color: #e9ecef;
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: #fff !important;
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    
+    .nav-tabs .nav-link i {
+        font-size: 1.2rem;
+        margin-right: 0.5rem;
+    }
+</style>
 <div class="container-fluid">
     <h2 class="mb-4">Quản lý Người dùng</h2>
 
@@ -129,7 +162,7 @@
                                 <tr>
                                     <td>{{ $item->manv }}</td>
                                     <td>{{ $item->ten }}</td>
-                                    <td>{{ $item->chucvu->tencv ?? 'N/A' }}</td>
+                                    <td>{{ $item->chucvu->chucvu ?? 'N/A' }}</td>
                                     <td>{{ $item->sdt }}</td>
                                     <td>{{ $item->email ?? '-' }}</td>
                                     <td class="text-center">

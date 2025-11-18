@@ -14,11 +14,14 @@ class Chuyendi extends Model
 
     protected $fillable = [
         'machuyendi', 'tenchuyen', 'maxe', 'SLgheconlai', 
-        'thoigiandi', 'thoigiandichuyen', 'gia'
+        'thoigiandi', 'thoigiandichuyen', 'gia', 'trangthai',
+        'batdau_luc', 'ketthuc_luc'
     ];
 
     protected $casts = [
         'thoigiandi' => 'datetime',
+        'batdau_luc' => 'datetime',
+        'ketthuc_luc' => 'datetime',
     ];
 
     public function xe()
@@ -34,5 +37,10 @@ class Chuyendi extends Model
     public function ves()
     {
         return $this->hasMany(Ve::class, 'machuyendi', 'machuyendi');
+    }
+
+    public function baocaosucos()
+    {
+        return $this->hasMany(Baocaosuco::class, 'machuyendi', 'machuyendi');
     }
 }

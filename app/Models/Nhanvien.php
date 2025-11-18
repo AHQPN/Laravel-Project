@@ -33,4 +33,9 @@ class Nhanvien extends Model
     {
         return $this->hasMany(Hoadon::class, 'manv', 'manv');
     }
+
+    public function baocaosucos()
+    {
+        return $this->hasMany(Baocaosuco::class, 'manv', 'manv');
+    }
 }

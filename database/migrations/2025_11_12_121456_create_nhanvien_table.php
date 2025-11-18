@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('nhanvien', function (Blueprint $table) {
             $table->string('manv', 5)->primary();
-            $table->string('macv', 3)->nullable();
+            $table->string('macv', 10)->nullable();
             $table->string('password', 255)->nullable();
             $table->string('ten', 100)->nullable()->charset('utf8mb4')->collation('utf8mb4_unicode_ci');
             $table->string('sdt', 15)->nullable();

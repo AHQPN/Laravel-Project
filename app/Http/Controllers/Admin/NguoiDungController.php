@@ -20,7 +20,10 @@ class NguoiDungController extends Controller
                         ->orWhere('sdt', 'like', "%{$search}%");
         })->paginate(10);
 
-        return view('admin.nguoidung.index', compact('khachs', 'search'));
+        // Also load nhanvien for the tabs
+        $nhanviens = Nhanvien::with('chucvu')->paginate(10);
+
+        return view('admin.nguoidung.index', compact('khachs', 'nhanviens', 'search'));
     }
 
     public function khachEdit($id)
@@ -70,7 +73,10 @@ class NguoiDungController extends Controller
                             ->orWhere('sdt', 'like', "%{$search}%");
             })->paginate(10);
 
-        return view('admin.nguoidung.index', compact('nhanviens', 'search'));
+        // Also load khach for the tabs
+        $khachs = Khach::paginate(10);
+
+        return view('admin.nguoidung.index', compact('nhanviens', 'khachs', 'search'));
     }
 
     public function nhanvienCreate()

@@ -208,94 +208,96 @@
         <div class="content row">
             <div class="container">
 
-                <div class=" row">
-                    <div class="container p-4 my-4 border rounded-3 ticket-search-container shadow-lg">
-                        <div class="text-center mb-4">
-                            <h3 class="fw-bold text-primary">
-                                <i class="bi bi-search"></i>
-                                Tìm Kiếm Chuyến Xe
-                            </h3>
-                            <p class="text-muted mb-0">Đặt vé nhanh chóng và thuận tiện</p>
+                @if(!Request::is('book-ticket/*') && !Request::is('ticket/payment') && !Request::is('payment/success'))
+                    <div class=" row">
+                        <div class="container p-4 my-4 border rounded-3 ticket-search-container shadow-lg">
+                            <div class="text-center mb-4">
+                                <h3 class="fw-bold text-primary">
+                                    <i class="bi bi-search"></i>
+                                    Tìm Kiếm Chuyến Xe
+                                </h3>
+                                <p class="text-muted mb-0">Đặt vé nhanh chóng và thuận tiện</p>
+                            </div>
+
+                            <form class="row g-3" id="find-trip-form" action="{{ route('trip.find') }}" method="post"
+                                enctype="multipart/form-data">
+                                @csrf
+
+                                {{-- Tái tạo logic @Html.Action("DSTinh", ...) bằng View Composer --}}
+                                <div class="col-md-3">
+                                    <label for="fromCity" class="form-label fw-bold">
+                                        <i class="bi bi-geo-alt-fill text-success"></i>
+                                        Điểm đi
+                                    </label>
+                                    <select id="fromCity" name="FromCity" class="form-select info-ticket shadow-sm"
+                                        required>
+                                        <option value="" selected disabled>-- Chọn điểm đi --</option>
+                                        @if (!empty($cities))
+                                            @foreach ($cities as $city)
+                                                <option value="{{ $city }}" {{ request('FromCity') == $city ? 'selected' : '' }}>
+                                                    {{ $city }}
+                                                </option>
+                                            @endforeach
+                                        @else
+                                            <option disabled>-- Không có dữ liệu --</option>
+                                        @endif
+                                    </select>
+                                    <span class="form-message text-danger"></span>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="toCity" class="form-label fw-bold">
+                                        <i class="bi bi-geo-fill text-danger"></i>
+                                        Điểm đến
+                                    </label>
+                                    <select id="toCity" name="ToCity" class="form-select info-ticket shadow-sm" required>
+                                        <option value="" selected disabled>-- Chọn điểm đến --</option>
+                                        @if (!empty($cities))
+                                            @foreach ($cities as $city)
+                                                <option value="{{ $city }}" {{ request('ToCity') == $city ? 'selected' : '' }}>
+                                                    {{ $city }}
+                                                </option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                    <span class="form-message text-danger"></span>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="date" class="form-label fw-bold">
+                                        <i class="bi bi-calendar-event text-primary"></i>
+                                        Ngày đi
+                                    </label>
+                                    <input type="date" id="date" value="{{ request('txtDate', now()->format('Y-m-d')) }}"
+                                        name="txtDate" class="form-control info-ticket shadow-sm" required>
+                                    <span class="form-message text-danger"></span>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label for="tickets" class="form-label fw-bold">
+                                        <i class="bi bi-ticket-perforated text-warning"></i>
+                                        Số vé
+                                    </label>
+                                    <select name="SoVe" id="tickets" class="form-select info-ticket shadow-sm">
+                                        <option value="1" selected>1 vé</option>
+                                        <option value="2">2 vé</option>
+                                        <option value="3">3 vé</option>
+                                        <option value="4">4 vé</option>
+                                        <option value="5">5 vé</option>
+                                    </select>
+                                </div>
+                                <div class="d-flex justify-content-center mt-4">
+                                    <button class="btn btn-danger w-100 w-md-50 search-btn shadow pulse-on-hover"
+                                        type="submit">
+                                        <i class="bi bi-search me-2"></i>
+                                        Tìm Chuyến Xe
+                                    </button>
+                                </div>
+                            </form>
+
                         </div>
-
-                        <form class="row g-3" id="find-trip-form" action="{{ route('trip.find') }}" method="post"
-                            enctype="multipart/form-data">
-                            @csrf
-
-                            {{-- Tái tạo logic @Html.Action("DSTinh", ...) bằng View Composer --}}
-                            <div class="col-md-3">
-                                <label for="fromCity" class="form-label fw-bold">
-                                    <i class="bi bi-geo-alt-fill text-success"></i>
-                                    Điểm đi
-                                </label>
-                                <select id="fromCity" name="FromCity" class="form-select info-ticket shadow-sm"
-                                    required>
-                                    <option value="" selected disabled>-- Chọn điểm đi --</option>
-                                    @if (!empty($cities))
-                                        @foreach ($cities as $city)
-                                            <option value="{{ $city }}" {{ request('FromCity') == $city ? 'selected' : '' }}>
-                                                {{ $city }}
-                                            </option>
-                                        @endforeach
-                                    @else
-                                        <option disabled>-- Không có dữ liệu --</option>
-                                    @endif
-                                </select>
-                                <span class="form-message text-danger"></span>
-                            </div>
-
-                            <div class="col-md-3">
-                                <label for="toCity" class="form-label fw-bold">
-                                    <i class="bi bi-geo-fill text-danger"></i>
-                                    Điểm đến
-                                </label>
-                                <select id="toCity" name="ToCity" class="form-select info-ticket shadow-sm" required>
-                                    <option value="" selected disabled>-- Chọn điểm đến --</option>
-                                    @if (!empty($cities))
-                                        @foreach ($cities as $city)
-                                            <option value="{{ $city }}" {{ request('ToCity') == $city ? 'selected' : '' }}>
-                                                {{ $city }}
-                                            </option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                                <span class="form-message text-danger"></span>
-                            </div>
-
-                            <div class="col-md-3">
-                                <label for="date" class="form-label fw-bold">
-                                    <i class="bi bi-calendar-event text-primary"></i>
-                                    Ngày đi
-                                </label>
-                                <input type="date" id="date" value="{{ request('txtDate', now()->format('Y-m-d')) }}"
-                                    name="txtDate" class="form-control info-ticket shadow-sm" required>
-                                <span class="form-message text-danger"></span>
-                            </div>
-
-                            <div class="col-md-3">
-                                <label for="tickets" class="form-label fw-bold">
-                                    <i class="bi bi-ticket-perforated text-warning"></i>
-                                    Số vé
-                                </label>
-                                <select name="SoVe" id="tickets" class="form-select info-ticket shadow-sm">
-                                    <option value="1" selected>1 vé</option>
-                                    <option value="2">2 vé</option>
-                                    <option value="3">3 vé</option>
-                                    <option value="4">4 vé</option>
-                                    <option value="5">5 vé</option>
-                                </select>
-                            </div>
-                            <div class="d-flex justify-content-center mt-4">
-                                <button class="btn btn-danger w-100 w-md-50 search-btn shadow pulse-on-hover"
-                                    type="submit">
-                                    <i class="bi bi-search me-2"></i>
-                                    Tìm Chuyến Xe
-                                </button>
-                            </div>
-                        </form>
-
                     </div>
-                </div>
+                @endif
 
                 @yield('content')
 

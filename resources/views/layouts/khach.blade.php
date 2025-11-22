@@ -282,33 +282,59 @@
             <button type="button" class="close-form border-0 p-0" aria-label="Close" onclick="closeLoginForm()">
                 <span class="fs-2" aria-hidden="true">&times;</span>
             </button>
-            <div class="header-form-text text-center co-6 fs-2">Đăng nhập</div>
+            
+            <div class="form-header text-center mb-4">
+                <div class="form-icon mb-3">
+                    <i class="bi bi-person-circle" style="font-size: 4rem; color: #f97019;"></i>
+                </div>
+                <h2 class="header-form-text fw-bold mb-2" style="color: #2c3e50;">Đăng Nhập</h2>
+                <p class="text-muted">Chào mừng bạn trở lại!</p>
+            </div>
 
-            <div class="my-5">
-                <input type="text" name="sdt" class="form-control-lg form-control" id="Phone-number-login"
-                    placeholder="Số điện thoại" required>
+            <div class="form-input-group mb-4">
+                <label class="form-label fw-bold text-secondary mb-2">
+                    <i class="bi bi-phone me-2"></i>Số điện thoại
+                </label>
+                <div class="input-with-icon">
+                    <i class="bi bi-telephone-fill input-icon"></i>
+                    <input type="text" name="sdt" class="form-control form-control-lg modern-input" 
+                           id="Phone-number-login" placeholder="Nhập số điện thoại" required>
+                </div>
                 <span class="form-message"></span>
             </div>
-            <div class="my-5">
-                <input type="password" name="pw" class="form-control-lg form-control" id="Pw-login"
-                    placeholder="Mật khẩu" required>
+
+            <div class="form-input-group mb-4">
+                <label class="form-label fw-bold text-secondary mb-2">
+                    <i class="bi bi-lock me-2"></i>Mật khẩu
+                </label>
+                <div class="input-with-icon">
+                    <i class="bi bi-lock-fill input-icon"></i>
+                    <input type="password" name="pw" class="form-control form-control-lg modern-input" 
+                           id="Pw-login" placeholder="Nhập mật khẩu" required>
+                    <i class="bi bi-eye toggle-password" onclick="togglePassword('Pw-login')"></i>
+                </div>
                 <span class="form-message"></span>
             </div>
 
             @if (session('error'))
-                <div class="alert alert-danger text-center">
+                <div class="alert alert-danger alert-modern text-center animate-shake">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
                     {{ session('error') }}
                 </div>
             @endif
 
-            <div class="row justify-content-center">
-                <button type="submit" class="btn btn-primary w-50" style="background-color: #f97019;">
-                    Đăng nhập
+            <div class="d-grid gap-2 mb-3">
+                <button type="submit" class="btn btn-lg btn-auth-primary">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>
+                    Đăng Nhập
                 </button>
             </div>
-            <div class="form-footer">
-                <span>Chưa có tài khoản ?</span>
-                <a href="#" class="register-link">Ấn vào đây để đăng ký</a>
+
+            <div class="form-footer text-center">
+                <p class="text-muted mb-0">
+                    Chưa có tài khoản? 
+                    <a href="#" class="register-link fw-bold">Đăng ký ngay</a>
+                </p>
             </div>
         </form>
     </div>
@@ -316,47 +342,117 @@
     <div class="register-form">
         <form action="{{ route('auth.signup') }}" id="register-form1" method="post" enctype="multipart/form-data">
             @csrf
-            <button type="button" class="close-form border-0 p-0 " aria-label="Close" onclick="closeRegisterForm()">
+            <button type="button" class="close-form border-0 p-0" aria-label="Close" onclick="closeRegisterForm()">
                 <span class="fs-2" aria-hidden="true">&times;</span>
             </button>
-            <div class="header-form-text text-center co-6 fs-2">Đăng ký</div>
+            
+            <div class="form-header text-center mb-4">
+                <div class="form-icon mb-3">
+                    <i class="bi bi-person-plus-fill" style="font-size: 3.5rem; color: #f97019;"></i>
+                </div>
+                <h2 class="header-form-text fw-bold mb-2" style="color: #2c3e50;">Đăng Ký Tài Khoản</h2>
+                <p class="text-muted">Tạo tài khoản mới để đặt vé nhanh chóng</p>
+            </div>
 
-            <div class="my-3">
-                <input type="text" name="ten" class="form-control" id="tenkh" placeholder="Họ Tên" required>
-                <span class="form-message"></span>
-            </div>
-            <div class="my-3 form-group">
-                <input name="sdt" type="text" class=" form-control" id="Phone-number" placeholder="Số điện thoại"
-                    required>
-                <span class="form-message"></span>
-            </div>
-            <div class="my-3 form-group">
-                <input name="diachi" type="text" class=" form-control" id="Address" placeholder="Địa chỉ">
-                <span class="form-message"></span>
-            </div>
-            <div class="my-3 form-group">
-                <input name="pw" type="password" class=" form-control" id="Pw-register" placeholder="Mật khẩu" required>
-                <span class="form-message"></span>
-            </div>
-            <div class="my-3 form-group">
-                <input name="confrimed-pw" type="password" class=" form-control" id="Pw-confrim"
-                    placeholder="Xác nhận mật khẩu" required>
-                <span class="form-message"></span>
+            <div class="row g-3">
+                <div class="col-12">
+                    <div class="form-input-group">
+                        <label class="form-label fw-bold text-secondary mb-2">
+                            <i class="bi bi-person me-2"></i>Họ và Tên
+                        </label>
+                        <div class="input-with-icon">
+                            <i class="bi bi-person-fill input-icon"></i>
+                            <input type="text" name="ten" class="form-control modern-input" 
+                                   id="tenkh" placeholder="Nhập họ và tên" required>
+                        </div>
+                        <span class="form-message"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-input-group">
+                        <label class="form-label fw-bold text-secondary mb-2">
+                            <i class="bi bi-phone me-2"></i>Số điện thoại
+                        </label>
+                        <div class="input-with-icon">
+                            <i class="bi bi-telephone-fill input-icon"></i>
+                            <input name="sdt" type="text" class="form-control modern-input" 
+                                   id="Phone-number" placeholder="Nhập số điện thoại" required>
+                        </div>
+                        <span class="form-message"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-input-group">
+                        <label class="form-label fw-bold text-secondary mb-2">
+                            <i class="bi bi-geo-alt me-2"></i>Địa chỉ
+                        </label>
+                        <div class="input-with-icon">
+                            <i class="bi bi-house-fill input-icon"></i>
+                            <input name="diachi" type="text" class="form-control modern-input" 
+                                   id="Address" placeholder="Nhập địa chỉ">
+                        </div>
+                        <span class="form-message"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-input-group">
+                        <label class="form-label fw-bold text-secondary mb-2">
+                            <i class="bi bi-lock me-2"></i>Mật khẩu
+                        </label>
+                        <div class="input-with-icon">
+                            <i class="bi bi-lock-fill input-icon"></i>
+                            <input name="pw" type="password" class="form-control modern-input" 
+                                   id="Pw-register" placeholder="Nhập mật khẩu" required>
+                            <i class="bi bi-eye toggle-password" onclick="togglePassword('Pw-register')"></i>
+                        </div>
+                        <span class="form-message"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-input-group">
+                        <label class="form-label fw-bold text-secondary mb-2">
+                            <i class="bi bi-shield-check me-2"></i>Xác nhận mật khẩu
+                        </label>
+                        <div class="input-with-icon">
+                            <i class="bi bi-shield-fill-check input-icon"></i>
+                            <input name="confrimed-pw" type="password" class="form-control modern-input" 
+                                   id="Pw-confrim" placeholder="Nhập lại mật khẩu" required>
+                            <i class="bi bi-eye toggle-password" onclick="togglePassword('Pw-confrim')"></i>
+                        </div>
+                        <span class="form-message"></span>
+                    </div>
+                </div>
             </div>
 
             @if (session('error_register'))
-                <div class="alert alert-danger text-center">
+                <div class="alert alert-danger alert-modern text-center mt-3 animate-shake">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
                     {{ session('error_register') }}
                 </div>
             @endif
             @if (session('success'))
-                <div class="alert alert-success text-center">
+                <div class="alert alert-success alert-modern text-center mt-3 animate-bounce">
+                    <i class="bi bi-check-circle-fill me-2"></i>
                     {{ session('success') }}
                 </div>
             @endif
 
-            <div class="row justify-content-center">
-                <button type="submit" class="btn w-50" style="background-color: #f97019;">Đăng ký</button>
+            <div class="d-grid gap-2 mt-4">
+                <button type="submit" class="btn btn-lg btn-auth-primary">
+                    <i class="bi bi-person-plus me-2"></i>
+                    Đăng Ký Ngay
+                </button>
+            </div>
+
+            <div class="form-footer text-center mt-3">
+                <p class="text-muted mb-0">
+                    Đã có tài khoản? 
+                    <a href="#" class="register-link fw-bold" onclick="event.preventDefault(); closeRegisterForm(); showLoginForm();">Đăng nhập</a>
+                </p>
             </div>
         </form>
     </div>
@@ -371,6 +467,22 @@
     <script>
         const today = new Date().toISOString().split("T")[0];
         document.getElementById("date").setAttribute("min", today);
+
+        // Toggle password visibility
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.parentElement.querySelector('.toggle-password');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        }
     </script>
 
     @if(session('ShowLogin'))

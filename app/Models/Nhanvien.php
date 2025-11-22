@@ -7,15 +7,25 @@ use Illuminate\Support\Facades\Hash;
 
 class Nhanvien extends Model
 {
-    protected $table = 'Nhanvien';
+    protected $table = 'nhanvien';
     protected $primaryKey = 'manv';
     public $incrementing = false;
     protected $keyType = 'string';
     public $timestamps = false;
 
     protected $fillable = [
-        'manv', 'macv', 'password', 'ten', 'sdt', 'diachi', 
-        'cccd', 'email', 'ngaysinh', 'gioitinh', 'hinhanh', 'trangthai'
+        'manv',
+        'macv',
+        'password',
+        'ten',
+        'sdt',
+        'diachi',
+        'cccd',
+        'email',
+        'ngaysinh',
+        'gioitinh',
+        'hinhanh',
+        'trangthai'
     ];
 
     protected $hidden = ['password'];

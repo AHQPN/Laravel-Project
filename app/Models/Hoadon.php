@@ -7,15 +7,21 @@ use Carbon\Carbon;
 
 class Hoadon extends Model
 {
-    protected $table = 'Hoadon';
+    protected $table = 'hoadon';
     protected $primaryKey = 'mahd';
     public $incrementing = false;
     protected $keyType = 'string';
     public $timestamps = false;
 
     protected $fillable = [
-        'mahd', 'makh', 'manv', 'thoigian', 'matt', 
-        'soluong', 'thanhtien', 'trangthai'
+        'mahd',
+        'makh',
+        'manv',
+        'thoigian',
+        'matt',
+        'soluong',
+        'thanhtien',
+        'trangthai'
     ];
 
     protected $casts = [
@@ -119,7 +125,7 @@ class Hoadon extends Model
     {
         $year = $year ?? Carbon::now()->year;
         return $query->whereMonth('thoigian', $month)
-                     ->whereYear('thoigian', $year);
+            ->whereYear('thoigian', $year);
     }
 
     // ==================== ACCESSORS ====================
@@ -129,7 +135,7 @@ class Hoadon extends Model
      */
     public function getTrangThaiBadgeAttribute()
     {
-        return match($this->trangthai) {
+        return match ($this->trangthai) {
             'Chờ xử lý' => 'warning',
             'Đã thanh toán' => 'success',
             'Đã hủy' => 'danger',

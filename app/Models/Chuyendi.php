@@ -7,7 +7,7 @@ use Carbon\Carbon;
 
 class Chuyendi extends Model
 {
-    protected $table = 'Chuyendi';
+    protected $table = 'chuyendi';
     protected $primaryKey = 'machuyendi';
     public $incrementing = false;
     protected $keyType = 'string';
@@ -106,7 +106,7 @@ class Chuyendi extends Model
     // Lấy badge màu theo trạng thái chuyến đi
     public function getTrangThaiBadgeAttribute()
     {
-        return match($this->trangthai) {
+        return match ($this->trangthai) {
             'Chưa khởi hành' => 'warning',
             'Đang di chuyển' => 'info',
             'Đã hoàn thành' => 'success',
@@ -130,7 +130,7 @@ class Chuyendi extends Model
     // Kiểm tra chuyến đi có thể bắt đầu không
     public function canStart(): bool
     {
-        return $this->trangthai === 'Chưa khởi hành' && 
-               Carbon::parse($this->thoigiandi)->isToday();
+        return $this->trangthai === 'Chưa khởi hành' &&
+            Carbon::parse($this->thoigiandi)->isToday();
     }
 }

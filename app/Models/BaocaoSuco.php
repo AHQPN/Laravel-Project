@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BaocaoSuco extends Model
 {
-    protected $table = 'BaocaoSuco';
+    protected $table = 'baocaosuco';
     protected $primaryKey = 'mabaocao';
     public $incrementing = false;
     protected $keyType = 'string';
@@ -102,7 +102,7 @@ class BaocaoSuco extends Model
      */
     public function getTrangThaiBadgeAttribute()
     {
-        return match($this->trangthai) {
+        return match ($this->trangthai) {
             'Đang xử lý' => 'warning',
             'Đã hoàn thành' => 'success',
             'Đã hủy' => 'danger',

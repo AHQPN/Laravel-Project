@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Loaixe extends Model
 {
-    protected $table = 'Loaixe';
+    protected $table = 'loaixe';
     protected $primaryKey = 'maloai';
     public $incrementing = false;
     protected $keyType = 'string';

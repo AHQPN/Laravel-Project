@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CTHD extends Model
 {
-    protected $table = 'CTHD';
+    protected $table = 'cthd';
     public $incrementing = false;
     public $timestamps = false;
 

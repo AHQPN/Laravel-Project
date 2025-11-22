@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Lotrinh extends Model
 {
-    protected $table = 'Lotrinh';
+    protected $table = 'lotrinh';
     public $incrementing = false;
     public $timestamps = false;
 

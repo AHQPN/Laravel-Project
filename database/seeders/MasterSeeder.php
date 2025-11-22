@@ -15,9 +15,9 @@ class MasterSeeder extends Seeder
     public function run(): void
     {
         $this->command->info('🚀 Bắt đầu seed toàn bộ database...');
-        
+
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-        
+
         $this->truncateAllTables();
         $this->seedChucvu();
         $this->seedTinhThanh();
@@ -28,42 +28,42 @@ class MasterSeeder extends Seeder
         $this->seedXe();
         $this->seedChuyendiVaLotrinh();
         $this->seedVeVaHoadon();
-        
+
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-        
+
         $this->command->info('✅ Hoàn thành seed toàn bộ database!');
     }
 
     private function truncateAllTables(): void
     {
         $this->command->warn('🗑️  Xóa toàn bộ dữ liệu cũ...');
-        
+
         $tables = ['CTHD', 'Hoadon', 'Ve', 'Lotrinh', 'Chuyendi', 'Xe', 'Khach', 'Nhanvien', 'Thanhtoan', 'Loaixe', 'TinhThanh', 'Chucvu'];
-        
+
         foreach ($tables as $table) {
             DB::table($table)->truncate();
         }
-        
+
         $this->command->info('✓ Đã xóa dữ liệu cũ');
     }
 
     private function seedChucvu(): void
     {
         $this->command->info('👔 Tạo chức vụ...');
-        
+
         DB::table('Chucvu')->insert([
             ['macv' => 'QL', 'chucvu' => 'Quản lý'],
             ['macv' => 'BV', 'chucvu' => 'Nhân viên bán vé'],
             ['macv' => 'TX', 'chucvu' => 'Tài xế'],
         ]);
-        
+
         $this->command->info('✓ Đã tạo 3 chức vụ');
     }
 
     private function seedTinhThanh(): void
     {
         $this->command->info('🗺️  Tạo tỉnh thành...');
-        
+
         DB::table('TinhThanh')->insert([
             ['matinh' => 'CT', 'ten' => 'Can Tho'],
             ['matinh' => 'DL', 'ten' => 'Da Lat'],
@@ -74,14 +74,14 @@ class MasterSeeder extends Seeder
             ['matinh' => 'SG', 'ten' => 'TP. Ho Chi Minh'],
             ['matinh' => 'VT', 'ten' => 'Vung Tau'],
         ]);
-        
+
         $this->command->info('✓ Đã tạo 8 tỉnh thành');
     }
 
     private function seedLoaixe(): void
     {
         $this->command->info('🚍 Tạo loại xe...');
-        
+
         DB::table('Loaixe')->insert([
             ['maloai' => 'LX1', 'tenloai' => 'Giuong nam 44 cho', 'soghe' => 44],
             ['maloai' => 'LX2', 'tenloai' => 'Ghe ngoi 30 cho', 'soghe' => 30],
@@ -89,26 +89,26 @@ class MasterSeeder extends Seeder
             ['maloai' => 'LX4', 'tenloai' => 'Ghe ngoi 45 cho', 'soghe' => 45],
             ['maloai' => 'LX5', 'tenloai' => 'Limousine 22 cho', 'soghe' => 22],
         ]);
-        
+
         $this->command->info('✓ Đã tạo 5 loại xe');
     }
 
     private function seedThanhtoan(): void
     {
         $this->command->info('💳 Tạo phương thức thanh toán...');
-        
+
         DB::table('Thanhtoan')->insert([
             ['matt' => 'TM', 'ptthanhtoan' => 'Tien mat'],
             ['matt' => 'CK', 'ptthanhtoan' => 'Chuyen khoan'],
         ]);
-        
+
         $this->command->info('✓ Đã tạo 2 phương thức thanh toán');
     }
 
     private function seedNhanvien(): void
     {
         $this->command->info('👥 Tạo nhân viên...');
-        
+
         DB::table('Nhanvien')->insert([
             [
                 'manv' => 'NV001',
@@ -153,7 +153,7 @@ class MasterSeeder extends Seeder
                 'trangthai' => 1,
             ],
         ]);
-        
+
         $nhanvienCount = 3;
         for ($i = 4; $i <= 15; $i++) {
             $macv = ['BV', 'TX'][rand(0, 1)];
@@ -173,14 +173,14 @@ class MasterSeeder extends Seeder
             ]);
             $nhanvienCount++;
         }
-        
+
         $this->command->info("✓ Đã tạo {$nhanvienCount} nhân viên");
     }
 
     private function seedKhach(): void
     {
         $this->command->info('👤 Tạo khách hàng...');
-        
+
         $count = 80;
         for ($i = 1; $i <= $count; $i++) {
             DB::table('Khach')->insert([
@@ -191,21 +191,21 @@ class MasterSeeder extends Seeder
                 'password' => Hash::make('123456'),
             ]);
         }
-        
+
         $this->command->info("✓ Đã tạo {$count} khách hàng");
     }
 
     private function seedXe(): void
     {
         $this->command->info('🚌 Tạo xe...');
-        
+
         $loaixe = ['LX1', 'LX2', 'LX3', 'LX4', 'LX5'];
         $taixe = DB::table('Nhanvien')->where('macv', 'TX')->pluck('manv')->toArray();
-        
+
         $count = 20;
         for ($i = 1; $i <= $count; $i++) {
             $bienSo = rand(10, 99) . chr(rand(65, 90)) . '-' . rand(10000, 99999);
-            
+
             DB::table('Xe')->insert([
                 'maxe' => 'XE' . str_pad($i, 3, '0', STR_PAD_LEFT),
                 'maloai' => $loaixe[array_rand($loaixe)],
@@ -213,14 +213,14 @@ class MasterSeeder extends Seeder
                 'manv' => !empty($taixe) ? $taixe[array_rand($taixe)] : null,
             ]);
         }
-        
+
         $this->command->info("✓ Đã tạo {$count} xe");
     }
 
     private function seedChuyendiVaLotrinh(): void
     {
         $this->command->info('🚌 Tạo chuyến đi và lộ trình...');
-        
+
         $routes = [
             ['HN', 'DN', 'Ha Noi - Da Nang', 350000, 720],
             ['DN', 'HN', 'Da Nang - Ha Noi', 350000, 720],
@@ -253,21 +253,22 @@ class MasterSeeder extends Seeder
 
         for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
             $tripsPerDay = rand(5, 9);
-            
+
             for ($i = 0; $i < $tripsPerDay; $i++) {
                 $route = $routes[array_rand($routes)];
                 $shift = $shifts[array_rand($shifts)];
-                
+
                 $datetime = Carbon::parse($date->format('Y-m-d') . ' ' . $shift[1]);
-                
+
                 $baseCode = $route[0] . '-' . $route[1] . '-' . $datetime->format('dmy') . $shift[0];
                 $code = $baseCode;
                 $attempt = 0;
-                
+
                 while (DB::table('Chuyendi')->where('machuyendi', $code)->exists()) {
                     $attempt++;
                     $code = $baseCode . $attempt;
-                    if ($attempt > 10) break;
+                    if ($attempt > 10)
+                        break;
                 }
 
                 $maxe = $xeIds[array_rand($xeIds)];
@@ -308,7 +309,7 @@ class MasterSeeder extends Seeder
     private function seedVeVaHoadon(): void
     {
         $this->command->info('🎫 Tạo vé và hóa đơn...');
-        
+
         $trips = DB::table('Chuyendi')
             ->whereBetween('thoigiandi', ['2025-11-10 00:00:00', '2025-11-22 23:59:59'])
             ->orderBy('thoigiandi')
@@ -328,10 +329,10 @@ class MasterSeeder extends Seeder
             $xe = DB::table('Xe')->where('maxe', $trip->maxe)->first();
             $loaixe = $xe ? DB::table('Loaixe')->where('maloai', $xe->maloai)->first() : null;
             $sucChua = $loaixe ? $loaixe->soghe : 40;
-            
+
             $tripDate = Carbon::parse($trip->thoigiandi);
             $soldPercentage = 0;
-            
+
             if ($tripDate->isPast()) {
                 $soldPercentage = rand(70, 100);
             } elseif ($tripDate->isToday()) {
@@ -341,28 +342,28 @@ class MasterSeeder extends Seeder
             } else {
                 $soldPercentage = rand(10, 40);
             }
-            
-            $soldSeats = (int)(($soldPercentage / 100) * $sucChua);
+
+            $soldSeats = (int) (($soldPercentage / 100) * $sucChua);
             $soldSeats = max(1, min($soldSeats, $sucChua));
-            
+
             $seats = [];
             for ($i = 1; $i <= $sucChua; $i++) {
                 $seats[] = $i <= 20 ? 'A' . str_pad($i, 2, '0', STR_PAD_LEFT) : 'B' . str_pad($i - 20, 2, '0', STR_PAD_LEFT);
             }
             shuffle($seats);
-            
+
             $seatsToBook = array_slice($seats, 0, $soldSeats);
 
             foreach ($seatsToBook as $seatNumber) {
                 $this->ticketCounter++;
                 $mave = 'VE' . str_pad($this->ticketCounter, 5, '0', STR_PAD_LEFT);
-                
+
                 DB::table('Ve')->insert([
                     'mave' => $mave,
                     'machuyendi' => $trip->machuyendi,
                     'maghe' => $seatNumber,
                 ]);
-                
+
                 $ticketCount++;
 
                 if (rand(1, 100) <= 90) {
@@ -386,13 +387,14 @@ class MasterSeeder extends Seeder
     {
         $this->invoiceCounter++;
         $mahd = 'HD' . str_pad($this->invoiceCounter, 7, '0', STR_PAD_LEFT);
-        
+
         $attempt = 0;
         while (DB::table('Hoadon')->where('mahd', $mahd)->exists()) {
             $this->invoiceCounter++;
             $mahd = 'HD' . str_pad($this->invoiceCounter, 7, '0', STR_PAD_LEFT);
             $attempt++;
-            if ($attempt > 100) return false;
+            if ($attempt > 100)
+                return false;
         }
 
         $makh = $khachIds[array_rand($khachIds)];

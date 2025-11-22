@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ve extends Model
 {
-    protected $table = 'Ve';
+    protected $table = 've';
     protected $primaryKey = 'mave';
     public $incrementing = false;
     protected $keyType = 'string';
@@ -72,7 +72,10 @@ class Ve extends Model
     public function scopeUnavailable($query)
     {
         return $query->whereIn('trangthai', [
-            'Pending', 'Booked', 'approved', 'pending'
+            'Pending',
+            'Booked',
+            'approved',
+            'pending'
         ]);
     }
 
@@ -123,9 +126,9 @@ class Ve extends Model
      */
     public function scopeNotPickedUp($query)
     {
-        return $query->where(function($q) {
+        return $query->where(function ($q) {
             $q->where('trangthai_don', 'chua_don')
-              ->orWhereNull('trangthai_don');
+                ->orWhereNull('trangthai_don');
         });
     }
 
@@ -146,7 +149,7 @@ class Ve extends Model
      */
     public function getTrangThaiBadgeAttribute()
     {
-        return match($this->trangthai) {
+        return match ($this->trangthai) {
             'Pending' => 'info',
             'Booked' => 'warning',
             'approved' => 'success',

@@ -7,7 +7,7 @@
     <title>Bootstrap demo</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-          xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link href="{{ asset('css/base.css') }}" rel="stylesheet" />
     <link href="{{ asset('css/index.css') }}" rel="stylesheet" />
     <link href="{{ asset('css/Trip.css') }}" rel="stylesheet" />
@@ -24,14 +24,16 @@
 
                     @if (session('UserID'))
                         <div class="col-auto">
-                            <div class="d-inline-block position-relative">
-                                <span class="dropdown-toggle" id="userDropdown" style="cursor: pointer; color: white; font-weight: bold;">
+                            <div class="d-inline-block position-relative user-menu-wrapper">
+                                <span class="dropdown-toggle" id="userDropdown"
+                                    style="cursor: pointer; color: white; font-weight: bold; padding: 10px 15px; background: rgba(255,255,255,0.2); border-radius: 25px; display: inline-block; transition: all 0.3s ease;">
+                                    <i class="bi bi-person-circle me-2"></i>
                                     {{ session('UserName', 'Tài khoản') }}
                                 </span>
                                 <ul class="dropdown-menu-custom">
                                     <li>
                                         <a class="dropdown-item-custom" href="#">
-                                            <i class="bi bi-info-circle"></i>
+                                            <i class="bi bi-person-fill"></i>
                                             Thông tin cá nhân
                                         </a>
                                     </li>
@@ -43,7 +45,8 @@
                                     </li>
                                     <li>
                                         <a class="dropdown-item-custom" href="{{ route('auth.logout') }}">
-                                            <i class="bi bi-box-arrow-in-left"></i> Đăng xuất
+                                            <i class="bi bi-box-arrow-right"></i>
+                                            Đăng xuất
                                         </a>
                                     </li>
                                 </ul>
@@ -64,21 +67,22 @@
                         <div class="container-fluid">
 
                             <div class="offcanvas offcanvas-end " tabindex="-1" id="offcanvasNavbar"
-                                 aria-labelledby="offcanvasNavbarLabel">
+                                aria-labelledby="offcanvasNavbarLabel">
                                 <div class="offcanvas-header">
                                     <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
-                                            aria-label="Close"></button>
+                                        aria-label="Close"></button>
                                 </div>
                                 <div class="offcanvas-body ">
                                     <ul class="navbar-nav justify-content-center flex-grow-1 ">
                                         <li class="nav-item mx-lg-3">
                                             <a class="nav-link text-white active" aria-current="page"
-                                               href="{{ route('home.index') }}">Trang chủ</a>
+                                                href="{{ route('home.index') }}">Trang chủ</a>
                                         </li>
 
                                         <li class="nav-item mx-lg-3">
-                                            <a class="nav-link text-white" href="{{ route('ticket.find') }}">Tra cứu vé</a>
+                                            <a class="nav-link text-white" href="{{ route('ticket.find') }}">Tra cứu
+                                                vé</a>
                                         </li>
                                         <li class="nav-item mx-lg-3">
                                             <a class="nav-link text-white" href="{{ route('bill.index') }}">Hóa đơn</a>
@@ -96,8 +100,8 @@
                             </div>
 
                             <button class="navbar-toggler bg-white border-0 ms-auto" type="button"
-                                    data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
-                                    aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+                                data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+                                aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
                                 <span class="navbar-toggler-icon"></span>
                             </button>
 
@@ -106,7 +110,7 @@
                 </div>
                 <div class="banner row w-75 justify-content-center d-none d-md-block">
                     <img src="https://cdn.futabus.vn/futa-busline-web-cms-prod/2257_x_501_px_2ecaaa00d0/2257_x_501_px_2ecaaa00d0.png"
-                         alt="">
+                        alt="">
                 </div>
             </div>
 
@@ -115,22 +119,34 @@
             <div class="container">
 
                 <div class=" row">
-                    <div class="container p-4 my-4 border rounded-3 ticket-search-container">
+                    <div class="container p-4 my-4 border rounded-3 ticket-search-container shadow-lg">
+                        <div class="text-center mb-4">
+                            <h3 class="fw-bold text-primary">
+                                <i class="bi bi-search"></i>
+                                Tìm Kiếm Chuyến Xe
+                            </h3>
+                            <p class="text-muted mb-0">Đặt vé nhanh chóng và thuận tiện</p>
+                        </div>
 
-                        <form class="row g-3" id="find-trip-form" action="{{ route('trip.find') }}" method="post" enctype="multipart/form-data">
+                        <form class="row g-3" id="find-trip-form" action="{{ route('trip.find') }}" method="post"
+                            enctype="multipart/form-data">
                             @csrf
 
                             {{-- Tái tạo logic @Html.Action("DSTinh", ...) bằng View Composer --}}
                             <div class="col-md-3">
-                                <label for="fromCity" class="form-label">Điểm đi</label>
-                                <select id="fromCity" name="FromCity" class="form-select info-ticket" required>
-                                    <option value="" selected disabled>-- Chọn bến xe --</option>
+                                <label for="fromCity" class="form-label fw-bold">
+                                    <i class="bi bi-geo-alt-fill text-success"></i>
+                                    Điểm đi
+                                </label>
+                                <select id="fromCity" name="FromCity" class="form-select info-ticket shadow-sm"
+                                    required>
+                                    <option value="" selected disabled>-- Chọn điểm đi --</option>
                                     @if (!empty($cities))
-                                    @foreach ($cities as $city)
-                                        <option value="{{ $city }}" {{ request('FromCity') == $city ? 'selected' : '' }}>
-                                            {{ $city }}
-                                        </option>
-                                    @endforeach
+                                        @foreach ($cities as $city)
+                                            <option value="{{ $city }}" {{ request('FromCity') == $city ? 'selected' : '' }}>
+                                                {{ $city }}
+                                            </option>
+                                        @endforeach
                                     @else
                                         <option disabled>-- Không có dữ liệu --</option>
                                     @endif
@@ -139,38 +155,52 @@
                             </div>
 
                             <div class="col-md-3">
-                                <label for="toCity" class="form-label">Điểm đến</label>
-                                <select id="toCity" name="ToCity" class="form-select info-ticket" required>
-                                    <option value="" selected disabled>-- Chọn bến xe --</option>
+                                <label for="toCity" class="form-label fw-bold">
+                                    <i class="bi bi-geo-fill text-danger"></i>
+                                    Điểm đến
+                                </label>
+                                <select id="toCity" name="ToCity" class="form-select info-ticket shadow-sm" required>
+                                    <option value="" selected disabled>-- Chọn điểm đến --</option>
                                     @if (!empty($cities))
-                                    @foreach ($cities as $city)
-                                        <option value="{{ $city }}" {{ request('ToCity') == $city ? 'selected' : '' }}>
-                                            {{ $city }}
-                                        </option>
-                                    @endforeach
+                                        @foreach ($cities as $city)
+                                            <option value="{{ $city }}" {{ request('ToCity') == $city ? 'selected' : '' }}>
+                                                {{ $city }}
+                                            </option>
+                                        @endforeach
                                     @endif
                                 </select>
                                 <span class="form-message text-danger"></span>
                             </div>
 
-                            <div class="col-md-3 ">
-                                <label for="date" class="form-label">Ngày đi</label>
-                                <input type="date" id="date" value="{{ request('txtDate', now()->format('Y-m-d')) }}" name="txtDate" class="form-control info-ticket" required>
+                            <div class="col-md-3">
+                                <label for="date" class="form-label fw-bold">
+                                    <i class="bi bi-calendar-event text-primary"></i>
+                                    Ngày đi
+                                </label>
+                                <input type="date" id="date" value="{{ request('txtDate', now()->format('Y-m-d')) }}"
+                                    name="txtDate" class="form-control info-ticket shadow-sm" required>
                                 <span class="form-message text-danger"></span>
                             </div>
 
-                            <div class="col-md-2">
-                                <label for="tickets" class="form-label">Số vé</label>
-                                <select name="SoVe" id="tickets" class="form-select info-ticket">
-                                    <option value="1" selected>1</option>
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
+                            <div class="col-md-3">
+                                <label for="tickets" class="form-label fw-bold">
+                                    <i class="bi bi-ticket-perforated text-warning"></i>
+                                    Số vé
+                                </label>
+                                <select name="SoVe" id="tickets" class="form-select info-ticket shadow-sm">
+                                    <option value="1" selected>1 vé</option>
+                                    <option value="2">2 vé</option>
+                                    <option value="3">3 vé</option>
+                                    <option value="4">4 vé</option>
+                                    <option value="5">5 vé</option>
                                 </select>
                             </div>
-                            <div class="d-flex justify-content-center">
-                                <button class="btn btn-danger w-100 w-md-50 mt-4 search-btn" type="submit">Tìm chuyến xe</button>
+                            <div class="d-flex justify-content-center mt-4">
+                                <button class="btn btn-danger w-100 w-md-50 search-btn shadow pulse-on-hover"
+                                    type="submit">
+                                    <i class="bi bi-search me-2"></i>
+                                    Tìm Chuyến Xe
+                                </button>
                             </div>
                         </form>
 
@@ -202,11 +232,11 @@
                     <div class="app-links">
                         <a href="#">
                             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSADMTEo4YEurEn-gXFBOfumKYAJMviq-T9ww&s"
-                                 alt="Google Play" style="height: 40px; width: 100px;">
+                                alt="Google Play" style="height: 40px; width: 100px;">
                         </a>
                         <a href="#">
                             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQT5wbyQA1MXQWe_E1TtPb5zBklQjH_N_xVnQ&s"
-                                 alt="App Store" style="height: 40px; width: 100px;">
+                                alt="App Store" style="height: 40px; width: 100px;">
                         </a>
                     </div>
                 </div>
@@ -225,14 +255,22 @@
             <div class="row mt-4">
                 <div class="col-md-6">
                     <img src="https://cdn.futabus.vn/futa-busline-cms-dev/Bus_Lines_817c989817/Bus_Lines_817c989817.svg"
-                         alt="FUTA Logo" style="height: 30px;">
+                        alt="FUTA Logo" style="height: 30px;">
                 </div>
             </div>
         </div>
     </footer>
-    <div class="bg-secondary row p-3 text-white justify-content-center align-items-center">
-        © 2023|Bản quyền thuộc về Công ty Cổ Phần Xe khách Phương Trang - FUTA Bus Lines 2023
-        Chịu trách nhiệm quản lý nội dung: Ông Võ Duy Thành
+    <div class="copyright-section row p-4 text-white justify-content-center align-items-center">
+        <div class="col-12 text-center">
+            <p class="mb-1">
+                <i class="bi bi-c-circle"></i>
+                {{ date('Y') }} | Bản quyền thuộc về Công ty Cổ Phần Xe khách Phương Trang - FUTA Bus Lines
+            </p>
+            <p class="mb-0 small">
+                <i class="bi bi-person-badge"></i>
+                Chịu trách nhiệm quản lý nội dung: Ông Võ Duy Thành
+            </p>
+        </div>
     </div>
 
 
@@ -248,12 +286,12 @@
 
             <div class="my-5">
                 <input type="text" name="sdt" class="form-control-lg form-control" id="Phone-number-login"
-                       placeholder="Số điện thoại" required>
+                    placeholder="Số điện thoại" required>
                 <span class="form-message"></span>
             </div>
             <div class="my-5">
                 <input type="password" name="pw" class="form-control-lg form-control" id="Pw-login"
-                       placeholder="Mật khẩu" required>
+                    placeholder="Mật khẩu" required>
                 <span class="form-message"></span>
             </div>
 
@@ -288,7 +326,8 @@
                 <span class="form-message"></span>
             </div>
             <div class="my-3 form-group">
-                <input name="sdt" type="text" class=" form-control" id="Phone-number" placeholder="Số điện thoại" required>
+                <input name="sdt" type="text" class=" form-control" id="Phone-number" placeholder="Số điện thoại"
+                    required>
                 <span class="form-message"></span>
             </div>
             <div class="my-3 form-group">
@@ -301,7 +340,7 @@
             </div>
             <div class="my-3 form-group">
                 <input name="confrimed-pw" type="password" class=" form-control" id="Pw-confrim"
-                       placeholder="Xác nhận mật khẩu" required>
+                    placeholder="Xác nhận mật khẩu" required>
                 <span class="form-message"></span>
             </div>
 
@@ -312,7 +351,7 @@
             @endif
             @if (session('success'))
                 <div class="alert alert-success text-center">
-                   {{ session('success') }}
+                    {{ session('success') }}
                 </div>
             @endif
 
@@ -326,8 +365,8 @@
     <script src="{{ asset('js/index.js') }}"></script>
     <script src="{{ asset('js/validator.js') }}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-            xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-            crossorigin="anonymous"></script>
+        xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
 
     <script>
         const today = new Date().toISOString().split("T")[0];
@@ -335,19 +374,19 @@
     </script>
 
     @if(session('ShowLogin'))
-    <script>
-         document.addEventListener("DOMContentLoaded", function() {
-            showLoginForm();
-        });
-    </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                showLoginForm();
+            });
+        </script>
     @endif
 
     @if(session('ShowRegister'))
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            showRegisterForm();
-        });
-    </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                showRegisterForm();
+            });
+        </script>
     @endif
 
     <script>
@@ -374,7 +413,7 @@
                 }
             }
 
-            if(fromCity && toCity) {
+            if (fromCity && toCity) {
                 fromCity.addEventListener("change", function () {
                     syncSelects(fromCity, toCity);
                 });
@@ -388,4 +427,5 @@
         });
     </script>
 </body>
+
 </html>

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Chucvu extends Model
 {
-    protected $table = 'Chucvu';
+    protected $table = 'chucvu';
     protected $primaryKey = 'macv';
     public $incrementing = false;
     protected $keyType = 'string';

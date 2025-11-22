@@ -43,7 +43,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('access-taixe', function (?Nhanvien $nhanvien) {
             return $nhanvien && $nhanvien->macv === 'TX' && $nhanvien->isActive();
         });
-        
+
         // Cung cấp $cities cho view 'layouts.khach'
         View::composer('layouts.khach', CityComposer::class);
     }

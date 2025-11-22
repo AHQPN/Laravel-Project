@@ -14,18 +14,18 @@ class HoadonController extends Controller
     {
         // Kiểm tra quyền xem danh sách hóa đơn
         $this->authorize('viewAny', Hoadon::class);
-        
+
         $search = $request->get('search');
         $status = $request->get('status');
-        
+
         $query = Hoadon::with(['khach', 'nhanvien', 'thanhtoan', 'cthds.ve.chuyendi'])
-            ->when($search, function($query, $search) {
+            ->when($search, function ($query, $search) {
                 return $query->where('mahd', 'like', "%{$search}%")
-                            ->orWhereHas('khach', function($q) use ($search) {
-                                $q->where('ten', 'like', "%{$search}%");
-                            });
+                    ->orWhereHas('khach', function ($q) use ($search) {
+                        $q->where('ten', 'like', "%{$search}%");
+                    });
             })
-            ->when($status, function($query, $status) {
+            ->when($status, function ($query, $status) {
                 return $query->where('trangthai', $status);
             });
 
@@ -38,7 +38,7 @@ class HoadonController extends Controller
     {
         $hoadon = Hoadon::with(['khach', 'nhanvien', 'thanhtoan', 'cthds.ve.chuyendi'])
             ->findOrFail($id);
-        
+
         // Kiểm tra quyền xem hóa đơn này
         $this->authorize('view', $hoadon);
         return view('admin.HoaDon.Show', compact('hoadon'));
@@ -47,13 +47,13 @@ class HoadonController extends Controller
     public function approve($id)
     {
         $hoadon = Hoadon::findOrFail($id);
-        
+
         // Kiểm tra quyền duyệt hóa đơn (chỉ Quản lý)
         $this->authorize('approve', $hoadon);
-        
+
         $oldStatus = $hoadon->trangthai;
         $hoadon->update(['trangthai' => 'Đã duyệt']);
-        
+
         // Log activity
         ActivityLog::log(
             'approved',
@@ -63,7 +63,7 @@ class HoadonController extends Controller
             ['trangthai' => 'Đã duyệt'],
             "Duyệt hóa đơn #{$hoadon->mahd}"
         );
-        
+
         return redirect()->route('quan-ly.hoadon.index')
             ->with('success', 'Duyệt đơn hàng thành công!');
     }
@@ -71,13 +71,13 @@ class HoadonController extends Controller
     public function cancel($id)
     {
         $hoadon = Hoadon::findOrFail($id);
-        
+
         // Kiểm tra quyền hủy hóa đơn
         $this->authorize('cancel', $hoadon);
-        
+
         $oldStatus = $hoadon->trangthai;
         $hoadon->update(['trangthai' => 'Đã hủy']);
-        
+
         // Cập nhật lại số ghế trống
         foreach ($hoadon->cthds as $cthd) {
             $chuyendi = $cthd->ve->chuyendi;
@@ -85,7 +85,7 @@ class HoadonController extends Controller
                 $chuyendi->increment('SLgheconlai');
             }
         }
-        
+
         // Log activity
         ActivityLog::log(
             'cancelled',
@@ -95,7 +95,7 @@ class HoadonController extends Controller
             ['trangthai' => 'Đã hủy'],
             "Hủy hóa đơn #{$hoadon->mahd}"
         );
-        
+
         return redirect()->route('quan-ly.hoadon.index')
             ->with('success', 'Hủy đơn hàng thành công!');
     }
@@ -104,10 +104,10 @@ class HoadonController extends Controller
     {
         try {
             $hoadon = Hoadon::findOrFail($id);
-            
+
             // Kiểm tra quyền xóa hóa đơn (chỉ Quản lý và chỉ xóa hóa đơn đã hủy)
             $this->authorize('delete', $hoadon);
-            
+
             // Log before delete
             ActivityLog::log(
                 'deleted',
@@ -117,7 +117,7 @@ class HoadonController extends Controller
                 null,
                 "Xóa hóa đơn #{$hoadon->mahd}"
             );
-            
+
             CTHD::where('mahd', $id)->delete();
             $hoadon->delete();
             return redirect()->route('quan-ly.hoadon.index')

@@ -72,10 +72,17 @@
                             <table class="table table-hover align-middle mb-0" id="khach-table">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="px-3 py-3 sortable" data-sort="makh" style="width: 100px; cursor: pointer;">Mã KH <i class="fas fa-sort ms-1 text-muted"></i></th>
-                                        <th class="px-3 py-3 sortable" data-sort="ten" style="width: 180px; cursor: pointer;">Họ tên <i class="fas fa-sort ms-1 text-muted"></i></th>
-                                        <th class="px-3 py-3 sortable" data-sort="sdt" style="width: 130px; cursor: pointer;">Số điện thoại <i class="fas fa-sort ms-1 text-muted"></i></th>
-                                        <th class="px-3 py-3 sortable d-none d-lg-table-cell" data-sort="email" style="cursor: pointer;">Email <i class="fas fa-sort ms-1 text-muted"></i></th>
+                                        <th class="px-3 py-3 sortable" data-sort="makh"
+                                            style="width: 100px; cursor: pointer;">Mã KH <i
+                                                class="fas fa-sort ms-1 text-muted"></i></th>
+                                        <th class="px-3 py-3 sortable" data-sort="ten"
+                                            style="width: 180px; cursor: pointer;">Họ tên <i
+                                                class="fas fa-sort ms-1 text-muted"></i></th>
+                                        <th class="px-3 py-3 sortable" data-sort="sdt"
+                                            style="width: 130px; cursor: pointer;">Số điện thoại <i
+                                                class="fas fa-sort ms-1 text-muted"></i></th>
+                                        <th class="px-3 py-3 sortable d-none d-lg-table-cell" data-sort="email"
+                                            style="cursor: pointer;">Email <i class="fas fa-sort ms-1 text-muted"></i></th>
                                         <th class="px-3 py-3 d-none d-xl-table-cell" style="width: auto;">Địa chỉ</th>
                                         <th class="px-3 py-3 text-center" style="width: 150px;">Thao tác</th>
                                     </tr>
@@ -220,9 +227,9 @@
                                 </div>
                                 <div class="col-md-5 text-md-end">
                                     @can('create', App\Models\Nhanvien::class)
-                                    <a href="{{ route('quan-ly.nguoidung.nhanvien.create') }}" class="btn btn-success">
-                                        <i class="fas fa-plus me-1"></i> Thêm Nhân viên
-                                    </a>
+                                        <a href="{{ route('quan-ly.nguoidung.nhanvien.create') }}" class="btn btn-success">
+                                            <i class="fas fa-plus me-1"></i> Thêm Nhân viên
+                                        </a>
                                     @endcan
                                 </div>
                             </div>
@@ -237,11 +244,20 @@
                             <table class="table table-hover align-middle mb-0" id="nhanvien-table">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="px-3 py-3 sortable" data-sort="manv" style="width: 100px; cursor: pointer;">Mã NV <i class="fas fa-sort ms-1 text-muted"></i></th>
-                                        <th class="px-3 py-3 sortable" data-sort="ten" style="width: 180px; cursor: pointer;">Họ tên <i class="fas fa-sort ms-1 text-muted"></i></th>
-                                        <th class="px-3 py-3 sortable" data-sort="chucvu" style="width: 140px; cursor: pointer;">Chức vụ <i class="fas fa-sort ms-1 text-muted"></i></th>
-                                        <th class="px-3 py-3 sortable" data-sort="sdt" style="width: 130px; cursor: pointer;">Số điện thoại <i class="fas fa-sort ms-1 text-muted"></i></th>
-                                        <th class="px-3 py-3 sortable d-none d-lg-table-cell" data-sort="email" style="cursor: pointer;">Email <i class="fas fa-sort ms-1 text-muted"></i></th>
+                                        <th class="px-3 py-3 sortable" data-sort="manv"
+                                            style="width: 100px; cursor: pointer;">Mã NV <i
+                                                class="fas fa-sort ms-1 text-muted"></i></th>
+                                        <th class="px-3 py-3 sortable" data-sort="ten"
+                                            style="width: 180px; cursor: pointer;">Họ tên <i
+                                                class="fas fa-sort ms-1 text-muted"></i></th>
+                                        <th class="px-3 py-3 sortable" data-sort="chucvu"
+                                            style="width: 140px; cursor: pointer;">Chức vụ <i
+                                                class="fas fa-sort ms-1 text-muted"></i></th>
+                                        <th class="px-3 py-3 sortable" data-sort="sdt"
+                                            style="width: 130px; cursor: pointer;">Số điện thoại <i
+                                                class="fas fa-sort ms-1 text-muted"></i></th>
+                                        <th class="px-3 py-3 sortable d-none d-lg-table-cell" data-sort="email"
+                                            style="cursor: pointer;">Email <i class="fas fa-sort ms-1 text-muted"></i></th>
                                         <th class="px-3 py-3 text-center" style="width: 150px;">Thao tác</th>
                                     </tr>
                                 </thead>
@@ -283,23 +299,23 @@
                                                         <i class="fas fa-eye"></i>
                                                     </button>
                                                     @can('update', $item)
-                                                    <a href="{{ route('quan-ly.nguoidung.nhanvien.edit', $item->manv) }}"
-                                                        class="btn btn-warning btn-sm px-2 py-1" title="Sửa">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
+                                                        <a href="{{ route('quan-ly.nguoidung.nhanvien.edit', $item->manv) }}"
+                                                            class="btn btn-warning btn-sm px-2 py-1" title="Sửa">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
                                                     @endcan
                                                     @can('delete', $item)
-                                                    <form
-                                                        action="{{ route('quan-ly.nguoidung.nhanvien.destroy', $item->manv) }}"
-                                                        method="POST" class="d-inline"
-                                                        onsubmit="return confirm('Bạn có chắc muốn xóa nhân viên {{ $item->ten }}?')">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger btn-sm px-2 py-1"
-                                                            title="Xóa">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
+                                                        <form
+                                                            action="{{ route('quan-ly.nguoidung.nhanvien.destroy', $item->manv) }}"
+                                                            method="POST" class="d-inline"
+                                                            onsubmit="return confirm('Bạn có chắc muốn xóa nhân viên {{ $item->ten }}?')">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-danger btn-sm px-2 py-1"
+                                                                title="Xóa">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </form>
                                                     @endcan
                                                 </div>
                                             </td>
@@ -453,24 +469,24 @@
         }
 
         /* Modal Detail.detail-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .detail-row:last-child {
-            border-bottom: none;
-        }
-        .detail-label {
-            font-weight: 500;
-            color: #6c757d;
-        }
-        .detail-value {
-            text-align: right;
-        }
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 0.75rem 0;
+                border-bottom: 1px solid #f0f0f0;
+            }
+            .detail-row:last-child {
+                border-bottom: none;
+            }
+            .detail-label {
+                font-weight: 500;
+                color: #6c757d;
+            }
+            .detail-value {
+                text-align: right;
+            }
 
-        /* Pagination */
+            /* Pagination */
         .pagination-sm .page-link {
             padding: 0.4rem 0.75rem;
             font-size: 0.875rem;
@@ -509,40 +525,42 @@
 @endsection
 
 @push('styles')
-<style>
-    #khach-table thead th.sortable,
-    #nhanvien-table thead th.sortable {
-        cursor: pointer;
-        user-select: none;
-        transition: all 0.2s ease;
-    }
-    #khach-table thead th.sortable:hover,
-    #nhanvien-table thead th.sortable:hover {
-        background-color: #e9ecef;
-        color: #667eea;
-    }
-    #khach-table thead th.sort-asc,
-    #khach-table thead th.sort-desc,
-    #nhanvien-table thead th.sort-asc,
-    #nhanvien-table thead th.sort-desc {
-        background-color: #e9ecef;
-        color: #667eea;
-        font-weight: 600;
-    }
-</style>
+    <style>
+        #khach-table thead th.sortable,
+        #nhanvien-table thead th.sortable {
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        #khach-table thead th.sortable:hover,
+        #nhanvien-table thead th.sortable:hover {
+            background-color: #e9ecef;
+            color: #667eea;
+        }
+
+        #khach-table thead th.sort-asc,
+        #khach-table thead th.sort-desc,
+        #nhanvien-table thead th.sort-asc,
+        #nhanvien-table thead th.sort-desc {
+            background-color: #e9ecef;
+            color: #667eea;
+            font-weight: 600;
+        }
+    </style>
 @endpush
 
 @push('scripts')
     <script src="{{ asset('js/pagination.js') }}"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Initialize JS Pagination for both tables
             const khachPagination = new Pagination({
                 tableId: 'khach-table',
                 paginationId: 'khach-pagination',
                 itemsPerPage: 10
             });
-            
+
             const nhanvienPagination = new Pagination({
                 tableId: 'nhanvien-table',
                 paginationId: 'nhanvien-pagination',
@@ -551,7 +569,7 @@
 
             // Sorting for Khach table
             initTableSorting('khach-table', khachPagination);
-            
+
             // Sorting for Nhanvien table
             initTableSorting('nhanvien-table', nhanvienPagination);
 
@@ -594,7 +612,7 @@
                             let aValue, bValue;
                             let cellIndex = 0;
 
-                            switch(sortType) {
+                            switch (sortType) {
                                 case 'makh':
                                 case 'manv':
                                     cellIndex = 0;

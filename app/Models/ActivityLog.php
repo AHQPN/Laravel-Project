@@ -90,7 +90,7 @@ class ActivityLog extends Model
     {
         // Lấy thông tin user từ session
         $user = session('admin') ?? session('nhanvien') ?? session('taixe');
-        
+
         if (!$user) {
             return null;
         }

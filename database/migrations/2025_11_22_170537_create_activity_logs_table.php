@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -23,10 +22,10 @@ return new class extends Migration
             $table->text('user_agent')->nullable(); // Browser info
             $table->text('description')->nullable(); // Mô tả chi tiết
             $table->timestamps();
-            
+
             // Foreign key
             $table->foreign('manv')->references('manv')->on('nhanvien')->onDelete('cascade');
-            
+
             // Indexes
             $table->index(['manv', 'created_at']);
             $table->index(['model', 'model_id']);

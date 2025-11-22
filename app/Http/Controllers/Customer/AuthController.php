@@ -19,7 +19,7 @@ class AuthController extends Controller
         ]);
 
         $customer = Khach::where('sdt', $request->sdt)->first();
-        
+
         // Kiểm tra password với Hash::check (hỗ trợ cả password đã hash và plain text)
         if ($customer) {
             // Nếu password trong DB đã hash (bắt đầu bằng $2y$)
@@ -29,7 +29,7 @@ class AuthController extends Controller
                 // Nếu password plain text (để tương thích với dữ liệu cũ)
                 $passwordMatch = ($request->pw == $customer->password);
             }
-            
+
             if ($passwordMatch) {
                 Session::put('UserID', $customer->makh);
                 Session::put('UserName', $customer->ten);
@@ -77,9 +77,9 @@ class AuthController extends Controller
             Session::put('UserName', $customer->ten);
 
             return redirect()->route('home.index')->with('success', 'Đăng ký tài khoản thành công!');
-        
+
         } catch (\Exception $e) {
-             return back()
+            return back()
                 ->withInput($request->except('pw', 'confrimed-pw'))
                 ->with('error_register', 'Đã xảy ra lỗi: ' . $e->getMessage())
                 ->with('ShowRegister', true);

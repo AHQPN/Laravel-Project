@@ -13,9 +13,9 @@ class HoadonPolicy
     public function viewAny(?Nhanvien $nhanvien): bool
     {
         // Quản lý và Nhân viên bán vé có thể xem tất cả hóa đơn
-        return $nhanvien && 
-               ($nhanvien->macv === 'QL' || $nhanvien->macv === 'BV') && 
-               $nhanvien->isActive();
+        return $nhanvien &&
+            ($nhanvien->macv === 'QL' || $nhanvien->macv === 'BV') &&
+            $nhanvien->isActive();
     }
 
     /**
@@ -42,9 +42,9 @@ class HoadonPolicy
     public function create(?Nhanvien $nhanvien): bool
     {
         // Chỉ Nhân viên bán vé mới tạo được hóa đơn
-        return $nhanvien && 
-               $nhanvien->macv === 'BV' && 
-               $nhanvien->isActive();
+        return $nhanvien &&
+            $nhanvien->macv === 'BV' &&
+            $nhanvien->isActive();
     }
 
     /**
@@ -63,8 +63,8 @@ class HoadonPolicy
 
         // Nhân viên bán vé chỉ sửa được hóa đơn chưa duyệt do mình tạo
         if ($nhanvien->macv === 'BV') {
-            return $hoadon->manv === $nhanvien->manv && 
-                   $hoadon->tinhtrang === 'Chờ duyệt';
+            return $hoadon->manv === $nhanvien->manv &&
+                $hoadon->tinhtrang === 'Chờ duyệt';
         }
 
         return false;
@@ -104,8 +104,8 @@ class HoadonPolicy
 
         // Nhân viên bán vé chỉ hủy được hóa đơn chờ duyệt do mình tạo
         if ($nhanvien->macv === 'BV') {
-            return $hoadon->manv === $nhanvien->manv && 
-                   $hoadon->tinhtrang === 'Chờ duyệt';
+            return $hoadon->manv === $nhanvien->manv &&
+                $hoadon->tinhtrang === 'Chờ duyệt';
         }
 
         return false;
@@ -117,10 +117,10 @@ class HoadonPolicy
     public function delete(?Nhanvien $nhanvien, Hoadon $hoadon): bool
     {
         // Chỉ Quản lý mới xóa được và chỉ xóa hóa đơn đã hủy
-        return $nhanvien && 
-               $nhanvien->macv === 'QL' && 
-               $nhanvien->isActive() && 
-               $hoadon->tinhtrang === 'Đã hủy';
+        return $nhanvien &&
+            $nhanvien->macv === 'QL' &&
+            $nhanvien->isActive() &&
+            $hoadon->tinhtrang === 'Đã hủy';
     }
 
     /**
@@ -128,8 +128,8 @@ class HoadonPolicy
      */
     public function export(?Nhanvien $nhanvien): bool
     {
-        return $nhanvien && 
-               ($nhanvien->macv === 'QL' || $nhanvien->macv === 'BV') && 
-               $nhanvien->isActive();
+        return $nhanvien &&
+            ($nhanvien->macv === 'QL' || $nhanvien->macv === 'BV') &&
+            $nhanvien->isActive();
     }
 }

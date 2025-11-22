@@ -16,12 +16,12 @@ class NguoiDungController extends Controller
     public function khach(Request $request)
     {
         $search = $request->get('search');
-        
+
         $query = Khach::query()
-            ->when($search, function($query, $search) {
+            ->when($search, function ($query, $search) {
                 return $query->where('makh', 'like', "%{$search}%")
-                            ->orWhere('ten', 'like', "%{$search}%")
-                            ->orWhere('sdt', 'like', "%{$search}%");
+                    ->orWhere('ten', 'like', "%{$search}%")
+                    ->orWhere('sdt', 'like', "%{$search}%");
             });
 
         $khachs = $query->orderBy('makh', 'desc')->get();
@@ -71,14 +71,14 @@ class NguoiDungController extends Controller
     {
         // Kiểm tra quyền xem danh sách nhân viên (chỉ Quản lý)
         $this->authorize('viewAny', Nhanvien::class);
-        
+
         $search = $request->get('search');
-        
+
         $query = Nhanvien::with('chucvu')
-            ->when($search, function($query, $search) {
+            ->when($search, function ($query, $search) {
                 return $query->where('manv', 'like', "%{$search}%")
-                            ->orWhere('ten', 'like', "%{$search}%")
-                            ->orWhere('sdt', 'like', "%{$search}%");
+                    ->orWhere('ten', 'like', "%{$search}%")
+                    ->orWhere('sdt', 'like', "%{$search}%");
             });
 
         $nhanviens = $query->orderBy('manv', 'desc')->get();
@@ -91,7 +91,7 @@ class NguoiDungController extends Controller
     {
         // Kiểm tra quyền tạo nhân viên (chỉ Quản lý)
         $this->authorize('create', Nhanvien::class);
-        
+
         $chucvus = Chucvu::all();
         return view('admin.NguoiDung.NhanVien.Create', compact('chucvus'));
     }
@@ -100,7 +100,7 @@ class NguoiDungController extends Controller
     {
         // Kiểm tra quyền tạo nhân viên
         $this->authorize('create', Nhanvien::class);
-        
+
         $request->validate([
             'manv' => 'required|max:5|unique:Nhanvien,manv',
             'macv' => 'required|exists:Chucvu,macv',
@@ -113,7 +113,7 @@ class NguoiDungController extends Controller
         ]);
 
         $nhanvien = Nhanvien::create($request->all());
-        
+
         // Log activity
         ActivityLog::log(
             'created',
@@ -131,7 +131,7 @@ class NguoiDungController extends Controller
     public function nhanvienEdit($id)
     {
         $nhanvien = Nhanvien::findOrFail($id);
-        
+
         // Kiểm tra quyền sửa nhân viên (chỉ Quản lý)
         $this->authorize('update', $nhanvien);
         $chucvus = Chucvu::all();
@@ -141,10 +141,10 @@ class NguoiDungController extends Controller
     public function nhanvienUpdate(Request $request, $id)
     {
         $nhanvien = Nhanvien::findOrFail($id);
-        
+
         // Kiểm tra quyền cập nhật nhân viên
         $this->authorize('update', $nhanvien);
-        
+
         $request->validate([
             'macv' => 'required|exists:chucvu,macv',
             'ten' => 'required|max:100',
@@ -157,13 +157,13 @@ class NguoiDungController extends Controller
 
         $oldData = $nhanvien->toArray();
         $data = $request->only(['macv', 'ten', 'sdt', 'email', 'ngaysinh', 'gioitinh', 'diachi', 'cccd', 'trangthai']);
-        
+
         if ($request->password) {
             $data['password'] = $request->password;
         }
 
         $nhanvien->update($data);
-        
+
         // Log activity
         ActivityLog::log(
             'updated',
@@ -182,10 +182,10 @@ class NguoiDungController extends Controller
     {
         try {
             $nhanvien = Nhanvien::findOrFail($id);
-            
+
             // Kiểm tra quyền xóa (Quản lý và không được xóa chính mình)
             $this->authorize('delete', $nhanvien);
-            
+
             // Log before delete
             ActivityLog::log(
                 'deleted',
@@ -195,7 +195,7 @@ class NguoiDungController extends Controller
                 null,
                 "Xóa nhân viên: {$nhanvien->ten} (#{$nhanvien->manv})"
             );
-            
+
             $nhanvien->delete();
             return redirect()->route('quan-ly.nguoidung.nhanvien')
                 ->with('success', 'Xóa nhân viên thành công!');

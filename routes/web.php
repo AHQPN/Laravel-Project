@@ -102,11 +102,11 @@ Route::prefix('quan-ly')->name('quan-ly.')->group(function () {
         Route::resource('xe', XeController::class);
         Route::resource('chuyendi', ChuyendiController::class);
         Route::resource('hoadon', HoadonController::class)->except(['create', 'store', 'edit', 'update']);
-        
+
         // Invoice approval/cancellation routes (unified)
         Route::post('hoadon/{id}/duyet', [HoadonController::class, 'approve'])->name('hoadon.duyet');
         Route::post('hoadon/{id}/huy', [HoadonController::class, 'cancel'])->name('hoadon.huy');
-        
+
         Route::prefix('nguoidung')->name('nguoidung.')->group(function () {
             Route::get('khach', [NguoiDungController::class, 'khach'])->name('khach');
             Route::get('khach/{id}/edit', [NguoiDungController::class, 'khachEdit'])->name('khach.edit');
@@ -133,7 +133,7 @@ Route::prefix('nhan-vien-ban-ve')->name('nhan-vien-ban-ve.')->group(function () 
 
     Route::middleware(['nhanvien.auth'])->group(function () {
         Route::get('tong-quan', [NhanVienBanVeController::class, 'dashboard'])->name('tong-quan');
-        
+
         Route::get('profile', [NhanVienBanVeController::class, 'profile'])->name('ho-so');
         Route::get('profile/edit', [NhanVienBanVeController::class, 'editProfile'])->name('ho-so.edit');
         Route::post('profile/update', [NhanVienBanVeController::class, 'updateProfile'])->name('ho-so.update');
@@ -146,7 +146,7 @@ Route::prefix('nhan-vien-ban-ve')->name('nhan-vien-ban-ve.')->group(function () 
         Route::get('ve', [NhanVienBanVeController::class, 'indexVe'])->name('ve.index');
         Route::get('ve/{id}', [NhanVienBanVeController::class, 'showVe'])->name('ve.show');
         Route::delete('ve/{id}', [NhanVienBanVeController::class, 'destroyVe'])->name('ve.destroy');
-        
+
         Route::get('chuyen-di', [NhanVienBanVeController::class, 'indexChuyenDi'])->name('chuyen-di.index');
         Route::get('chuyen-di/{machuyendi}', [NhanVienBanVeController::class, 'getChuyenDiDetails'])->name('chuyen-di.details');
 
@@ -192,7 +192,7 @@ Route::prefix('tai-xe')->name('tai-xe.')->group(function () {
     Route::post('dang-xuat', [AuthTaiXeController::class, 'logout'])->name('dang-xuat');
 
     Route::middleware(['taixe.auth'])->group(function () {
-        Route::get('/', fn () => redirect()->route('tai-xe.chuyen-hom-nay'));
+        Route::get('/', fn() => redirect()->route('tai-xe.chuyen-hom-nay'));
 
         Route::get('chuyen-hom-nay', [ChuyenController::class, 'today'])->name('chuyen-hom-nay');
         Route::post('chuyen-di/{machuyendi}/bat-dau', [ChuyenController::class, 'start'])->name('chuyen-di.bat-dau');

@@ -374,10 +374,10 @@
                         <div class="total-amount">{{ number_format($bill->thanhtien, 0, ',', '.') }}đ</div>
                     </div>
                     <div class="status-badge 
-                                @if($bill->trangthai == 'Đã duyệt' || $bill->trangthai == 'Paid') status-paid
-                                @elseif($bill->trangthai == 'Chờ duyệt') status-pending
-                                @else status-cancelled
-                                @endif">
+                                    @if($bill->trangthai == 'Đã duyệt' || $bill->trangthai == 'Paid') status-paid
+                                    @elseif($bill->trangthai == 'Chờ duyệt') status-pending
+                                    @else status-cancelled
+                                    @endif">
                         @if($bill->trangthai == 'Đã duyệt' || $bill->trangthai == 'Paid')
                             ✓ Đã thanh toán
                         @elseif($bill->trangthai == 'Chờ duyệt')
@@ -405,9 +405,9 @@
                     <a href="{{ route('bill.index') }}" class="btn btn-action btn-back">
                         <i class="bi bi-arrow-left me-1"></i> Quay lại
                     </a>
-                    <button onclick="window.print()" class="btn btn-action btn-print">
+                    <a href="{{ route('bill.downloadPDF', $bill->mahd) }}" class="btn btn-action btn-print">
                         <i class="bi bi-printer me-1"></i> In vé
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>

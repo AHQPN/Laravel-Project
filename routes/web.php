@@ -80,6 +80,7 @@ Route::prefix('bill')->name('bill.')->group(function () {
     Route::get('search', [BillController::class, 'index'])->name('index');
     Route::post('search', [BillController::class, 'search'])->name('search');
     Route::get('detail/{id}', [BillController::class, 'chiTietHoaDon'])->name('detail');
+    Route::get('download-pdf/{id}', [BillController::class, 'downloadPDF'])->name('downloadPDF');
 });
 
 /*

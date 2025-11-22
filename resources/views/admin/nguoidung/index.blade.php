@@ -219,9 +219,11 @@
                                     </button>
                                 </div>
                                 <div class="col-md-5 text-md-end">
+                                    @can('create', App\Models\Nhanvien::class)
                                     <a href="{{ route('quan-ly.nguoidung.nhanvien.create') }}" class="btn btn-success">
                                         <i class="fas fa-plus me-1"></i> Thêm Nhân viên
                                     </a>
+                                    @endcan
                                 </div>
                             </div>
                         </form>
@@ -280,10 +282,13 @@
                                                         data-bs-target="#detailNhanVienModal{{ $item->manv }}" title="Chi tiết">
                                                         <i class="fas fa-eye"></i>
                                                     </button>
+                                                    @can('update', $item)
                                                     <a href="{{ route('quan-ly.nguoidung.nhanvien.edit', $item->manv) }}"
                                                         class="btn btn-warning btn-sm px-2 py-1" title="Sửa">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
+                                                    @endcan
+                                                    @can('delete', $item)
                                                     <form
                                                         action="{{ route('quan-ly.nguoidung.nhanvien.destroy', $item->manv) }}"
                                                         method="POST" class="d-inline"
@@ -295,6 +300,7 @@
                                                             <i class="fas fa-trash"></i>
                                                         </button>
                                                     </form>
+                                                    @endcan
                                                 </div>
                                             </td>
                                         </tr>

@@ -89,7 +89,9 @@ Route::prefix('bill')->name('bill.')->group(function () {
 */
 Route::prefix('quan-ly')->name('quan-ly.')->group(function () {
     Route::get('dang-nhap', [AdminAuthController::class, 'showLogin'])->name('dang-nhap');
-    Route::post('dang-nhap', [AdminAuthController::class, 'login'])->name('dang-nhap.post');
+    Route::post('dang-nhap', [AdminAuthController::class, 'login'])
+        ->middleware('throttle:5,1') // Giới hạn 5 lần login/phút
+        ->name('dang-nhap.post');
     Route::post('dang-xuat', [AdminAuthController::class, 'logout'])->name('dang-xuat');
 
     // Protected Admin Routes
@@ -124,7 +126,9 @@ Route::prefix('quan-ly')->name('quan-ly.')->group(function () {
 // NhanVienBanVe Routes
 Route::prefix('nhan-vien-ban-ve')->name('nhan-vien-ban-ve.')->group(function () {
     Route::get('dang-nhap', [AdminAuthController::class, 'showNhanVienLogin'])->name('dang-nhap');
-    Route::post('dang-nhap', [AdminAuthController::class, 'nhanvienLogin'])->name('dang-nhap.post');
+    Route::post('dang-nhap', [AdminAuthController::class, 'nhanvienLogin'])
+        ->middleware('throttle:5,1') // Giới hạn 5 lần login/phút
+        ->name('dang-nhap.post');
     Route::post('dang-xuat', [AdminAuthController::class, 'nhanvienLogout'])->name('dang-xuat');
 
     Route::middleware(['nhanvien.auth'])->group(function () {
@@ -182,7 +186,9 @@ Route::get('/check-seeder-stats', function () {
 // Tài xế Routes
 Route::prefix('tai-xe')->name('tai-xe.')->group(function () {
     Route::get('dang-nhap', [AuthTaiXeController::class, 'showLogin'])->name('dang-nhap');
-    Route::post('dang-nhap', [AuthTaiXeController::class, 'login'])->name('dang-nhap.post');
+    Route::post('dang-nhap', [AuthTaiXeController::class, 'login'])
+        ->middleware('throttle:5,1') // Giới hạn 5 lần login/phút
+        ->name('dang-nhap.post');
     Route::post('dang-xuat', [AuthTaiXeController::class, 'logout'])->name('dang-xuat');
 
     Route::middleware(['taixe.auth'])->group(function () {

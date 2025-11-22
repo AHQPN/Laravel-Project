@@ -20,11 +20,21 @@ class AuthController extends Controller
 
         $customer = Khach::where('sdt', $request->sdt)->first();
         
-        if ($customer && $request->pw == $customer->password) { // Tạm thời check text
-        // if ($customer && Hash::check($request->pw, $customer->password)) { // Dùng khi bạn đã hash pass
-             Session::put('UserID', $customer->makh);
-             Session::put('UserName', $customer->ten);
-             return redirect()->route('home.index');
+        // Kiểm tra password với Hash::check (hỗ trợ cả password đã hash và plain text)
+        if ($customer) {
+            // Nếu password trong DB đã hash (bắt đầu bằng $2y$)
+            if (str_starts_with($customer->password, '$2y$') || str_starts_with($customer->password, '$2a$')) {
+                $passwordMatch = Hash::check($request->pw, $customer->password);
+            } else {
+                // Nếu password plain text (để tương thích với dữ liệu cũ)
+                $passwordMatch = ($request->pw == $customer->password);
+            }
+            
+            if ($passwordMatch) {
+                Session::put('UserID', $customer->makh);
+                Session::put('UserName', $customer->ten);
+                return redirect()->route('home.index')->with('success', 'Đăng nhập thành công!');
+            }
         }
 
         return back()->with('error', 'SĐT hoặc mật khẩu không đúng.')->with('ShowLogin', true);
@@ -38,16 +48,29 @@ class AuthController extends Controller
             'pw' => 'required|string|min:6',
             'confrimed-pw' => 'required|same:pw',
             'diachi' => 'nullable|string|max:255',
+        ], [
+            'ten.required' => 'Vui lòng nhập họ tên.',
+            'sdt.required' => 'Vui lòng nhập số điện thoại.',
+            'sdt.unique' => 'Số điện thoại này đã được đăng ký.',
+            'pw.required' => 'Vui lòng nhập mật khẩu.',
+            'pw.min' => 'Mật khẩu phải có ít nhất 6 ký tự.',
+            'confrimed-pw.required' => 'Vui lòng xác nhận mật khẩu.',
+            'confrimed-pw.same' => 'Mật khẩu xác nhận không khớp.',
         ]);
 
         try {
+            // Tạo mã khách hàng unique
+            do {
+                $makh = 'KH' . Str::upper(Str::random(8));
+            } while (Khach::where('makh', $makh)->exists());
+
+            // Model Khach đã có mutator tự động hash password
             $customer = Khach::create([
-                'makh' => 'KH'.Str::upper(Str::random(8)),
+                'makh' => $makh,
                 'ten' => $request->ten,
                 'sdt' => $request->sdt,
                 'diachi' => $request->diachi,
-                'password' => $request->pw, // Tạm thời
-                // 'password' => Hash::make($request->pw), // Dùng khi production
+                'password' => $request->pw, // Sẽ tự động hash qua mutator
             ]);
 
             Session::put('UserID', $customer->makh);
@@ -56,7 +79,10 @@ class AuthController extends Controller
             return redirect()->route('home.index')->with('success', 'Đăng ký tài khoản thành công!');
         
         } catch (\Exception $e) {
-             return back()->with('error_register', 'Đã xảy ra lỗi. Vui lòng thử lại.')->with('ShowRegister', true);
+             return back()
+                ->withInput($request->except('pw', 'confrimed-pw'))
+                ->with('error_register', 'Đã xảy ra lỗi: ' . $e->getMessage())
+                ->with('ShowRegister', true);
         }
     }
 

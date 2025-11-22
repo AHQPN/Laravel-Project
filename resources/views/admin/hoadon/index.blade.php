@@ -178,6 +178,7 @@
                             <td class="px-3 py-3 text-center">
                                 @if($item->trangthai == 'Chờ duyệt')
                                     <div class="btn-group-sm d-flex gap-1 justify-content-center" role="group">
+                                        @can('approve', $item)
                                         <form action="{{ route('quan-ly.hoadon.duyet', $item->mahd) }}" method="POST" class="d-inline">
                                             @csrf
                                             <button type="submit" 
@@ -187,16 +188,19 @@
                                                 <i class="fas fa-check"></i>
                                             </button>
                                         </form>
+                                        @endcan
+                                        @can('cancel', $item)
                                         <form action="{{ route('quan-ly.hoadon.huy', $item->mahd) }}" method="POST" class="d-inline">
                                             @csrf
                                             <button type="submit" 
                                                     class="btn btn-danger btn-sm px-2 py-1" 
-                                                    onclick="return confirm('Xác nhận hủy đơn #{{ $item->mahd }}?')"
+                                                    onclick="return confirm('Xác nhận hủy đơn #{{ $item->mahd }}?')" 
                                                     title="Hủy">
                                                 <i class="fas fa-times"></i>
                                             </button>
                                         </form>
-                                        <button type="button" 
+                                        @endcan
+                                        <button type="button"
                                                 class="btn btn-info btn-sm px-2 py-1" 
                                                 data-bs-toggle="modal" 
                                                 data-bs-target="#detailModal{{ $item->mahd }}"
@@ -261,6 +265,7 @@
                                     </div>
                                     <div class="modal-footer">
                                         @if($item->trangthai == 'Chờ duyệt')
+                                            @can('approve', $item)
                                             <form action="{{ route('quan-ly.hoadon.duyet', $item->mahd) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 <button type="submit" 
@@ -269,6 +274,8 @@
                                                     <i class="fas fa-check me-1"></i> Duyệt đơn
                                                 </button>
                                             </form>
+                                            @endcan
+                                            @can('cancel', $item)
                                             <form action="{{ route('quan-ly.hoadon.huy', $item->mahd) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 <button type="submit" 
@@ -277,6 +284,7 @@
                                                     <i class="fas fa-times me-1"></i> Hủy đơn
                                                 </button>
                                             </form>
+                                            @endcan
                                         @endif
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                                     </div>

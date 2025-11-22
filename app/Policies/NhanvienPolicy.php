@@ -101,4 +101,36 @@ class NhanvienPolicy
     {
         return $this->isQuanLy($user) && $user->manv !== $nhanvien->manv;
     }
+
+    /**
+     * Determine if the user can manage vehicles (Quản lý only).
+     */
+    public function manageVehicles(?Nhanvien $nhanvien): bool
+    {
+        return $this->isQuanLy($nhanvien);
+    }
+
+    /**
+     * Determine if the user can manage cities and routes (Quản lý only).
+     */
+    public function manageLocations(?Nhanvien $nhanvien): bool
+    {
+        return $this->isQuanLy($nhanvien);
+    }
+
+    /**
+     * Determine if the user can view statistics (Quản lý only).
+     */
+    public function viewStatistics(?Nhanvien $nhanvien): bool
+    {
+        return $this->isQuanLy($nhanvien);
+    }
+
+    /**
+     * Determine if the user can export reports (Quản lý and Nhân viên bán vé).
+     */
+    public function exportReports(?Nhanvien $nhanvien): bool
+    {
+        return $this->isQuanLy($nhanvien) || $this->isNhanVienBanVe($nhanvien);
+    }
 }

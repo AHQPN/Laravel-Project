@@ -7,12 +7,15 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Nhanvien;
+use App\Models\Hoadon;
 use App\Policies\NhanvienPolicy;
+use App\Policies\HoadonPolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
     protected $policies = [
         Nhanvien::class => NhanvienPolicy::class,
+        Hoadon::class => HoadonPolicy::class,
     ];
 
     public function register(): void
@@ -24,6 +27,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(Nhanvien::class, NhanvienPolicy::class);
+        Gate::policy(Hoadon::class, HoadonPolicy::class);
 
         // Gate cho Quản lý
         Gate::define('access-quanly', function (?Nhanvien $nhanvien) {
@@ -39,6 +43,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('access-taixe', function (?Nhanvien $nhanvien) {
             return $nhanvien && $nhanvien->macv === 'TX' && $nhanvien->isActive();
         });
+        
         // Cung cấp $cities cho view 'layouts.khach'
         View::composer('layouts.khach', CityComposer::class);
     }

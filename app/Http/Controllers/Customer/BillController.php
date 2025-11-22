@@ -18,7 +18,10 @@ class BillController extends Controller
         }
 
         $userId = Session::get('UserID');
-        $bills = Hoadon::where('makh', $userId)->orderBy('thoigian', 'desc')->get();
+        $bills = Hoadon::with(['khach', 'thanhtoan', 'cthds.ve.chuyendi.xe.loaixe'])
+            ->where('makh', $userId)
+            ->orderBy('thoigian', 'desc')
+            ->get();
 
         return view('bill.search', compact('bills'));
     }
@@ -32,7 +35,8 @@ class BillController extends Controller
         $userId = Session::get('UserID');
         $mahd = $request->input('MaHD');
 
-        $query = Hoadon::where('makh', $userId);
+        $query = Hoadon::with(['khach', 'thanhtoan', 'cthds.ve.chuyendi.xe.loaixe'])
+            ->where('makh', $userId);
 
         if (empty($mahd)) {
             Session::flash('error', 'Vui lòng nhập mã hóa đơn cần tra cứu.');
@@ -56,7 +60,7 @@ class BillController extends Controller
         }
 
         // 👇 SỬA LỖI Ở ĐÂY: 'cthd' -> 'cthds'
-        $bill = Hoadon::with(['khach', 'cthds.ve.chuyendi.xe.loaixe'])
+        $bill = Hoadon::with(['khach', 'thanhtoan', 'cthds.ve.chuyendi.xe.loaixe'])
             ->findOrFail($id);
 
         if ($bill->makh != Session::get('UserID')) {
@@ -64,6 +68,26 @@ class BillController extends Controller
             return redirect()->route('bill.index');
         }
 
-        return view('bill.detail', compact('bill'));
+        // Tạo dữ liệu cho QR code
+        $qrData = [
+            'mahd' => $bill->mahd,
+            'khach' => $bill->khach->ten ?? 'N/A',
+            'sdt' => $bill->khach->sdt ?? 'N/A',
+            'thoigian' => $bill->thoigian->format('d/m/Y H:i'),
+            'thanhtien' => number_format($bill->thanhtien, 0, ',', '.') . 'đ',
+            'trangthai' => $bill->trangthai,
+        ];
+
+        // Thêm thông tin chuyến đi nếu có
+        $firstTicket = $bill->cthds->first();
+        if ($firstTicket && $firstTicket->ve && $firstTicket->ve->chuyendi) {
+            $trip = $firstTicket->ve->chuyendi;
+            $qrData['chuyen'] = $trip->tenchuyen;
+            $qrData['ngaydi'] = \Carbon\Carbon::parse($trip->thoigiandi)->format('d/m/Y H:i');
+        }
+
+        $qrContent = json_encode($qrData, JSON_UNESCAPED_UNICODE);
+
+        return view('bill.detail', compact('bill', 'qrContent'));
     }
 }

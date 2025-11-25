@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Hoadon;
 use App\Models\CTHD;
-use App\Models\ActivityLog;
 
 class HoadonController extends Controller
 {
@@ -36,14 +35,11 @@ class HoadonController extends Controller
         return view('admin.HoaDon.Index', compact('hoadons', 'search', 'status'));
     }
 
-    public function show($id, Request $request)
+    public function show($id)
     {
         $hoadon = Hoadon::with(['khach', 'nhanvien', 'thanhtoan', 'cthds.ve.chuyendi'])
             ->findOrFail($id);
 
-        // Kiểm tra quyền xem hóa đơn này
-        $admin = $request->session()->get('admin');
-        Gate::forUser($admin)->authorize('view', $hoadon);
         return view('admin.HoaDon.Show', compact('hoadon'));
     }
 
@@ -51,22 +47,8 @@ class HoadonController extends Controller
     {
         $hoadon = Hoadon::findOrFail($id);
 
-        // Kiểm tra quyền duyệt hóa đơn (chỉ Quản lý)
-        $admin = $request->session()->get('admin');
-        Gate::forUser($admin)->authorize('approve', $hoadon);
-
         $oldStatus = $hoadon->trangthai;
         $hoadon->update(['trangthai' => 'Đã duyệt']);
-
-        // Log activity
-        ActivityLog::log(
-            'approved',
-            $hoadon,
-            $hoadon->mahd,
-            ['trangthai' => $oldStatus],
-            ['trangthai' => 'Đã duyệt'],
-            "Duyệt hóa đơn #{$hoadon->mahd}"
-        );
 
         return redirect()->route('quan-ly.hoadon.index')
             ->with('success', 'Duyệt đơn hàng thành công!');
@@ -75,10 +57,6 @@ class HoadonController extends Controller
     public function cancel($id, Request $request)
     {
         $hoadon = Hoadon::findOrFail($id);
-
-        // Kiểm tra quyền hủy hóa đơn
-        $admin = $request->session()->get('admin');
-        Gate::forUser($admin)->authorize('cancel', $hoadon);
 
         $oldStatus = $hoadon->trangthai;
         $hoadon->update(['trangthai' => 'Đã hủy']);
@@ -91,38 +69,20 @@ class HoadonController extends Controller
             }
         }
 
-        // Log activity
-        ActivityLog::log(
-            'cancelled',
-            $hoadon,
-            $hoadon->mahd,
-            ['trangthai' => $oldStatus],
-            ['trangthai' => 'Đã hủy'],
-            "Hủy hóa đơn #{$hoadon->mahd}"
-        );
-
         return redirect()->route('quan-ly.hoadon.index')
             ->with('success', 'Hủy đơn hàng thành công!');
     }
 
-    public function destroy($id, Request $request)
+    public function destroy($id)
     {
         try {
             $hoadon = Hoadon::findOrFail($id);
 
-            // Kiểm tra quyền xóa hóa đơn (chỉ Quản lý và chỉ xóa hóa đơn đã hủy)
-            $admin = $request->session()->get('admin');
-            Gate::forUser($admin)->authorize('delete', $hoadon);
-
-            // Log before delete
-            ActivityLog::log(
-                'deleted',
-                $hoadon,
-                $hoadon->mahd,
-                $hoadon->toArray(),
-                null,
-                "Xóa hóa đơn #{$hoadon->mahd}"
-            );
+            // Only allow deletion of cancelled invoices
+            if ($hoadon->trangthai !== 'Đã hủy') {
+                return redirect()->route('quan-ly.hoadon.index')
+                    ->with('error', 'Chỉ có thể xóa hóa đơn đã hủy!');
+            }
 
             CTHD::where('mahd', $id)->delete();
             $hoadon->delete();

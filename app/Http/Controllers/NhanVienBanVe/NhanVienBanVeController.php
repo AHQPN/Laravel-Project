@@ -192,7 +192,7 @@ class NhanVienBanVeController extends Controller
                     'trangthai' => 'Booked',
                 ]);
 
-                event(new \App\Events\SeatBooked($chuyendi->machuyendi, $seatCode, 'Booked'));
+                // event(new \App\Events\SeatBooked($chuyendi->machuyendi, $seatCode, 'Booked'));
 
                 \App\Models\CTHD::create([
                     'mahd' => $hoadon->mahd,
@@ -206,10 +206,28 @@ class NhanVienBanVeController extends Controller
             \DB::commit();
 
             $message = 'Đặt vé thành công! Mã hóa đơn: ' . $hoadon->mahd . '. Đã tạo ' . count($createdTickets) . ' vé.';
+            
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                    'mahd' => $hoadon->mahd,
+                    'redirect_url' => route('nhan-vien-ban-ve.ve.index')
+                ]);
+            }
+            
             return redirect()->route('nhan-vien-ban-ve.ve.index')->with('success', $message);
 
         } catch (\Exception $e) {
             \DB::rollBack();
+            
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Lỗi khi đặt vé: ' . $e->getMessage()
+                ], 422);
+            }
+            
             return back()->with('error', 'Lỗi khi đặt vé: ' . $e->getMessage())->withInput();
         }
     }

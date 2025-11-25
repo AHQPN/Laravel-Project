@@ -582,30 +582,33 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch('{{ route("nhan-vien-ban-ve.dat-ve.store") }}', {
             method: 'POST',
             headers: {
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
             },
             body: payload
         })
-        .then(res => {
-            if (!res.ok) {
-                return res.json().then(data => {
-                    throw new Error(data.message || 'Có lỗi xảy ra');
-                });
+        .then(res => res.json().then(data => ({ status: res.status, ok: res.ok, data })))
+        .then(({ status, ok, data }) => {
+            if (!ok) {
+                throw new Error(data.message || 'Có lỗi xảy ra khi đặt vé');
             }
-            return res.json();
-        })
-        .then(data => {
+            
+            // Close the modal first
+            bootstrap.Modal.getInstance(document.getElementById('checkoutModal')).hide();
+            
+            // Show success message
             Swal.fire({
                 icon: 'success',
                 title: 'Đặt vé thành công!',
-                text: 'Vé đã được tạo và lưu vào hệ thống',
+                text: data.message || 'Vé đã được tạo và lưu vào hệ thống',
                 confirmButtonColor: '#0d6efd'
             }).then(() => {
-                window.location.href = '{{ route("nhan-vien-ban-ve.ve.index") }}';
+                window.location.href = data.redirect_url || '{{ route("nhan-vien-ban-ve.ve.index") }}';
             });
         })
         .catch(err => {
-            showError(err.message || 'Có lỗi xảy ra');
+            console.error('Checkout error:', err);
+            showError(err.message || 'Có lỗi xảy ra khi đặt vé');
         });
     }
 

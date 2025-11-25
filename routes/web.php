@@ -154,6 +154,7 @@ Route::prefix('nhan-vien-ban-ve')->name('nhan-vien-ban-ve.')->group(function () 
         Route::get('hoa-don', [NhanVienBanVeController::class, 'indexHoadon'])->name('hoa-don.index');
 
         Route::get('api/chuyen-di', [NhanVienBanVeController::class, 'getChuyenDiApi'])->name('api.chuyen-di');
+        Route::get('api/chuyen-di/{machuyendi}/ghe', [NhanVienBanVeController::class, 'getSeatMapApi'])->name('api.seat-map');
         Route::get('api/xe-by-chuyendi', [NhanVienBanVeController::class, 'getXeApi'])->name('api.xe');
         Route::get('api/gio-khoi-hanh', [NhanVienBanVeController::class, 'getGioKhoiHanhApi'])->name('api.gio-khoi-hanh');
         Route::get('api/vehicles', [NhanVienBanVeController::class, 'getVehiclesApi'])->name('api.vehicles');

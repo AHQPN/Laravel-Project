@@ -25,16 +25,20 @@
     <link rel="stylesheet" href="{{ asset('css/admin_style.css') }}">
     <style>
         :root {
-            --sidebar-width: 260px;
-            --header-height: 70px;
-            --primary-color: #2dce89;
-            --secondary-color: #2dcecc;
-            --sidebar-bg: #172b4d;
+            --sidebar-width: 250px;
+            --header-height: 64px;
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --sidebar-bg: #212529;
+            --sidebar-text: #e9ecef;
+            --sidebar-active-bg: #0d6efd;
+            --body-bg: #f8f9fa;
         }
 
         body {
-            font-family: 'Open Sans', sans-serif;
-            background-color: #f8f9fe;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--body-bg);
+            color: #212529;
         }
 
         .layout-shell {
@@ -49,32 +53,38 @@
             width: var(--sidebar-width);
             min-height: 100vh;
             background: var(--sidebar-bg);
-            color: #fff;
-            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            color: var(--sidebar-text);
             z-index: 1030;
             transition: transform 0.3s ease;
+            border-right: 1px solid rgba(255,255,255,0.1);
         }
 
         .layout-sidebar .nav-link {
-            color: rgba(255,255,255,0.75);
-            padding: 12px 24px;
-            border-radius: 12px;
+            color: rgba(255,255,255,0.7);
+            padding: 10px 16px;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
         }
 
         .layout-sidebar .nav-link i {
-            width: 22px;
+            width: 24px;
             text-align: center;
             font-size: 1rem;
+            margin-right: 8px;
         }
 
-        .layout-sidebar .nav-link.active,
         .layout-sidebar .nav-link:hover {
-            background: linear-gradient(87deg, var(--primary-color), var(--secondary-color));
             color: #fff;
+            background-color: rgba(255,255,255,0.1);
         }
 
-        .layout-sidebar .nav-link.active i {
+        .layout-sidebar .nav-link.active {
+            background-color: var(--sidebar-active-bg);
             color: #fff;
+            font-weight: 500;
         }
 
         .layout-main {
@@ -84,17 +94,25 @@
             display: flex;
             flex-direction: column;
             transition: margin-left 0.3s ease;
+            width: calc(100% - var(--sidebar-width));
         }
 
         .layout-header {
             position: sticky;
             top: 0;
             z-index: 1020;
+            background: #fff;
+            border-bottom: 1px solid #dee2e6;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
         }
 
         .layout-content {
-            padding: 30px;
+            padding: 24px;
             flex: 1;
+            overflow-x: hidden;
         }
 
         /* Mobile Responsive */
@@ -109,49 +127,63 @@
 
             .layout-main {
                 margin-left: 0;
+                width: 100%;
             }
 
             .layout-content {
-                padding: 15px;
-            }
-
-            .mobile-menu-toggle {
-                display: block !important;
+                padding: 16px;
             }
         }
 
-        @media (max-width: 575.98px) {
-            :root {
-                --sidebar-width: 100%;
-            }
-
-            .layout-content {
-                padding: 10px;
-            }
-        }
-
+        /* Utility Classes Overrides */
         .card {
-            border: none;
-            border-radius: 1rem;
-            box-shadow: 0 0 2rem 0 rgba(136,152,170,.15);
-            margin-bottom: 30px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
-
-        .card-header {
-            background: white;
-            border-bottom: 1px solid rgba(0,0,0,.05);
-            padding: 1.25rem 1.5rem;
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+        }
+        
+        /* Route Badge Styles */
+        .route-display {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: nowrap;
+        }
+        .route-badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
             font-weight: 600;
+            font-size: 0.875rem;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100px;
         }
-
-        .table thead th {
-            font-size: .65rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .route-from {
+            background-color: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #90caf9;
         }
-
-        .bg-gradient {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        .route-to {
+            background-color: #f3e5f5;
+            color: #7b1fa2;
+            border: 1px solid #ce93d8;
+        }
+        .route-arrow {
+            color: #6c757d;
+            font-size: 0.875rem;
+            flex-shrink: 0;
         }
     </style>
     @stack('styles')

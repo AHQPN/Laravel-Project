@@ -1,127 +1,96 @@
 @extends('layouts.TaiXeLayout')
 
 @section('title', 'Chuyến hôm nay')
-@section('page-title', 'Chuyến hôm nay')
-
-@push('styles')
-<link rel="stylesheet" href="{{ asset('css/design-system.css') }}">
-<style>
-.driver-header {
-    background: white;
-    padding: 24px;
-    border: 2px solid #DFE1E6;
-    border-radius: 4px;
-    margin-bottom: 24px;
-}
-.driver-time {
-    font-size: 48px;
-    font-weight: 700;
-    color: #0052CC;
-    line-height: 1;
-    font-family: var(--font-mono);
-}
-.driver-route {
-    font-size: 24px;
-    font-weight: 700;
-    color: #172B4D;
-    margin-top: 8px;
-}
-.action-tile {
-    background: white;
-    border: 2px solid #DFE1E6;
-    border-radius: 4px;
-    padding: 32px;
-    text-align: center;
-    text-decoration: none;
-    color: #172B4D;
-    display: block;
-    transition: all 150ms ease;
-    min-height: 160px;
-}
-.action-tile:hover {
-    border-color: #0052CC;
-    background: #F4F5F7;
-    transform: translateY(-4px);
-    text-decoration: none;
-}
-.action-tile-icon {
-    font-size: 56px;
-    margin-bottom: 16px;
-}
-.action-tile-label {
-    font-size: 20px;
-    font-weight: 700;
-}
-</style>
-@endpush
+@section('page-title', 'Lịch trình hôm nay')
 
 @section('content')
-    <div class="driver-card mb-3">
+    <div class="driver-card mb-3 border-0 text-white shadow-sm" style="background: linear-gradient(135deg, #00796b 0%, #004d40 100%);">
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <h3 class="mb-1">Xin chào, {{ $driver->ten ?? 'Tài xế' }}</h3>
-                <p class="meta mb-0">Chúc bạn một chuyến đi an toàn!</p>
+                <h5 class="mb-1 fw-bold text-white">Xin chào, {{ $driver->ten ?? 'Tài xế' }}</h5>
+                <p class="mb-0 small opacity-75">Chúc bạn một ngày làm việc hiệu quả!</p>
             </div>
-            <a href="{{ route('tai-xe.su-co.create') }}" class="btn btn-outline-danger btn-sm">
-                <i class="fas fa-exclamation-triangle me-2"></i>Báo cáo sự cố
+            <a href="{{ route('tai-xe.su-co.create') }}" class="btn btn-light btn-sm text-danger fw-bold shadow-sm">
+                <i class="fas fa-exclamation-triangle me-1"></i> Báo sự cố
             </a>
         </div>
     </div>
 
     @if($trips->isEmpty())
-        <div class="driver-card text-center">
-            <i class="fas fa-bus-alt fa-3x text-secondary mb-3"></i>
-            <h3>Hôm nay bạn chưa có chuyến nào</h3>
-            <p class="meta mb-0">Vui lòng liên hệ điều hành nếu cần hỗ trợ.</p>
+        <div class="driver-card text-center py-5">
+            <div class="mb-3 text-muted opacity-50">
+                <i class="fas fa-clipboard-list fa-4x"></i>
+            </div>
+            <h5 class="fw-bold text-dark">Chưa có chuyến nào</h5>
+            <p class="text-muted small mb-0">Hôm nay bạn chưa được phân công chuyến đi nào.</p>
         </div>
     @else
+        <h6 class="text-muted small fw-bold text-uppercase mb-3 ps-1">Danh sách chuyến đi ({{ $trips->count() }})</h6>
+        
         @foreach($trips as $trip)
-            <div class="driver-card" data-trip="{{ $trip['machuyendi'] }}">
-                <div class="d-flex justify-content-between align-items-start mb-3">
+            <div class="driver-card position-relative overflow-hidden" data-trip="{{ $trip['machuyendi'] }}">
+                {{-- Status Strip --}}
+                <div class="position-absolute top-0 start-0 bottom-0" style="width: 4px; background-color: {{ $trip['raw_status'] === 'dang_chay' ? '#198754' : ($trip['raw_status'] === 'hoan_thanh' ? '#6c757d' : '#0d6efd') }};"></div>
+                
+                <div class="d-flex justify-content-between align-items-start mb-3 ps-2">
                     <div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="fs-4">{{ $trip['badge'] }}</span>
-                            <span class="fw-semibold text-uppercase text-muted small">{{ $trip['trang_thai'] }}</span>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="badge {{ $trip['raw_status'] === 'dang_chay' ? 'bg-success' : ($trip['raw_status'] === 'hoan_thanh' ? 'bg-secondary' : 'bg-primary') }} bg-opacity-10 {{ $trip['raw_status'] === 'dang_chay' ? 'text-success' : ($trip['raw_status'] === 'hoan_thanh' ? 'text-secondary' : 'text-primary') }} border {{ $trip['raw_status'] === 'dang_chay' ? 'border-success' : ($trip['raw_status'] === 'hoan_thanh' ? 'border-secondary' : 'border-primary') }} px-2 py-1 rounded-2 fw-normal" style="font-size: 0.75rem;">
+                                {{ $trip['trang_thai'] }}
+                            </span>
+                            <span class="text-muted small">
+                                <i class="fas fa-clock me-1"></i>{{ $trip['gio_xuat_phat'] }}
+                            </span>
                         </div>
-                        <h3 class="mt-2">{{ $trip['tuyen'] }}</h3>
+                        <div class="mt-1">
+                            <x-route-badge :route="$trip['tuyen']" />
+                        </div>
                     </div>
-                    <span class="badge bg-light text-dark rounded-pill px-3 py-2">
-                        <i class="fas fa-ticket-alt me-1 text-success"></i>
-                        {{ $trip['so_ghe_trong'] }} ghế trống
-                    </span>
-                </div>
-                <div class="row g-3 mb-3">
-                    <div class="col-6">
-                        <div class="meta">
-                            <i class="fas fa-clock me-2 text-primary"></i> Giờ xuất phát
-                        </div>
-                        <p class="fw-semibold fs-5 mb-0">{{ $trip['gio_xuat_phat'] }}</p>
-                    </div>
-                    <div class="col-6 text-end">
-                        <div class="meta">
-                            <i class="fas fa-id-card me-2 text-primary"></i> Biển số
-                        </div>
-                        <p class="fw-semibold fs-5 mb-0">{{ $trip['bien_so'] }}</p>
+                    <div class="text-end">
+                        <span class="d-block fw-bold text-dark fs-5">{{ $trip['bien_so'] }}</span>
+                        <small class="text-muted" style="font-size: 0.75rem;">Biển số xe</small>
                     </div>
                 </div>
-                <div class="d-flex gap-2">
-                    <a href="{{ route('tai-xe.hanh-khach.show', $trip['machuyendi']) }}" class="btn btn-outline-primary flex-grow-1">
-                        <i class="fas fa-users me-2 d-none d-sm-inline"></i><i class="fas fa-users d-sm-none"></i><span class="d-none d-sm-inline">Danh sách hành khách</span><span class="d-sm-none">Hành khách</span>
-                    </a>
-                    <button
-                        class="btn btn-primary flex-grow-1 btn-start-trip"
-                        data-start-url="{{ route('tai-xe.chuyen-di.bat-dau', $trip['machuyendi']) }}"
-                        {{ $trip['raw_status'] !== 'sap_chay' ? 'disabled' : '' }}
-                    >
-                        <i class="fas fa-play me-2 d-none d-sm-inline"></i><i class="fas fa-play d-sm-none"></i><span class="d-none d-sm-inline">Bắt đầu chuyến</span><span class="d-sm-none">Bắt đầu</span>
-                    </button>
-                    <button
-                        class="btn btn-success flex-grow-1 btn-end-trip"
-                        data-end-url="{{ route('tai-xe.chuyen-di.ket-thuc', $trip['machuyendi']) }}"
-                        {{ $trip['raw_status'] !== 'dang_chay' ? 'disabled' : '' }}
-                    >
-                        <i class="fas fa-stop me-2 d-none d-sm-inline"></i><i class="fas fa-stop d-sm-none"></i><span class="d-none d-sm-inline">Kết thúc chuyến</span><span class="d-sm-none">Kết thúc</span>
-                    </button>
+
+                <div class="d-flex align-items-center justify-content-between bg-light rounded-3 p-3 mb-3 mx-2">
+                    <div class="text-center">
+                        <small class="d-block text-muted" style="font-size: 0.7rem; text-transform: uppercase;">Ghế trống</small>
+                        <span class="fw-bold {{ $trip['so_ghe_trong'] > 0 ? 'text-success' : 'text-danger' }} fs-5">
+                            {{ $trip['so_ghe_trong'] }}
+                        </span>
+                    </div>
+                    <div style="width: 1px; height: 24px; background-color: #dee2e6;"></div>
+                    <div class="text-center">
+                        <small class="d-block text-muted" style="font-size: 0.7rem; text-transform: uppercase;">Tổng khách</small>
+                        <span class="fw-bold text-dark fs-5">
+                            {{ $trip['tong_khach'] ?? '--' }}
+                        </span>
+                    </div>
+                    <div style="width: 1px; height: 24px; background-color: #dee2e6;"></div>
+                    <div class="text-center">
+                        <a href="{{ route('tai-xe.hanh-khach.show', $trip['machuyendi']) }}" class="text-decoration-none">
+                            <small class="d-block text-primary" style="font-size: 0.7rem; text-transform: uppercase;">Chi tiết <i class="fas fa-chevron-right ms-1"></i></small>
+                            <i class="fas fa-users text-primary fs-5 mt-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 px-2">
+                    @if($trip['raw_status'] === 'sap_chay')
+                        <button class="btn btn-primary btn-lg btn-start-trip fw-bold" 
+                                data-start-url="{{ route('tai-xe.chuyen-di.bat-dau', $trip['machuyendi']) }}">
+                            <i class="fas fa-play me-2"></i> Bắt đầu chuyến đi
+                        </button>
+                    @elseif($trip['raw_status'] === 'dang_chay')
+                        <button class="btn btn-success btn-lg btn-end-trip fw-bold" 
+                                data-end-url="{{ route('tai-xe.chuyen-di.ket-thuc', $trip['machuyendi']) }}">
+                            <i class="fas fa-check-circle me-2"></i> Hoàn thành chuyến đi
+                        </button>
+                    @else
+                        <button class="btn btn-secondary btn-lg" disabled>
+                            <i class="fas fa-lock me-2"></i> Đã hoàn thành
+                        </button>
+                    @endif
                 </div>
             </div>
         @endforeach
@@ -130,93 +99,101 @@
 
 @push('scripts')
 <script>
-    document.querySelectorAll('.btn-start-trip').forEach(button => {
-        button.addEventListener('click', function () {
-            const url = this.dataset.startUrl;
-            const card = this.closest('.driver-card');
-            Swal.fire({
-                title: 'Bắt đầu chuyến?',
-                text: 'Xác nhận để chuyển chuyến sang trạng thái đang chạy.',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Bắt đầu',
-                cancelButtonText: 'Hủy'
-            }).then(result => {
-                if (result.isConfirmed) {
-                    fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({})
-                    })
-                    .then(response => response.json().then(data => ({ ok: response.ok, data })))
-                    .then(({ ok, data }) => {
-                        if (!ok) {
-                            showToast(data.message || 'Không thể bắt đầu chuyến.', 'error');
-                            return;
-                        }
-                        showToast(data.message, 'success');
-                        card.querySelector('.btn-start-trip').setAttribute('disabled', true);
-                        card.querySelector('.btn-end-trip').removeAttribute('disabled');
-                        const statusBadge = card.querySelector('.fw-semibold.text-uppercase');
-                        if (statusBadge) {
-                            statusBadge.textContent = 'Đang chạy';
-                        }
-                    })
-                    .catch(() => {
-                        showToast('Có lỗi khi kết nối máy chủ.', 'error');
-                    });
-                }
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle Start Trip
+        document.querySelectorAll('.btn-start-trip').forEach(button => {
+            button.addEventListener('click', function () {
+                const url = this.dataset.startUrl;
+                
+                Swal.fire({
+                    title: 'Bắt đầu chuyến đi?',
+                    text: 'Xác nhận xe đã xuất bến và bắt đầu hành trình.',
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#0d6efd',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Bắt đầu ngay',
+                    cancelButtonText: 'Hủy bỏ'
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        handleTripAction(url, 'start');
+                    }
+                });
             });
         });
-    });
 
-    document.querySelectorAll('.btn-end-trip').forEach(button => {
-        button.addEventListener('click', function () {
-            const url = this.dataset.endUrl;
-            const card = this.closest('.driver-card');
-            Swal.fire({
-                title: 'Kết thúc chuyến?',
-                text: 'Xác nhận để chuyển chuyến sang trạng thái hoàn thành.',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: 'Kết thúc',
-                cancelButtonText: 'Hủy'
-            }).then(result => {
-                if (result.isConfirmed) {
-                    fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify({})
-                    })
-                    .then(response => response.json().then(data => ({ ok: response.ok, data })))
-                    .then(({ ok, data }) => {
-                        if (!ok) {
-                            showToast(data.message || 'Không thể kết thúc chuyến.', 'error');
-                            return;
-                        }
-                        showToast(data.message, 'success');
-                        card.querySelector('.btn-start-trip').removeAttribute('disabled');
-                        card.querySelector('.btn-end-trip').setAttribute('disabled', true);
-                        const statusBadge = card.querySelector('.fw-semibold.text-uppercase');
-                        if (statusBadge) {
-                            statusBadge.textContent = 'Hoàn thành';
-                        }
-                    })
-                    .catch(() => {
-                        showToast('Có lỗi khi kết nối máy chủ.', 'error');
-                    });
-                }
+        // Handle End Trip
+        document.querySelectorAll('.btn-end-trip').forEach(button => {
+            button.addEventListener('click', function () {
+                const url = this.dataset.endUrl;
+                
+                Swal.fire({
+                    title: 'Kết thúc chuyến đi?',
+                    text: 'Xác nhận xe đã về bến và trả hết khách.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#198754',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Xác nhận hoàn thành',
+                    cancelButtonText: 'Hủy bỏ'
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        handleTripAction(url, 'end');
+                    }
+                });
             });
         });
+
+        function handleTripAction(url, action) {
+            Swal.fire({
+                title: 'Đang xử lý...',
+                text: 'Vui lòng đợi trong giây lát',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json().then(data => ({ ok: response.ok, data })))
+            .then(({ ok, data }) => {
+                if (!ok) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: data.message || 'Có lỗi xảy ra',
+                        confirmButtonColor: '#0d6efd'
+                    });
+                    return;
+                }
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công',
+                    text: data.message,
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.reload();
+                });
+            })
+            .catch(() => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi kết nối',
+                    text: 'Không thể kết nối đến máy chủ',
+                    confirmButtonColor: '#0d6efd'
+                });
+            });
+        }
     });
 </script>
 @endpush
-

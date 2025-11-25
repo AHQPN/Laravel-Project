@@ -1,42 +1,42 @@
 @extends('layouts.NhanVienLayout')
 
 @section('title', 'Quản lý vé')
-@section('page-title', 'Quản lý vé')
+@section('page-title', 'Danh sách vé')
 
 @section('content')
-    <div class="container-fluid px-2 px-md-4">
+    <div class="container-fluid py-4">
 
         {{-- ====== FILTER CARD ====== --}}
-        <div class="card shadow-sm border-0 mb-4 animate-card">
-            <div class="card-header bg-gradient-primary text-white py-3">
-                <h5 class="mb-0 fw-semibold d-flex align-items-center">
-                    <i class="fas fa-filter me-2"></i>
+        <div class="card border shadow-sm mb-4">
+            <div class="card-header bg-white py-3 border-bottom">
+                <h6 class="mb-0 fw-bold text-dark d-flex align-items-center">
+                    <i class="fas fa-filter me-2 text-secondary"></i>
                     Bộ lọc tìm kiếm
-                </h5>
+                </h6>
             </div>
 
-            <div class="card-body p-3 p-md-4">
+            <div class="card-body p-4">
                 <form action="{{ route('nhan-vien-ban-ve.ve.index') }}" method="GET">
-                    <div class="row g-3 mb-3">
+                    <div class="row g-3">
                         <!-- Ngày đi -->
                         <div class="col-lg-3 col-md-6">
-                            <label class="form-label fw-semibold text-secondary mb-2">
-                                <i class="far fa-calendar-alt me-1"></i> Ngày đi
+                            <label class="form-label fw-bold text-secondary small text-uppercase">
+                                Ngày đi
                             </label>
                             <input type="date" name="ngay_di" value="{{ request('ngay_di') }}"
-                                class="form-control shadow-sm">
+                                class="form-control">
                         </div>
 
                         <!-- Chuyến đi -->
                         <div class="col-lg-3 col-md-6">
-                            <label class="form-label fw-semibold text-secondary mb-2">
-                                <i class="fas fa-route me-1"></i> Chuyến đi
+                            <label class="form-label fw-bold text-secondary small text-uppercase">
+                                Chuyến đi
                             </label>
-                            <select name="chuyen_di" id="chuyen_di" class="form-select shadow-sm">
+                            <select name="chuyen_di" id="chuyen_di" class="form-select">
                                 <option value="">Tất cả chuyến</option>
                                 @foreach($chuyenDis as $cd)
                                     <option value="{{ $cd->machuyendi }}" @selected(request('chuyen_di') == $cd->machuyendi)>
-                                        {{ $cd->tuyen_duong }}
+                                        {{ formatRouteForDropdown($cd->tuyen_duong) }}
                                     </option>
                                 @endforeach
                             </select>
@@ -44,34 +44,37 @@
 
                         <!-- Trạng thái -->
                         <div class="col-lg-3 col-md-6">
-                            <label class="form-label fw-semibold text-secondary mb-2">
-                                <i class="fas fa-info-circle me-1"></i> Trạng thái
+                            <label class="form-label fw-bold text-secondary small text-uppercase">
+                                Trạng thái
                             </label>
-                            <select name="trang_thai" id="trang_thai" class="form-select shadow-sm">
+                            <select name="trang_thai" id="trang_thai" class="form-select">
                                 <option value="">Tất cả trạng thái</option>
-                                <option value="Đã duyệt" @selected(request('trang_thai') == 'Đã duyệt')>✓ Đã duyệt</option>
-                                <option value="Chờ duyệt" @selected(request('trang_thai') == 'Chờ duyệt')>⏱ Chờ duyệt</option>
-                                <option value="Đã hủy" @selected(request('trang_thai') == 'Đã hủy')>✕ Đã hủy</option>
+                                <option value="Đã duyệt" @selected(request('trang_thai') == 'Đã duyệt')>Đã duyệt</option>
+                                <option value="Chờ duyệt" @selected(request('trang_thai') == 'Chờ duyệt')>Chờ duyệt</option>
+                                <option value="Đã hủy" @selected(request('trang_thai') == 'Đã hủy')>Đã hủy</option>
                             </select>
                         </div>
 
                         <!-- Tìm kiếm -->
                         <div class="col-lg-3 col-md-6">
-                            <label class="form-label fw-semibold text-secondary mb-2">
-                                <i class="fas fa-search me-1"></i> Tìm kiếm
+                            <label class="form-label fw-bold text-secondary small text-uppercase">
+                                Tìm kiếm
                             </label>
-                            <input type="text" name="search" value="{{ request('search') }}" class="form-control shadow-sm"
-                                placeholder="Mã vé, tên, SĐT...">
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+                                <input type="text" name="search" value="{{ request('search') }}" class="form-control border-start-0 ps-0"
+                                    placeholder="Mã vé, tên, SĐT...">
+                            </div>
                         </div>
                     </div>
 
                     <!-- Action Buttons -->
-                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
-                        <a href="{{ route('nhan-vien-ban-ve.ve.index') }}" class="btn btn-outline-secondary px-3 px-md-4">
-                            <i class="fas fa-redo-alt me-1 me-md-2"></i> <span class="d-none d-sm-inline">Đặt lại</span>
+                    <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                        <a href="{{ route('nhan-vien-ban-ve.ve.index') }}" class="btn btn-light border">
+                            <i class="fas fa-undo me-2"></i> Đặt lại
                         </a>
-                        <button type="submit" class="btn btn-primary px-3 px-md-4 shadow-sm">
-                            <i class="fas fa-search me-1 me-md-2"></i> <span class="d-none d-sm-inline">Tìm kiếm</span>
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-search me-2"></i> Tìm kiếm
                         </button>
                     </div>
                 </form>
@@ -79,46 +82,38 @@
         </div>
 
         {{-- ====== TABLE CARD ====== --}}
-        <div class="card shadow-sm border-0 animate-card">
-            <div class="card-header bg-white border-bottom py-3">
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <h5 class="mb-0 fw-semibold">
-                        <i class="fas fa-ticket-alt me-2 text-primary"></i>
-                        <span class="d-none d-sm-inline">Danh sách vé xe</span>
-                        <span class="d-inline d-sm-none">Vé xe</span>
-                    </h5>
-                    <span class="badge bg-primary-subtle text-primary px-3 py-2">
-                        <i class="fas fa-list me-1"></i> <span data-pagination-info="tickets-table">{{ $ves->count() }} vé</span>
-                    </span>
-                </div>
+        <div class="card border shadow-sm">
+            <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold text-dark">
+                    Danh sách vé xe
+                </h6>
+                <span class="badge bg-light text-dark border fw-normal">
+                    Tổng số: <span class="fw-bold">{{ $ves->count() }}</span> vé
+                </span>
             </div>
 
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0" id="tickets-table">
-                        <thead class="table-light">
+                        <thead class="bg-light">
                             <tr>
-                                <th class="fw-semibold text-secondary sortable" data-sort="mave" style="min-width: 90px; cursor: pointer;">Mã vé <i class="fas fa-sort ms-1"></i></th>
-                                <th class="fw-semibold text-secondary" style="min-width: 180px;">Chuyến đi</th>
-                                <th class="fw-semibold text-secondary d-none d-lg-table-cell sortable" data-sort="khach" style="min-width: 150px; cursor: pointer;">
-                                    Khách hàng <i class="fas fa-sort ms-1"></i></th>
-                                <th class="fw-semibold text-secondary text-center d-none d-md-table-cell"
-                                    style="min-width: 90px;">Biển số</th>
-                                <th class="fw-semibold text-secondary text-center sortable" data-sort="ghe" style="min-width: 70px; cursor: pointer;">Ghế <i class="fas fa-sort ms-1"></i></th>
-                                <th class="fw-semibold text-secondary text-end sortable" data-sort="gia" style="min-width: 100px; cursor: pointer;">Giá vé <i class="fas fa-sort ms-1"></i></th>
-                                <th class="fw-semibold text-secondary text-center d-none d-md-table-cell"
-                                    style="min-width: 90px;">Hóa đơn</th>
-                                <th class="fw-semibold text-secondary text-center" style="min-width: 80px;">Chi tiết</th>
+                                <th class="fw-bold text-secondary text-uppercase small py-3 ps-4 sortable" data-sort="mave" style="cursor: pointer;">Mã vé <i class="fas fa-sort ms-1 text-muted"></i></th>
+                                <th class="fw-bold text-secondary text-uppercase small py-3">Chuyến đi</th>
+                                <th class="fw-bold text-secondary text-uppercase small py-3 d-none d-lg-table-cell sortable" data-sort="khach" style="cursor: pointer;">Khách hàng <i class="fas fa-sort ms-1 text-muted"></i></th>
+                                <th class="fw-bold text-secondary text-uppercase small py-3 text-center d-none d-md-table-cell">Biển số</th>
+                                <th class="fw-bold text-secondary text-uppercase small py-3 text-center sortable" data-sort="ghe" style="cursor: pointer;">Ghế <i class="fas fa-sort ms-1 text-muted"></i></th>
+                                <th class="fw-bold text-secondary text-uppercase small py-3 text-end sortable" data-sort="gia" style="cursor: pointer;">Giá vé <i class="fas fa-sort ms-1 text-muted"></i></th>
+                                <th class="fw-bold text-secondary text-uppercase small py-3 text-center d-none d-md-table-cell">Trạng thái</th>
+                                <th class="fw-bold text-secondary text-uppercase small py-3 text-center pe-4">Thao tác</th>
                             </tr>
                         </thead>
 
                         <tbody>
                             @forelse ($ves as $ve)
-                                <tr class="ticket-row">
+                                <tr class="border-bottom">
                                     <!-- Mã vé -->
-                                    <td>
-                                        <span
-                                            class="badge bg-primary-subtle text-primary px-2 py-1 font-monospace fw-bold small">
+                                    <td class="ps-4">
+                                        <span class="fw-bold text-primary font-monospace">
                                             {{ $ve->mave }}
                                         </span>
                                     </td>
@@ -129,13 +124,11 @@
                                             $firstPoint = $ve->chuyendi->lotrinhs->sortBy('trinhtu')->first();
                                             $lastPoint = $ve->chuyendi->lotrinhs->sortBy('trinhtu')->last();
                                         @endphp
-                                        <div class="route-info">
-                                            <div class="fw-semibold text-dark mb-1 text-truncate" style="max-width: 200px;">
-                                                {{ $firstPoint->tinhthanh->ten }}
-                                                <i class="fas fa-arrow-right mx-1 text-primary" style="font-size: 0.7rem;"></i>
-                                                {{ $lastPoint->tinhthanh->ten }}
+                                        <div class="d-flex flex-column">
+                                            <div class="mb-1">
+                                                <x-route-badge :route="$firstPoint->tinhthanh->ten . ' -> ' . $lastPoint->tinhthanh->ten" />
                                             </div>
-                                            <small class="text-muted d-block">
+                                            <small class="text-muted">
                                                 <i class="far fa-clock me-1"></i>
                                                 {{ Carbon\Carbon::parse($ve->chuyendi->thoigiandi)->format('d/m/Y H:i') }}
                                             </small>
@@ -145,38 +138,32 @@
                                     <!-- Khách hàng -->
                                     <td class="d-none d-lg-table-cell">
                                         @if($ve->hoadon?->khach)
-                                            <div class="customer-info">
-                                                <div class="fw-semibold text-dark text-truncate" style="max-width: 150px;">
-                                                    {{ $ve->hoadon->khach->ten }}
-                                                </div>
-                                                <small class="text-muted d-block">
-                                                    {{ $ve->hoadon->khach->sdt }}
-                                                </small>
+                                            <div class="d-flex flex-column">
+                                                <span class="fw-bold text-dark">{{ $ve->hoadon->khach->ten }}</span>
+                                                <small class="text-muted">{{ $ve->hoadon->khach->sdt }}</small>
                                             </div>
                                         @else
-                                            <span class="text-muted fst-italic small">
-                                                Chưa có
-                                            </span>
+                                            <span class="text-muted small fst-italic">Chưa có thông tin</span>
                                         @endif
                                     </td>
 
                                     <!-- Biển số xe -->
                                     <td class="text-center d-none d-md-table-cell">
-                                        <span class="badge bg-secondary-subtle text-secondary px-2 py-1 small">
+                                        <span class="badge bg-light text-dark border fw-normal">
                                             {{ $ve->chuyendi->xe->soxe ?? 'N/A' }}
                                         </span>
                                     </td>
 
                                     <!-- Mã ghế -->
                                     <td class="text-center">
-                                        <span class="badge bg-info text-white px-2 py-1 fw-bold">
+                                        <span class="badge bg-warning text-dark fw-bold">
                                             {{ $ve->maghe }}
                                         </span>
                                     </td>
 
                                     <!-- Giá -->
                                     <td class="text-end">
-                                        <span class="fw-bold text-success">
+                                        <span class="fw-bold text-dark">
                                             {{ number_format($ve->chuyendi->gia, 0, ',', '.') }}đ
                                         </span>
                                     </td>
@@ -187,9 +174,9 @@
                                     </td>
 
                                     <!-- Thao tác -->
-                                    <td class="text-center">
-                                        <button class="btn btn-sm btn-info btn-view-ticket shadow-sm"
-                                            data-mave="{{ $ve->mave }}" title="Xem chi tiết vé">
+                                    <td class="text-center pe-4">
+                                        <button class="btn btn-sm btn-outline-primary btn-view-ticket"
+                                            data-mave="{{ $ve->mave }}" title="Xem chi tiết">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     </td>
@@ -198,8 +185,8 @@
                                 <tr>
                                     <td colspan="8" class="text-center py-5">
                                         <div class="text-muted">
-                                            <i class="fas fa-inbox fa-3x mb-3 d-block opacity-25"></i>
-                                            <p class="mb-0">Không tìm thấy vé nào</p>
+                                            <i class="fas fa-ticket-alt fa-3x mb-3 opacity-25"></i>
+                                            <p class="mb-0">Không tìm thấy vé nào phù hợp</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -210,24 +197,24 @@
             </div>
 
             {{-- ====== PAGINATION ====== --}}
-            <div class="card-footer bg-white border-top" id="tickets-pagination"></div>
+            <div class="card-footer bg-white border-top py-3" id="tickets-pagination"></div>
         </div>
     </div>
 
     {{-- ====== MODAL CHI TIẾT VÉ ====== --}}
     <div class="modal fade" id="ticketModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header bg-gradient-primary text-white">
-                    <h5 class="modal-title"><i class="fas fa-ticket-alt me-2"></i>Chi tiết vé</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-white border-bottom">
+                    <h5 class="modal-title fw-bold text-dark"><i class="fas fa-ticket-alt me-2 text-primary"></i>Chi tiết vé</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body" id="ticketModalContent">
+                <div class="modal-body p-0" id="ticketModalContent">
                     <div class="text-center py-5">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Đang tải...</span>
                         </div>
-                        <p class="text-muted mt-3">Đang tải thông tin vé...</p>
+                        <p class="text-muted mt-3 small">Đang tải thông tin vé...</p>
                     </div>
                 </div>
             </div>
@@ -237,359 +224,73 @@
 
 @push('styles')
     <style>
-        /* ====== CRITICAL: Prevent all horizontal overflow ====== */
-        html,
-        body {
-            overflow-x: hidden !important;
-            max-width: 100vw !important;
-        }
-
-        * {
-            box-sizing: border-box !important;
-        }
-
-        .container-fluid {
-            max-width: 100% !important;
-            padding-left: 0.5rem !important;
-            padding-right: 0.5rem !important;
-        }
-
-        @media (min-width: 768px) {
-            .container-fluid {
-                padding-left: 1rem !important;
-                padding-right: 1rem !important;
-            }
-        }
-
-        /* ====== Gradient Background ====== */
-        .bg-gradient-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        /* ====== Card Animation ====== */
-        .animate-card {
-            animation: fadeInUp 0.5s ease;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
+        /* Enterprise UI Overrides */
         .card {
-            max-width: 100% !important;
-            overflow: hidden !important;
+            border-radius: 6px;
+            border-color: #e0e0e0;
         }
-
-        /* ====== Form Controls ====== */
-        .form-control:focus,
-        .form-select:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        .shadow-sm {
+            box-shadow: 0 .125rem .25rem rgba(0,0,0,.05)!important;
         }
-
-        .form-control,
-        .form-select {
-            border-radius: 0.5rem;
-            padding: 0.625rem 0.875rem;
-            transition: all 0.2s ease;
-            max-width: 100%;
-        }
-
-        .form-control:hover,
-        .form-select:hover {
-            border-color: #667eea;
-        }
-
-        /* ====== Fix Choices.js overflow ====== */
-        .choices,
-        .choices__inner {
-            max-width: 100% !important;
-            width: 100% !important;
-        }
-
-        /* ====== Table Styling ====== */
-        .table-responsive {
-            overflow-x: auto !important;
-            -webkit-overflow-scrolling: touch;
-            max-width: 100% !important;
-            margin: 0 !important;
-        }
-
-        #tickets-table {
-            font-size: 0.875rem;
-            width: 100%;
-            margin-bottom: 0 !important;
-        }
-
-        #tickets-table thead th {
-            text-transform: uppercase;
+        .form-label {
             font-size: 0.75rem;
             letter-spacing: 0.5px;
-            padding: 1rem 0.75rem;
-            border-bottom: 2px solid #e9ecef;
-            white-space: nowrap;
-            position: sticky;
-            top: 0;
-            background-color: #f8f9fa;
-            z-index: 10;
         }
-
-        #tickets-table thead th.sortable {
-            cursor: pointer;
-            user-select: none;
-            transition: all 0.2s ease;
+        .form-select, .form-control {
+            border-radius: 4px;
+            border-color: #ced4da;
+            font-size: 0.9rem;
+            padding: 0.5rem 0.75rem;
         }
-
-        #tickets-table thead th.sortable:hover {
-            background-color: #e9ecef;
-            color: #667eea;
+        .form-select:focus, .form-control:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
         }
-
-        #tickets-table thead th.sort-asc,
-        #tickets-table thead th.sort-desc {
-            background-color: #e9ecef;
-            color: #667eea;
-            font-weight: 600;
+        .btn {
+            border-radius: 4px;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
         }
-
-        #tickets-table tbody td {
-            padding: 0.875rem 0.75rem;
-            vertical-align: middle !important;
-        }
-
-        /* ====== Row Hover Effect ====== */
-        .ticket-row {
-            transition: all 0.2s ease;
-            border-bottom: 1px solid #f1f3f5;
-        }
-
-        .ticket-row:hover {
-            background-color: #f8f9fa;
-            transform: translateX(2px);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        /* ====== Badge Styling ====== */
-        .badge {
-            font-weight: 500;
-            font-size: 0.75rem;
-            border-radius: 0.375rem;
-            letter-spacing: 0.3px;
-            white-space: nowrap;
-        }
-
-        .font-monospace {
-            font-family: 'Courier New', monospace;
-        }
-
-        /* ====== Button Styling ====== */
-        .btn-view-ticket {
-            transition: all 0.2s ease;
-            border-radius: 0.375rem;
-            padding: 0.375rem 0.625rem;
-        }
-
-        .btn-view-ticket:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
-        }
-
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            transition: all 0.3s ease;
+            background-color: #0d6efd;
+            border-color: #0d6efd;
         }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #5568d3 0%, #65408b 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-
-        /* ====== Pagination Styling ====== */
-        .smart-pagination .pagination {
-            gap: 4px;
-        }
-
-        .smart-pagination .page-link {
-            min-width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            border: 1px solid #e5e7eb;
-            color: #6b7280;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            padding: 0.5rem;
-        }
-
-        .smart-pagination .page-link:hover {
-            background-color: #f3f4f6;
-            border-color: #667eea;
-            color: #667eea;
-            transform: translateY(-2px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .smart-pagination .page-item.active .page-link {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-color: transparent;
-            color: white;
+        .table thead th {
             font-weight: 600;
-            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
         }
-
-        .smart-pagination .page-item.disabled .page-link {
+        .font-monospace {
+            font-family: 'SFMono-Regular', Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+        
+        /* Pagination Styles */
+        .smart-pagination .pagination {
+            justify-content: flex-end;
+            margin-bottom: 0;
+        }
+        .smart-pagination .page-link {
+            border-radius: 4px;
+            margin: 0 2px;
+            color: #495057;
+            border: 1px solid #dee2e6;
+        }
+        .smart-pagination .page-item.active .page-link {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+            color: #fff;
+        }
+        
+        /* Choices.js Customization */
+        .choices__inner {
+            background-color: #fff;
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+            min-height: auto;
+            padding: 0.25rem 0.5rem;
+        }
+        .choices__input {
             background-color: transparent;
-            border-color: transparent;
-            color: #d1d5db;
-            cursor: not-allowed;
-        }
-
-        .smart-pagination .page-item.disabled .page-link:hover {
-            transform: none;
-            box-shadow: none;
-        }
-
-        @media (max-width: 576px) {
-            .smart-pagination .page-link {
-                min-width: 32px;
-                height: 32px;
-                font-size: 0.875rem;
-                padding: 0.375rem;
-            }
-        }
-
-        /* ====== Route & Customer Info ====== */
-        .route-info,
-        .customer-info {
-            line-height: 1.5;
-        }
-
-        .text-truncate {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        /* ====== Modal Styling ====== */
-        .modal-content {
-            border-radius: 0.75rem;
-            overflow: hidden;
-        }
-
-        .modal-dialog {
-            max-width: 95%;
-            margin: 1rem auto;
-        }
-
-        @media (min-width: 992px) {
-            .modal-dialog {
-                max-width: 800px;
-            }
-        }
-
-        .modal-header {
-            border-bottom: none;
-            padding: 1.25rem 1.5rem;
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-        }
-
-        /* ====== Responsive Adjustments ====== */
-        @media (max-width: 992px) {
-            #tickets-table {
-                font-size: 0.8rem;
-            }
-
-            #tickets-table thead th,
-            #tickets-table tbody td {
-                padding: 0.75rem 0.5rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .card-body {
-                padding: 0.75rem !important;
-            }
-
-            #tickets-table {
-                font-size: 0.75rem;
-            }
-
-            #tickets-table thead th {
-                font-size: 0.7rem;
-                padding: 0.625rem 0.4rem;
-            }
-
-            #tickets-table tbody td {
-                padding: 0.625rem 0.4rem;
-            }
-
-            .badge {
-                font-size: 0.7rem;
-                padding: 0.25rem 0.5rem !important;
-            }
-
-            .btn-sm {
-                padding: 0.25rem 0.5rem;
-                font-size: 0.75rem;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .container-fluid {
-                padding-left: 0.25rem !important;
-                padding-right: 0.25rem !important;
-            }
-
-            .card-body {
-                padding: 0.5rem !important;
-            }
-
-            .card-footer {
-                padding: 0.75rem 0.5rem;
-            }
-
-            #tickets-table thead th,
-            #tickets-table tbody td {
-                padding: 0.5rem 0.3rem;
-            }
-
-            .badge {
-                font-size: 0.65rem;
-                padding: 0.2rem 0.4rem !important;
-            }
-        }
-
-        /* ====== Empty State ====== */
-        .opacity-25 {
-            opacity: 0.25;
-        }
-
-        /* ====== Utility Classes ====== */
-        .d-flex {
-            flex-wrap: wrap !important;
-        }
-
-        .gap-2 {
-            gap: 0.5rem !important;
-        }
-
-        .gap-3 {
-            gap: 1rem !important;
         }
     </style>
 @endpush
@@ -627,13 +328,13 @@
                     headers.forEach(h => {
                         h.classList.remove('sort-asc', 'sort-desc');
                         const icon = h.querySelector('i');
-                        if (icon) icon.className = 'fas fa-sort ms-1';
+                        if (icon) icon.className = 'fas fa-sort ms-1 text-muted';
                     });
 
                     // Add sort indicator to current header
                     header.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
                     const icon = header.querySelector('i');
-                    if (icon) icon.className = `fas fa-sort-${currentSort.direction === 'asc' ? 'up' : 'down'} ms-1`;
+                    if (icon) icon.className = `fas fa-sort-${currentSort.direction === 'asc' ? 'up' : 'down'} ms-1 text-dark`;
 
                     // Sort rows
                     rows.sort((a, b) => {
@@ -684,13 +385,15 @@
                     searchEnabled: true,
                     placeholder: true,
                     placeholderValue: 'Chọn chuyến đi',
-                    searchPlaceholderValue: 'Tìm kiếm...'
+                    searchPlaceholderValue: 'Tìm kiếm...',
+                    itemSelectText: ''
                 });
 
                 new Choices('#trang_thai', {
                     searchEnabled: false,
                     placeholder: true,
-                    placeholderValue: 'Chọn trạng thái'
+                    placeholderValue: 'Chọn trạng thái',
+                    itemSelectText: ''
                 });
             }
 
@@ -708,7 +411,7 @@
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Đang tải...</span>
                         </div>
-                        <p class="text-muted mt-3">Đang tải thông tin vé...</p>
+                        <p class="text-muted mt-3 small">Đang tải thông tin vé...</p>
                     </div>
                 `;
 

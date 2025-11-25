@@ -18,7 +18,6 @@ class NhanVienAuth
 
         $nhanvien = session()->get('nhanvien');
 
-        // Kiểm tra quyền truy cập bằng Gate
         if (!Gate::forUser($nhanvien)->allows('access-nhanvien-banve')) {
             session()->forget('nhanvien');
             return redirect()->route('nhan-vien-ban-ve.dang-nhap')->with('error', 'Bạn không có quyền truy cập!');

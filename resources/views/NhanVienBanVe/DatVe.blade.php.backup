@@ -1,0 +1,611 @@
+@extends('layouts.NhanVienLayout')
+
+@section('title', 'Đặt vé')
+@section('page-title', 'Bán vé tại quầy')
+
+@section('content')
+<div class="container-fluid py-4">
+    
+    {{-- Filters (Open by default) --}}
+    <div class="card border shadow-sm mb-4">
+        <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center cursor-pointer" data-bs-toggle="collapse" data-bs-target="#filterCollapse">
+            <h6 class="mb-0 fw-bold text-dark">
+                <i class="fas fa-filter me-2 text-secondary"></i>
+                Bộ lọc tìm kiếm
+            </h6>
+            <i class="fas fa-chevron-down text-secondary"></i>
+        </div>
+        <div class="collapse show" id="filterCollapse">
+            <div class="card-body p-4">
+                <div class="row g-3">
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label fw-bold text-secondary small text-uppercase">Tuyến đường</label>
+                        <select id="filter-route" class="form-select">
+                            <option value="">Tất cả tuyến</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label fw-bold text-secondary small text-uppercase">Thời gian</label>
+                        <select id="filter-time" class="form-select">
+                            <option value="">Tất cả giờ</option>
+                            <option value="morning">Sáng (6h-12h)</option>
+                            <option value="afternoon">Chiều (12h-18h)</option>
+                            <option value="evening">Tối (18h-24h)</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label fw-bold text-secondary small text-uppercase">Trạng thái</label>
+                        <select id="filter-status" class="form-select">
+                            <option value="">Tất cả</option>
+                            <option value="available">Còn ghế trống</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end gap-2 mt-3 pt-3 border-top">
+                    <button id="btn-reset-filter" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-redo me-1"></i> Đặt lại
+                    </button>
+                    <button id="btn-apply-filter" class="btn btn-primary btn-sm">
+                        <i class="fas fa-check me-1"></i> Áp dụng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Trip List --}}
+    <div class="card border shadow-sm mb-4">
+        <div class="card-header bg-white py-3 border-bottom">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold text-dark">
+                    <i class="fas fa-bus me-2 text-primary"></i>
+                    Danh sách chuyến đi
+                </h6>
+                <span class="badge bg-light text-dark border" id="trip-count">Đang tải...</span>
+            </div>
+        </div>
+        <div class="card-body p-4">
+            <div id="trip-list-container" class="row g-3">
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Đang tải...</span>
+                    </div>
+                    <p class="text-muted mt-3">Đang tải danh sách chuyến đi...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Seat Selection Modal --}}
+    <div class="modal fade" id="seatModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <div>
+                        <h5 class="modal-title fw-bold mb-1" id="modal-trip-title">Chọn ghế ngồi</h5>
+                        <small id="modal-trip-subtitle" class="opacity-75">-</small>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-4">
+                        <div class="col-lg-8">
+                            <div class="border rounded p-4 bg-light">
+                                <h6 class="fw-bold text-dark mb-3">Sơ đồ ghế</h6>
+                                <div id="seat-map-container" class="seat-map-container"></div>
+                                <div class="mt-4 pt-3 border-top">
+                                    <div class="row g-2 small">
+                                        <div class="col-auto">
+                                            <div class="d-flex align-items-center">
+                                                <div class="seat-legend seat-legend-available me-2"></div>
+                                                <span>Trống</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="d-flex align-items-center">
+                                                <div class="seat-legend seat-legend-selected me-2"></div>
+                                                <span>Đang chọn</span>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <div class="d-flex align-items-center">
+                                                <div class="seat-legend seat-legend-sold me-2"></div>
+                                                <span>Đã bán</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4">
+                            <div class="border rounded p-4 bg-white sticky-top" style="top: 20px;">
+                                <h6 class="fw-bold text-dark mb-3">Thông tin đặt vé</h6>
+                                
+                                <div class="mb-3 pb-3 border-bottom">
+                                    <div class="small text-muted mb-1">Ghế đã chọn</div>
+                                    <div id="selected-seats-display" class="fw-bold text-primary fs-5">Chưa chọn ghế</div>
+                                </div>
+
+                                <div class="mb-3 pb-3 border-bottom">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="small text-muted">Số lượng</span>
+                                        <span class="fw-bold" id="seat-quantity">0</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="small text-muted">Đơn giá</span>
+                                        <span class="fw-bold" id="seat-price">0 đ</span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="fw-bold">Tổng tiền</span>
+                                        <span class="fw-bold text-primary fs-4" id="total-price">0 đ</span>
+                                    </div>
+                                </div>
+
+                                <button id="btn-proceed-checkout" class="btn btn-primary w-100 fw-bold" disabled>
+                                    <i class="fas fa-arrow-right me-2"></i> Tiếp tục thanh toán
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Checkout Modal --}}
+    <div class="modal fade" id="checkoutModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fas fa-shopping-cart me-2"></i> Thanh toán
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="checkout-form">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-secondary small">Tên khách hàng <span class="text-danger">*</span></label>
+                                <input type="text" name="ten_khach" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold text-secondary small">Số điện thoại <span class="text-danger">*</span></label>
+                                <input type="tel" name="sdt" class="form-control" required pattern="[0-9]{10}">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold text-secondary small">Email</label>
+                                <input type="email" name="email" class="form-control">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold text-secondary small">Ghi chú</label>
+                                <textarea name="ghi_chu" class="form-control" rows="2"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-top">
+                            <h6 class="fw-bold mb-3">Tóm tắt đơn hàng</h6>
+                            <div class="bg-light rounded p-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Chuyến:</span>
+                                    <span class="fw-bold" id="checkout-trip">-</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Ghế:</span>
+                                    <span class="fw-bold text-primary" id="checkout-seats">-</span>
+                                </div>
+                                <div class="d-flex justify-content-between pt-2 border-top">
+                                    <span class="fw-bold">Tổng tiền:</span>
+                                    <span class="fw-bold text-success fs-5" id="checkout-total">0 đ</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-success btn-lg fw-bold">
+                                <i class="fas fa-check-circle me-2"></i> Xác nhận đặt vé
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                Quay lại
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+@endsection
+
+@push('styles')
+<style>
+.card {
+    border-radius: 6px;
+    border-color: #e0e0e0;
+}
+.shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.05)!important;
+}
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* Trip Card Styles */
+.trip-card {
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1.25rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    background: white;
+    height: 100%;
+}
+.trip-card:hover {
+    border-color: #0d6efd;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+    transform: translateY(-2px);
+}
+.trip-card.selected {
+    border-color: #0d6efd;
+    background-color: #f0f7ff;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.25);
+}
+
+/* Seat Map Styles */
+.seat-map-container {
+    display: grid;
+    gap: 8px;
+    max-width: 100%;
+    margin: 0 auto;
+}
+.seat {
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid #dee2e6;
+    background-color: #fff;
+    color: #495057;
+    user-select: none;
+}
+.seat:hover:not(.sold) {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.seat.available {
+    border-color: #198754;
+    color: #198754;
+    background-color: #f8fff9;
+}
+.seat.available:hover {
+    background-color: #198754;
+    color: #fff;
+}
+.seat.sold {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: #fff;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+.seat.selected {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #000;
+    font-weight: 800;
+    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.3);
+}
+
+/* Seat Legend */
+.seat-legend {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    display: inline-block;
+    border: 2px solid;
+}
+.seat-legend-available {
+    background-color: #f8fff9;
+    border-color: #198754;
+}
+.seat-legend-selected {
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+.seat-legend-sold {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+/* Form Styles */
+.form-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+}
+.form-select, .form-control {
+    border-radius: 4px;
+    border-color: #ced4da;
+    font-size: 0.9rem;
+    padding: 0.6rem 0.75rem;
+}
+.btn {
+    border-radius: 4px;
+    font-size: 0.9rem;
+    padding: 0.6rem 1.2rem;
+}
+</style>
+@endpush
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let allTrips = [];
+    let selectedTrip = null;
+    let selectedSeats = [];
+    let seatData = {};
+
+    // Initialize Choices.js for filters
+    const routeSelect = new Choices('#filter-route', {
+        searchEnabled: true,
+        itemSelectText: '',
+        shouldSort: false
+    });
+
+    // Load initial data
+    loadTrips();
+
+    // Filter handlers
+    document.getElementById('btn-apply-filter').addEventListener('click', applyFilters);
+    document.getElementById('btn-reset-filter').addEventListener('click', resetFilters);
+
+    // Checkout handlers
+    document.getElementById('btn-proceed-checkout').addEventListener('click', openCheckout);
+    document.getElementById('checkout-form').addEventListener('submit', handleCheckout);
+
+    function loadTrips() {
+        fetch('{{ route("nhan-vien-ban-ve.api.chuyen-di") }}')
+            .then(res => res.json())
+            .then(data => {
+                allTrips = data;
+                renderTrips(allTrips);
+                populateFilters(allTrips);
+            })
+            .catch(err => {
+                console.error('Error loading trips:', err);
+                showError('Không thể tải danh sách chuyến đi');
+            });
+    }
+
+    function populateFilters(trips) {
+        const routes = [...new Set(trips.map(t => t.tuyen))];
+        routeSelect.setChoices(
+            routes.map(r => ({ value: r, label: r })),
+            'value',
+            'label',
+            true
+        );
+    }
+
+    function renderTrips(trips) {
+        const container = document.getElementById('trip-list-container');
+        document.getElementById('trip-count').textContent = `${trips.length} chuyến`;
+
+        if (trips.length === 0) {
+            container.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Không tìm thấy chuyến đi phù hợp</p>
+                container.querySelectorAll('.trip-card').forEach(c => c.classList.remove('selected'));
+                // Add selected class to clicked card
+                this.classList.add('selected');
+                // Handle selection
+                const tripId = this.getAttribute('data-trip-id');
+                selectTrip(tripId);
+            });
+        });
+    }
+
+    function selectTrip(tripId) {
+        selectedTrip = allTrips.find(t => t.machuyendi === tripId);
+        if (!selectedTrip) return;
+
+        // Load seat data
+        fetch(`{{ url('nhan-vien-ban-ve/api/chuyen-di') }}/${tripId}/ghe`)
+            .then(res => res.json())
+            .then(data => {
+                seatData = data;
+                selectedSeats = []; // Reset selected seats
+                openSeatModal();
+            })
+            .catch(err => {
+                console.error('Error loading seats:', err);
+                showError('Không thể tải sơ đồ ghế');
+            });
+    }
+
+    function openSeatModal() {
+        document.getElementById('modal-trip-title').textContent = selectedTrip.tuyen;
+        document.getElementById('modal-trip-subtitle').textContent = 
+            `${selectedTrip.gio_khoi_hanh} • ${selectedTrip.bien_so}`;
+        
+        renderSeatMap();
+        updateBookingSummary();
+        
+        const modal = new bootstrap.Modal(document.getElementById('seatModal'));
+        modal.show();
+    }
+
+    function renderSeatMap() {
+        const container = document.getElementById('seat-map-container');
+        const { layout, seats } = seatData;
+        
+        container.style.gridTemplateColumns = `repeat(${layout.cols}, 1fr)`;
+        
+        container.innerHTML = seats.map(seat => {
+            const status = seat.trang_thai === 'Đã bán' ? 'sold' : 'available';
+            return `
+                <div class="seat ${status}" 
+                     data-seat-code="${seat.ma_ghe}"
+                     data-price="${seat.gia}">
+                    ${seat.ma_ghe}
+                </div>
+            `;
+        }).join('');
+        
+        // Add click handlers to seats
+        container.querySelectorAll('.seat.available').forEach(seat => {
+            seat.addEventListener('click', function() {
+                toggleSeat(this.getAttribute('data-seat-code'));
+            });
+        });
+    }
+
+    function toggleSeat(seatCode) {
+        const seatEl = document.querySelector(`[data-seat-code="${seatCode}"]`);
+        if (!seatEl || seatEl.classList.contains('sold')) return;
+
+        const index = selectedSeats.indexOf(seatCode);
+        if (index > -1) {
+            selectedSeats.splice(index, 1);
+            seatEl.classList.remove('selected');
+        } else {
+            selectedSeats.push(seatCode);
+            seatEl.classList.add('selected');
+        }
+
+        updateBookingSummary();
+    }
+
+    function updateBookingSummary() {
+        const quantity = selectedSeats.length;
+        const price = selectedTrip.gia_ve || 0;
+        const total = quantity * price;
+
+        document.getElementById('selected-seats-display').textContent = 
+            selectedSeats.length > 0 ? selectedSeats.join(', ') : 'Chưa chọn ghế';
+        document.getElementById('seat-quantity').textContent = quantity;
+        document.getElementById('seat-price').textContent = formatCurrency(price);
+        document.getElementById('total-price').textContent = formatCurrency(total);
+
+        document.getElementById('btn-proceed-checkout').disabled = quantity === 0;
+    }
+
+    function openCheckout() {
+        document.getElementById('checkout-trip').textContent = selectedTrip.tuyen;
+        document.getElementById('checkout-seats').textContent = selectedSeats.join(', ');
+        document.getElementById('checkout-total').textContent = 
+            document.getElementById('total-price').textContent;
+
+        bootstrap.Modal.getInstance(document.getElementById('seatModal')).hide();
+        const modal = new bootstrap.Modal(document.getElementById('checkoutModal'));
+        modal.show();
+    }
+
+    function handleCheckout(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        
+        const payload = new FormData();
+        payload.append('machuyendi', selectedTrip.machuyendi);
+        payload.append('seats', selectedSeats.join(','));
+        payload.append('gia_ve', selectedTrip.gia_ve);
+        payload.append('kh_hoten', formData.get('ten_khach'));
+        payload.append('kh_sdt', formData.get('sdt'));
+        payload.append('kh_email', formData.get('email') || '');
+        payload.append('phuongthuc_thanhtoan', 'tien-mat');
+        payload.append('ghi_chu', formData.get('ghi_chu') || '');
+
+        fetch('{{ route("nhan-vien-ban-ve.dat-ve.store") }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: payload
+        })
+        .then(res => {
+            if (!res.ok) {
+                return res.json().then(data => {
+                    throw new Error(data.message || 'Có lỗi xảy ra');
+                });
+            }
+            return res.json();
+        })
+        .then(data => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Đặt vé thành công!',
+                text: 'Vé đã được tạo và lưu vào hệ thống',
+                confirmButtonColor: '#0d6efd'
+            }).then(() => {
+                window.location.href = '{{ route("nhan-vien-ban-ve.ve.index") }}';
+            });
+        })
+        .catch(err => {
+            showError(err.message || 'Có lỗi xảy ra');
+        });
+    }
+
+    function applyFilters() {
+        const route = document.getElementById('filter-route').value;
+        const time = document.getElementById('filter-time').value;
+        const status = document.getElementById('filter-status').value;
+
+        let filtered = allTrips;
+
+        if (route) {
+            filtered = filtered.filter(t => t.tuyen === route);
+        }
+
+        if (time) {
+            filtered = filtered.filter(t => {
+                const hour = parseInt(t.gio_khoi_hanh.split(':')[0]);
+                if (time === 'morning') return hour >= 6 && hour < 12;
+                if (time === 'afternoon') return hour >= 12 && hour < 18;
+                if (time === 'evening') return hour >= 18;
+                return true;
+            });
+        }
+
+        if (status === 'available') {
+            filtered = filtered.filter(t => t.ghe_trong > 0);
+        }
+
+        renderTrips(filtered);
+    }
+
+    function resetFilters() {
+        routeSelect.setChoiceByValue('');
+        document.getElementById('filter-time').value = '';
+        document.getElementById('filter-status').value = '';
+        renderTrips(allTrips);
+    }
+
+    function formatCurrency(amount) {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(amount);
+    }
+
+    function showError(message) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Lỗi',
+            text: message,
+            confirmButtonColor: '#dc3545'
+        });
+    }
+});
+</script>
+@endpush

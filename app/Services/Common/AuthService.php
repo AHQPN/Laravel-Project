@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Services\Common;
+namespace App\Services\Common;
 
 use Illuminate\Support\Facades\Hash;
 

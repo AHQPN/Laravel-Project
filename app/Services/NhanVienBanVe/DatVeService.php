@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Services\NhanVienBanVe;
+namespace App\Services\NhanVienBanVe;
 
 use App\Models\Ve;
 use App\Models\Hoadon;
@@ -55,9 +55,6 @@ class DatVeService
                     'trangthai' => 'Booked',
                     'pickup_status' => 0,
                 ]);
-                
-                // Dispatch event for real-time seat update
-                event(new \App\Events\SeatBooked($data['machuyendi'], $soghe, 'Booked'));
 
                 // 5. Create CTHD (chi tiet hoa don)
                 CTHD::create([

@@ -116,8 +116,6 @@ class TicketController extends Controller
                             ]
                         );
                         
-                        event(new \App\Events\SeatBooked($tripID, $seat, 'Pending'));
-                        
                         $bookedSeats[] = $seat;
                     }
                 }
@@ -266,7 +264,6 @@ class TicketController extends Controller
 
                 foreach ($tickets as $ticket) {
                     $ticket->update(['trangthai' => 'Booked', 'pending_expires_at' => null]);
-                    event(new \App\Events\SeatBooked($tripID, $ticket->maghe, 'Booked'));
                 }
 
                 $trip->decrement('SLgheconlai', $tickets->count());

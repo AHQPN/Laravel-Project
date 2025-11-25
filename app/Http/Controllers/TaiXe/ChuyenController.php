@@ -26,7 +26,8 @@ class ChuyenController extends Controller
     public function passengerIndex(): \Illuminate\View\View
     {
         $taixe = session('taixe');
-        $trips = $this->fetchTripsForDriver($taixe->manv, Carbon::today()->subDays(3), Carbon::today()->addDays(3));
+        // Chỉ lấy các chuyến có thời gian khởi hành từ hiện tại trở đi (trong vòng 7 ngày tới)
+        $trips = $this->fetchTripsForDriver($taixe->manv, Carbon::now(), Carbon::now()->addDays(7));
 
         return view('TaiXe.DanhSachHanhKhach', [
             'trips' => $trips,
@@ -107,6 +108,7 @@ class ChuyenController extends Controller
         $trips = Chuyendi::with([
                 'xe',
                 'lotrinhs.tinhthanh',
+                'ves'
             ])
             ->whereIn('maxe', $xeIds)
             ->whereBetween('thoigiandi', [$from->startOfDay(), $to->endOfDay()])
@@ -119,6 +121,9 @@ class ChuyenController extends Controller
 
                 $status = $this->resolveStatus($trip);
                 $departure = $trip->thoigiandi ? Carbon::parse($trip->thoigiandi) : null;
+                
+                // Tính tổng số khách (vé đã đặt, không tính vé đã hủy)
+                $tongKhach = $trip->ves->where('trangthai', '!=', 'Đã hủy')->count();
 
                 return [
                     'machuyendi' => $trip->machuyendi,
@@ -128,6 +133,7 @@ class ChuyenController extends Controller
                     'thoi_gian_day_du' => $departure ? $departure->translatedFormat('H:i d/m') : 'Chưa cập nhật',
                     'bien_so' => optional($trip->xe)->soxe ?? 'Chưa gán xe',
                     'so_ghe_trong' => $trip->SLgheconlai,
+                    'tong_khach' => $tongKhach,
                     'trang_thai' => $status['label'],
                     'badge' => $status['badge'],
                     'raw_status' => $status['key'],

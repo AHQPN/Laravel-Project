@@ -1,45 +1,44 @@
-
 @extends('layouts.NhanVienLayout')
 
 @section('title', 'Theo dõi chuyến đi')
-@section('page-title', 'Theo dõi chuyến đi')
+@section('page-title', 'Lịch trình Chuyến đi')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid py-4">
     
     {{-- ====== FILTER CARD ====== --}}
-    <div class="card shadow-sm border-0 mb-4 animate-card">
-        <div class="card-header bg-gradient-primary text-white py-3">
-            <h5 class="mb-0 fw-semibold d-flex align-items-center">
-                <i class="fas fa-filter me-2"></i>
+    <div class="card border shadow-sm mb-4">
+        <div class="card-header bg-white py-3 border-bottom">
+            <h6 class="mb-0 fw-bold text-dark d-flex align-items-center">
+                <i class="fas fa-filter me-2 text-secondary"></i>
                 Bộ lọc tìm kiếm
-            </h5>
+            </h6>
         </div>
         <div class="card-body p-4">
             <form action="{{ route('nhan-vien-ban-ve.chuyen-di.index') }}" method="GET" id="filter-form">
-                <div class="row g-3 mb-3">
+                <div class="row g-3">
                     <!-- Ngày -->
                     <div class="col-lg-4 col-md-6">
-                        <label for="filter_date" class="form-label fw-semibold text-secondary mb-2">
-                            <i class="far fa-calendar-alt me-1"></i> Ngày
+                        <label for="filter_date" class="form-label fw-bold text-secondary small text-uppercase">
+                            Ngày khởi hành
                         </label>
                         <input type="date" 
                                name="date" 
                                id="filter_date" 
-                               class="form-control shadow-sm" 
+                               class="form-control" 
                                value="{{ request('date', \Carbon\Carbon::today()->format('Y-m-d')) }}">
                     </div>
 
                     <!-- Tuyến đường -->
                     <div class="col-lg-4 col-md-6">
-                        <label for="filter_route" class="form-label fw-semibold text-secondary mb-2">
-                            <i class="fas fa-route me-1"></i> Tuyến đường
+                        <label for="filter_route" class="form-label fw-bold text-secondary small text-uppercase">
+                            Tuyến đường
                         </label>
-                        <select name="route" id="filter_route" class="form-select shadow-sm">
+                        <select name="route" id="filter_route" class="form-select">
                             <option value="">Tất cả tuyến</option>
                             @foreach($routes as $route)
                                 <option value="{{ $route['value'] }}" @selected(request('route') == $route['value'])>
-                                    {{ $route['label'] }}
+                                    {{ formatRouteForDropdown($route['label']) }}
                                 </option>
                             @endforeach
                         </select>
@@ -47,31 +46,25 @@
 
                     <!-- Trạng thái -->
                     <div class="col-lg-4 col-md-6">
-                        <label for="filter_status" class="form-label fw-semibold text-secondary mb-2">
-                            <i class="fas fa-info-circle me-1"></i> Trạng thái
+                        <label for="filter_status" class="form-label fw-bold text-secondary small text-uppercase">
+                            Trạng thái
                         </label>
-                        <select name="status" id="filter_status" class="form-select shadow-sm">
+                        <select name="status" id="filter_status" class="form-select">
                             <option value="">Tất cả trạng thái</option>
-                            <option value="sap-khoi-hanh" @selected(request('status') == 'sap-khoi-hanh')>
-                                🕐 Sắp khởi hành
-                            </option>
-                            <option value="dang-chay" @selected(request('status') == 'dang-chay')>
-                                🚌 Đang chạy
-                            </option>
-                            <option value="hoan-thanh" @selected(request('status') == 'hoan-thanh')>
-                                ✓ Hoàn thành
-                            </option>
+                            <option value="sap-khoi-hanh" @selected(request('status') == 'sap-khoi-hanh')>Sắp khởi hành</option>
+                            <option value="dang-chay" @selected(request('status') == 'dang-chay')>Đang chạy</option>
+                            <option value="hoan-thanh" @selected(request('status') == 'hoan-thanh')>Hoàn thành</option>
                         </select>
                     </div>
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="d-flex justify-content-end gap-2 pt-3 border-top">
-                    <a href="{{ route('nhan-vien-ban-ve.chuyen-di.index') }}" class="btn btn-outline-secondary px-4">
-                        <i class="fas fa-redo-alt me-2"></i> Đặt lại
+                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                    <a href="{{ route('nhan-vien-ban-ve.chuyen-di.index') }}" class="btn btn-light border">
+                        <i class="fas fa-undo me-2"></i> Đặt lại
                     </a>
-                    <button type="submit" class="btn btn-primary px-4 shadow-sm">
-                        <i class="fas fa-search me-2"></i> Lọc
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="fas fa-filter me-2"></i> Lọc dữ liệu
                     </button>
                 </div>
             </form>
@@ -79,88 +72,98 @@
     </div>
 
     {{-- ====== TRIPS TABLE ====== --}}
-    <div class="card shadow-sm border-0 animate-card">
-        <div class="card-header bg-white border-bottom py-3">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <h5 class="mb-0 fw-semibold">
-                    <i class="fas fa-bus me-2 text-primary"></i>
-                    Danh sách chuyến đi
-                </h5>
-                <span class="badge bg-primary-subtle text-primary px-3 py-2">
-                    <i class="fas fa-list me-1"></i> Tổng: <span data-pagination-info="trips-table">{{ $chuyenDis->count() }} chuyến</span>
-                </span>
-            </div>
+    <div class="card border shadow-sm">
+        <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 fw-bold text-dark">
+                Danh sách chuyến đi
+            </h6>
+            <span class="badge bg-light text-dark border fw-normal">
+                Tổng số: <span class="fw-bold">{{ $chuyenDis->count() }}</span> chuyến
+            </span>
         </div>
 
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0" id="trips-table">
-                    <thead class="table-light">
+                    <thead class="bg-light">
                         <tr>
-                            <th class="sortable fw-semibold text-secondary" data-sort="route">
-                                Tuyến đường <i class="fas fa-sort ms-1"></i>
+                            <th class="fw-bold text-secondary text-uppercase small py-3 ps-4 sortable" data-sort="from" style="cursor: pointer;">
+                                Điểm đi <i class="fas fa-sort ms-1 text-muted"></i>
                             </th>
-                            <th class="sortable fw-semibold text-secondary" data-sort="time">
-                                Giờ khởi hành <i class="fas fa-sort ms-1"></i>
+                            <th class="fw-bold text-secondary text-uppercase small py-3 sortable" data-sort="to" style="cursor: pointer;">
+                                Điểm đến <i class="fas fa-sort ms-1 text-muted"></i>
                             </th>
-                            <th class="sortable fw-semibold text-secondary" data-sort="vehicle">
-                                Biển số xe <i class="fas fa-sort ms-1"></i>
+                            <th class="fw-bold text-secondary text-uppercase small py-3 sortable" data-sort="time" style="cursor: pointer;">
+                                Giờ khởi hành <i class="fas fa-sort ms-1 text-muted"></i>
                             </th>
-                            <th class="sortable fw-semibold text-secondary text-center" data-sort="booked">
-                                Ghế đã đặt <i class="fas fa-sort ms-1"></i>
+                            <th class="fw-bold text-secondary text-uppercase small py-3 sortable" data-sort="vehicle" style="cursor: pointer;">
+                                Biển số xe <i class="fas fa-sort ms-1 text-muted"></i>
                             </th>
-                            <th class="sortable fw-semibold text-secondary text-center" data-sort="available">
-                                Ghế trống <i class="fas fa-sort ms-1"></i>
+                            <th class="fw-bold text-secondary text-uppercase small py-3 text-center sortable" data-sort="booked" style="cursor: pointer;">
+                                Đã đặt <i class="fas fa-sort ms-1 text-muted"></i>
                             </th>
-                            <th class="sortable fw-semibold text-secondary text-center" data-sort="status">
-                                Trạng thái <i class="fas fa-sort ms-1"></i>
+                            <th class="fw-bold text-secondary text-uppercase small py-3 text-center sortable" data-sort="available" style="cursor: pointer;">
+                                Còn trống <i class="fas fa-sort ms-1 text-muted"></i>
                             </th>
-                            <th class="fw-semibold text-secondary text-center">Chi tiết</th>
+                            <th class="fw-bold text-secondary text-uppercase small py-3 text-center sortable" data-sort="status" style="cursor: pointer;">
+                                Trạng thái <i class="fas fa-sort ms-1 text-muted"></i>
+                            </th>
+                            <th class="fw-bold text-secondary text-uppercase small py-3 text-center pe-4">Chi tiết</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($chuyenDis as $chuyen)
-                            <tr class="trip-row">
-                                <!-- Tuyến đường -->
+                            <tr class="trip-row border-bottom">
+                                <!-- Điểm đi -->
+                                <td class="ps-4">
+                                    @php
+                                        $parts = preg_split('/\s*(?:→|->|-)\s*/u', $chuyen->tuyen_duong);
+                                        $from = trim($parts[0] ?? '');
+                                        $to = trim($parts[1] ?? '');
+                                    @endphp
+                                    <span class="badge bg-light text-primary border border-primary px-3 py-2">
+                                        {{ $from }}
+                                    </span>
+                                </td>
+
+                                <!-- Điểm đến -->
                                 <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="trip-icon-box me-2">
-                                            <i class="fas fa-route"></i>
-                                        </div>
-                                        <span class="fw-semibold">{{ $chuyen->tuyen_duong }}</span>
-                                    </div>
+                                    <span class="badge bg-light text-danger border border-danger px-3 py-2">
+                                        {{ $to }}
+                                    </span>
                                 </td>
 
                                 <!-- Giờ khởi hành -->
                                 <td>
-                                    <i class="far fa-clock me-1 text-muted"></i>
-                                    <span class="fw-semibold">{{ \Carbon\Carbon::parse($chuyen->thoigiandi)->format('H:i') }}</span>
+                                    <div class="d-flex align-items-center text-muted">
+                                        <i class="far fa-clock me-2"></i>
+                                        <span class="fw-semibold text-dark">{{ \Carbon\Carbon::parse($chuyen->thoigiandi)->format('H:i') }}</span>
+                                    </div>
                                 </td>
 
                                 <!-- Biển số xe -->
                                 <td>
-                                    <span class="badge bg-secondary-subtle text-secondary px-2 py-1">
-                                        <i class="fas fa-bus me-1"></i>
+                                    <span class="badge bg-light text-dark border fw-normal">
                                         {{ $chuyen->xe->soxe ?? 'N/A' }}
                                     </span>
                                 </td>
 
                                 <!-- Ghế đã đặt -->
                                 <td class="text-center">
-                                    <div class="seat-info">
-                                        <span class="badge bg-info-subtle text-info px-3 py-2">
-                                            {{ $chuyen->so_ghe_da_dat ?? 0 }} / {{ $chuyen->xe->loaixe->tong_so_ghe ?? 0 }}
-                                        </span>
-                                    </div>
+                                    <span class="fw-bold text-secondary">
+                                        {{ $chuyen->so_ghe_da_dat ?? 0 }} / {{ $chuyen->xe->loaixe->tong_so_ghe ?? 0 }}
+                                    </span>
                                 </td>
 
                                 <!-- Ghế trống -->
                                 <td class="text-center">
                                     @php
                                         $ghetrong = ($chuyen->xe->loaixe->tong_so_ghe ?? 0) - ($chuyen->so_ghe_da_dat ?? 0);
+                                        $percent = ($chuyen->xe->loaixe->tong_so_ghe ?? 0) > 0 ? ($ghetrong / $chuyen->xe->loaixe->tong_so_ghe) * 100 : 0;
+                                        $colorClass = $percent > 50 ? 'success' : ($percent > 20 ? 'warning' : 'danger');
                                     @endphp
-                                    <span class="badge bg-success-subtle text-success px-3 py-2 fw-bold">
-                                        <i class="fas fa-chair me-1"></i>{{ $ghetrong }}
+                                    <span class="badge bg-{{ $colorClass }}-subtle text-{{ $colorClass }} border border-{{ $colorClass }}-subtle fw-bold px-3">
+                                        {{ $ghetrong }}
                                     </span>
                                 </td>
 
@@ -168,27 +171,29 @@
                                 <td class="text-center">
                                     @php($status = $chuyen->status_display ?? 'N/A')
                                     @if ($status === 'Sắp khởi hành')
-                                        <span class="badge bg-primary px-3 py-2">
-                                            <i class="far fa-clock me-1"></i>{{ $status }}
+                                        <span class="badge bg-info text-dark bg-opacity-10 border border-info px-2 py-1 fw-normal text-info">
+                                            Sắp khởi hành
                                         </span>
                                     @elseif ($status === 'Đang chạy')
-                                        <span class="badge bg-warning px-3 py-2">
-                                            <i class="fas fa-bus me-1"></i>{{ $status }}
+                                        <span class="badge bg-warning text-dark bg-opacity-10 border border-warning px-2 py-1 fw-normal text-warning">
+                                            Đang chạy
                                         </span>
                                     @elseif ($status === 'Đã hoàn thành')
-                                        <span class="badge bg-success px-3 py-2">
-                                            <i class="fas fa-check-circle me-1"></i>{{ $status }}
+                                        <span class="badge bg-success text-dark bg-opacity-10 border border-success px-2 py-1 fw-normal text-success">
+                                            Hoàn thành
                                         </span>
                                     @else
-                                        <span class="badge bg-secondary px-3 py-2">{{ $status }}</span>
+                                        <span class="badge bg-secondary text-dark bg-opacity-10 border border-secondary px-2 py-1 fw-normal text-secondary">
+                                            {{ $status }}
+                                        </span>
                                     @endif
                                 </td>
 
                                 <!-- Actions -->
-                                <td class="text-center">
-                                    <button class="btn btn-sm btn-info btn-view-details shadow-sm" 
+                                <td class="text-center pe-4">
+                                    <button class="btn btn-sm btn-outline-primary btn-view-details" 
                                             data-id="{{ $chuyen->machuyendi }}"
-                                            title="Xem chi tiết chuyến đi">
+                                            title="Xem chi tiết">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </td>
@@ -197,8 +202,8 @@
                             <tr>
                                 <td colspan="7" class="text-center py-5">
                                     <div class="text-muted">
-                                        <i class="fas fa-bus fa-3x mb-3 d-block" style="opacity: 0.3;"></i>
-                                        <p class="mb-0">Không có chuyến đi nào</p>
+                                        <i class="fas fa-bus fa-3x mb-3 opacity-25"></i>
+                                        <p class="mb-0">Không tìm thấy chuyến đi nào phù hợp</p>
                                     </div>
                                 </td>
                             </tr>
@@ -209,27 +214,27 @@
         </div>
 
         {{-- ====== PAGINATION ====== --}}
-        <div class="card-footer bg-white border-top" id="trips-pagination"></div>
+        <div class="card-footer bg-white border-top py-3" id="trips-pagination"></div>
     </div>
 </div>
 
 {{-- ====== MODAL CHI TIẾT CHUYẾN ĐI ====== --}}
 <div class="modal fade" id="tripDetailsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content border-0 shadow-lg">
-            <div class="modal-header bg-gradient-primary text-white">
-                <h5 class="modal-title">
-                    <i class="fas fa-bus me-2"></i>
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-white border-bottom">
+                <h5 class="modal-title fw-bold text-dark">
+                    <i class="fas fa-info-circle me-2 text-primary"></i>
                     Chi tiết chuyến đi
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-4">
                 <div id="modal-content-placeholder" class="text-center py-5">
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Đang tải...</span>
                     </div>
-                    <p class="text-muted mt-3">Đang tải thông tin chuyến đi...</p>
+                    <p class="text-muted mt-3 small">Đang tải dữ liệu...</p>
                 </div>
             </div>
         </div>
@@ -239,253 +244,103 @@
 
 @push('styles')
 <style>
-/* ====== Gradient Background ====== */
-.bg-gradient-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+/* Enterprise UI Overrides */
+.card {
+    border-radius: 6px;
+    border-color: #e0e0e0;
 }
-
-/* ====== Card Animation ====== */
-.animate-card {
-    animation: fadeInUp 0.5s ease;
+.shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.05)!important;
 }
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* ====== Form Controls ====== */
-.form-control:focus,
-.form-select:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-}
-
-.form-control,
-.form-select {
-    border-radius: 0.5rem;
-    padding: 0.625rem 0.875rem;
-    transition: all 0.2s ease;
-}
-
-.form-control:hover,
-.form-select:hover {
-    border-color: #667eea;
-}
-
-/* ====== Table Styling ====== */
-#trips-table {
-    font-size: 0.9rem;
-}
-
-#trips-table thead th {
-    text-transform: uppercase;
+.form-label {
     font-size: 0.75rem;
     letter-spacing: 0.5px;
-    padding: 1rem 0.75rem;
-    border-bottom: 2px solid #e9ecef;
-    white-space: nowrap;
 }
-
-#trips-table tbody td {
-    padding: 1rem 0.75rem;
-    vertical-align: middle;
+.form-select, .form-control {
+    border-radius: 4px;
+    border-color: #ced4da;
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
 }
-
-/* ====== Sortable Headers ====== */
-.sortable {
-    cursor: pointer;
-    user-select: none;
-    transition: all 0.2s ease;
+.form-select:focus, .form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
 }
-
-.sortable:hover {
-    background-color: #f8f9fa !important;
+.btn {
+    border-radius: 4px;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
 }
-
-.sortable i {
-    opacity: 0.3;
-    transition: opacity 0.2s ease;
-}
-
-.sortable.sort-asc i::before {
-    content: "\f160";
-    opacity: 1;
-    color: #667eea;
-}
-
-.sortable.sort-desc i::before {
-    content: "\f161";
-    opacity: 1;
-    color: #667eea;
-}
-
-/* ====== Row Hover Effect ====== */
-.trip-row {
-    transition: all 0.2s ease;
-    border-bottom: 1px solid #f1f3f5;
-}
-
-.trip-row:hover {
-    background-color: #f8f9fa;
-    transform: translateX(2px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-/* ====== Trip Icon Box ====== */
-.trip-icon-box {
-    width: 35px;
-    height: 35px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-}
-
-/* ====== Badge Styling ====== */
-.badge {
-    font-weight: 500;
-    font-size: 0.75rem;
-    border-radius: 0.375rem;
-    letter-spacing: 0.3px;
-}
-
-/* ====== Button Styling ====== */
-.btn-view-details {
-    transition: all 0.2s ease;
-    border-radius: 0.375rem;
-}
-
-.btn-view-details:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
-}
-
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    transition: all 0.3s ease;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+.table thead th {
+    font-weight: 600;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
 }
 
-.btn-primary:hover {
-    background: linear-gradient(135deg, #5568d3 0%, #65408b 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+/* Pagination Styles */
+.smart-pagination .pagination {
+    justify-content: flex-end;
+    margin-bottom: 0;
+}
+.smart-pagination .page-link {
+    border-radius: 4px;
+    margin: 0 2px;
+    color: #495057;
+    border: 1px solid #dee2e6;
+}
+.smart-pagination .page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: #fff;
 }
 
-/* ====== Modal Styling ====== */
-.modal-content {
-    border-radius: 0.75rem;
-    overflow: hidden;
+/* Choices.js Customization */
+.choices__inner {
+    background-color: #fff;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+    min-height: auto;
+    padding: 0.25rem 0.5rem;
+}
+.choices__input {
+    background-color: transparent;
 }
 
-.modal-header {
-    border-bottom: none;
-    padding: 1.25rem 1.5rem;
-}
-
-.modal-body {
-    padding: 1.5rem;
-}
-
-/* ====== Seat Map in Modal ====== */
+/* Modal Seat Map */
 .seat-map-container {
     display: grid;
-    gap: 10px;
-    max-width: 600px;
+    gap: 8px;
+    max-width: 500px;
     margin: 20px auto;
-    padding: 2rem;
-    background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
-    border: 2px solid #e9ecef;
-    border-radius: 0.75rem;
+    padding: 1.5rem;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
 }
-
 .seat-box-modal {
-    width: 45px;
-    height: 45px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    font-size: 0.875rem;
-    border-radius: 0.5rem;
-    border: 2px solid;
-    transition: all 0.2s ease;
+    font-weight: 600;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    transition: all 0.2s;
 }
-
 .seat-box-modal:hover {
-    transform: scale(1.05);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-
-/* ====== Info Card in Modal ====== */
 .modal-info-card {
-    background: #f8f9fa;
+    background-color: #f8f9fa;
     padding: 1.5rem;
-    border-radius: 0.75rem;
-    border-left: 4px solid #667eea;
-    margin-bottom: 1.5rem;
-}
-
-/* ====== Legend in Modal ====== */
-.legend-box-modal {
-    width: 24px;
-    height: 24px;
-    border-radius: 0.375rem;
-    display: inline-block;
-    border: 2px solid;
-    margin-right: 0.5rem;
-}
-
-/* ====== Responsive ====== */
-@media (max-width: 992px) {
-    #trips-table {
-        font-size: 0.85rem;
-    }
-    
-    .badge {
-        font-size: 0.7rem;
-        padding: 0.35rem 0.6rem !important;
-    }
-    
-    .trip-icon-box {
-        width: 30px;
-        height: 30px;
-        font-size: 0.75rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .card-body {
-        padding: 1rem !important;
-    }
-    
-    #trips-table thead th {
-        font-size: 0.7rem;
-        padding: 0.75rem 0.5rem;
-    }
-    
-    #trips-table tbody td {
-        padding: 0.75rem 0.5rem;
-    }
-    
-    .btn-sm {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.8rem;
-    }
-}
-
-/* ====== Empty State ====== */
-.fa-bus.fa-3x {
-    opacity: 0.3;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
 }
 </style>
 @endpush
@@ -515,7 +370,11 @@ document.addEventListener('DOMContentLoaded', function () {
             if (rows.length === 0) return;
 
             // Remove previous sort indicators
-            headers.forEach(h => h.classList.remove('sort-asc', 'sort-desc'));
+            headers.forEach(h => {
+                h.classList.remove('sort-asc', 'sort-desc');
+                const icon = h.querySelector('i');
+                if (icon) icon.className = 'fas fa-sort ms-1 text-muted';
+            });
 
             // Toggle sort direction
             if (currentSort.column === sortType) {
@@ -527,6 +386,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Add sort indicator
             this.classList.add(`sort-${currentSort.direction}`);
+            const icon = this.querySelector('i');
+            if (icon) icon.className = `fas fa-sort-${currentSort.direction === 'asc' ? 'up' : 'down'} ms-1 text-dark`;
 
             // Sort rows
             rows.sort((a, b) => {
@@ -592,7 +453,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Đang tải...</span>
                     </div>
-                    <p class="text-muted mt-3">Đang tải thông tin chuyến đi...</p>
+                    <p class="text-muted mt-3 small">Đang tải thông tin chuyến đi...</p>
                 </div>
             `;
             modal.show();
@@ -654,10 +515,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 let seatMapHTML = `<div class="seat-map-container" style="grid-template-columns: repeat(${columns}, 1fr);">`;
                 allSeatCodes.forEach(seatCode => {
                     const isBooked = normalizedBooked.has(seatCode);
-                    const seatClass = isBooked ? 'booked' : 'available';
                     const seatStyle = isBooked 
                         ? 'background: #dc3545; border-color: #dc3545; color: white;' 
-                        : 'background: white; border-color: #28a745; color: #28a745;';
+                        : 'background: #f8fff9; border-color: #198754; color: #198754;';
                     const seatText = isBooked ? 'Đã đặt' : 'Trống';
                     seatMapHTML += `
                         <div class="seat-box-modal" 
@@ -672,22 +532,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Render passenger list
                 let passengerHTML = `
                     <div class="mt-4">
-                        <h5 class="mb-3">
-                            <i class="fas fa-users me-2 text-primary"></i>
+                        <h6 class="mb-3 fw-bold text-dark">
+                            <i class="fas fa-users me-2 text-secondary"></i>
                             Danh sách hành khách (${passengers.length})
-                        </h5>
+                        </h6>
                 `;
                 
                 if (passengers.length > 0) {
                     passengerHTML += `
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead class="table-light">
+                        <div class="table-responsive border rounded">
+                            <table class="table table-hover mb-0">
+                                <thead class="bg-light">
                                     <tr>
-                                        <th>Mã vé</th>
-                                        <th>Ghế</th>
-                                        <th>Tên khách</th>
-                                        <th>SĐT</th>
+                                        <th class="py-2">Mã vé</th>
+                                        <th class="py-2">Ghế</th>
+                                        <th class="py-2">Tên khách</th>
+                                        <th class="py-2">SĐT</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -695,10 +555,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     passengers.forEach(p => {
                         passengerHTML += `
                             <tr>
-                                <td><span class="badge bg-primary-subtle text-primary font-monospace">${p.mave}</span></td>
-                                <td><span class="badge bg-info px-3 py-2">${p.maghe}</span></td>
-                                <td class="fw-semibold">${p.ten_khach}</td>
-                                <td><i class="fas fa-phone-alt me-1 text-muted"></i>${p.sdt}</td>
+                                <td class="py-2"><span class="fw-bold text-primary font-monospace small">${p.mave}</span></td>
+                                <td class="py-2"><span class="badge bg-warning text-dark">${p.maghe}</span></td>
+                                <td class="py-2 fw-semibold small">${p.ten_khach}</td>
+                                <td class="py-2 small text-muted">${p.sdt}</td>
                             </tr>
                         `;
                     });
@@ -708,44 +568,48 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                     `;
                 } else {
-                    passengerHTML += '<p class="text-muted text-center py-4">Chưa có hành khách đặt vé</p>';
+                    passengerHTML += '<p class="text-muted text-center py-4 small border rounded bg-light">Chưa có hành khách đặt vé</p>';
                 }
                 passengerHTML += '</div>';
                 
                 modalBody.innerHTML = `
-                    <div class="modal-info-card">
-                        <h4 class="mb-4 fw-bold">
-                            <i class="fas fa-route me-2 text-primary"></i>
-                            ${trip.tuyen}
-                        </h4>
-                        <div class="row g-4">
-                            <div class="col-md-4">
-                                <div class="d-flex align-items-center">
-                                    <div class="me-3">
-                                        <i class="fas fa-chair fa-2x text-info"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-muted mb-1 small">Ghế đã đặt</p>
-                                        <p class="fw-bold mb-0">${booked_seats.length} / ${loaixe.tong_so_ghe}</p>
-                                    </div>
+                    <div class="modal-info-card mb-4">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="text-uppercase text-muted small fw-bold mb-1">Tuyến đường</div>
+                                <div class="route-display">
+                                    ${(() => {
+                                        const parts = trip.tuyen.split(/\s*(?:→|->|-)\s*/);
+                                        const from = parts[0] || '';
+                                        const to = parts[1] || '';
+                                        return `
+                                            <span class="route-badge route-from">${from}</span>
+                                            <i class="fas fa-arrow-right route-arrow"></i>
+                                            <span class="route-badge route-to">${to}</span>
+                                        `;
+                                    })()}
                                 </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="text-uppercase text-muted small fw-bold mb-1">Ghế đã đặt</div>
+                                <h5 class="fw-bold text-primary mb-0">${booked_seats.length} / ${loaixe.tong_so_ghe}</h5>
                             </div>
                         </div>
                     </div>
                     
-                    <h5 class="mt-4 mb-3">
-                        <i class="fas fa-th me-2 text-primary"></i>
+                    <h6 class="mb-3 fw-bold text-dark">
+                        <i class="fas fa-th me-2 text-secondary"></i>
                         Sơ đồ ghế ngồi
-                    </h5>
+                    </h6>
                     
-                    <div class="d-flex justify-content-center gap-4 mb-3 p-3 bg-light rounded">
+                    <div class="d-flex justify-content-center gap-4 mb-3 p-2 bg-light rounded border">
                         <div class="d-flex align-items-center">
-                            <span class="legend-box-modal" style="background: white; border-color: #28a745;"></span>
-                            <span class="small fw-semibold">Còn trống</span>
+                            <span class="d-inline-block rounded me-2" style="width: 16px; height: 16px; background: #f8fff9; border: 1px solid #198754;"></span>
+                            <span class="small fw-semibold text-secondary">Còn trống</span>
                         </div>
                         <div class="d-flex align-items-center">
-                            <span class="legend-box-modal" style="background: #dc3545; border-color: #dc3545;"></span>
-                            <span class="small fw-semibold">Đã đặt</span>
+                            <span class="d-inline-block rounded me-2" style="width: 16px; height: 16px; background: #dc3545; border: 1px solid #dc3545;"></span>
+                            <span class="small fw-semibold text-secondary">Đã đặt</span>
                         </div>
                     </div>
                     
@@ -758,8 +622,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="alert alert-danger d-flex align-items-center" role="alert">
                         <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
                         <div>
-                            <h5 class="alert-heading mb-1">Lỗi tải dữ liệu</h5>
-                            <p class="mb-0">Có lỗi xảy ra khi tải chi tiết chuyến đi. Vui lòng thử lại.</p>
+                            <h6 class="alert-heading mb-1 fw-bold">Lỗi tải dữ liệu</h6>
+                            <p class="mb-0 small">Có lỗi xảy ra khi tải chi tiết chuyến đi. Vui lòng thử lại.</p>
                         </div>
                     </div>
                 `;

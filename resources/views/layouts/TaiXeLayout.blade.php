@@ -20,69 +20,40 @@
 
     <style>
         :root {
-            --header-height: 64px;
-            --primary-color: #2dce89;
-            --secondary-color: #2dcecc;
-            --bottom-nav-height: 72px;
+            --header-height: 60px;
+            --primary-color: #00796b;
+            --secondary-color: #607d8b;
+            --bottom-nav-height: 64px;
+            --body-bg: #f5f7fa;
+            --card-border-color: #e0e0e0;
         }
 
         body {
-            font-family: 'Open Sans', sans-serif;
-            background: #f8f9fe;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--body-bg);
             margin: 0;
             padding-bottom: calc(var(--bottom-nav-height) + 20px);
+            color: #212529;
         }
 
         .layout-header {
             height: var(--header-height);
-            background: #f8f9fe;
+            background: #fff;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
+            padding: 0 16px;
             position: sticky;
             top: 0;
             z-index: 100;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            border-bottom: 1px solid #dee2e6;
         }
 
         .layout-header .header-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: #32325d;
+            font-size: 18px;
+            font-weight: 700;
+            color: #212529;
             margin: 0;
-        }
-
-        .layout-header .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .layout-header .avatar {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            font-weight: 600;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .layout-header .user-name {
-            font-weight: 600;
-            font-size: 14px;
-            color: #525f7f;
-            margin: 0;
-        }
-
-        .layout-header .user-role {
-            font-size: 12px;
-            color: #8898aa;
-            margin: 0;
-            text-align: right;
         }
 
         .layout-content {
@@ -90,24 +61,27 @@
         }
 
         .driver-card {
-            border-radius: 16px;
+            border-radius: 8px;
             background: white;
-            box-shadow: 0 4px 16px rgba(136,152,170,0.15);
+            border: 1px solid var(--card-border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             padding: 16px;
             margin-bottom: 16px;
         }
 
         .driver-card h3 {
-            font-size: 18px;
-            font-weight: 600;
-            color: #32325d;
+            font-size: 16px;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 8px;
         }
 
         .driver-card .meta {
-            font-size: 14px;
-            color: #5f6c7b;
+            font-size: 13px;
+            color: #6c757d;
         }
 
+        /* Mobile Navigation */
         .mobile-nav {
             position: fixed;
             bottom: 0;
@@ -115,28 +89,33 @@
             right: 0;
             height: var(--bottom-nav-height);
             background: white;
-            box-shadow: 0 -4px 16px rgba(136,152,170,0.15);
+            border-top: 1px solid #dee2e6;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            z-index: 200;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            z-index: 1030;
         }
 
         .mobile-nav__item {
             text-decoration: none;
-            color: #a0aec0;
-            font-size: 12px;
+            color: #6c757d;
+            font-size: 11px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            padding: 8px 12px;
+            gap: 4px;
+            padding: 8px;
+            transition: all 0.2s ease;
         }
 
         .mobile-nav__item i {
             font-size: 20px;
+            margin-bottom: 2px;
+        }
+
+        .mobile-nav__item:hover {
+            background-color: #f8f9fa;
+            color: var(--primary-color);
         }
 
         .mobile-nav__item.active {
@@ -146,10 +125,64 @@
 
         @media (min-width: 768px) {
             .layout-content {
-                padding: 24px 32px 120px;
-                max-width: 720px;
+                padding: 24px;
+                max-width: 800px;
                 margin: 0 auto;
             }
+            
+            .driver-card {
+                padding: 24px;
+            }
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        /* Route Badge Styles */
+        .route-display {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            flex-wrap: nowrap;
+        }
+        .route-badge {
+            display: inline-block;
+            padding: 0.3rem 0.65rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.8125rem;
+            line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+        .route-from {
+            background-color: #e0f2f1;
+            color: #00695c;
+            border: 1px solid #80cbc4;
+        }
+        .route-to {
+            background-color: #fce4ec;
+            color: #c2185b;
+            border: 1px solid #f48fb1;
+        }
+        .route-arrow {
+            color: #6c757d;
+            font-size: 0.75rem;
+            flex-shrink: 0;
         }
     </style>
 

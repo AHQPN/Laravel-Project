@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Services\QuanLy;
+namespace App\Services\QuanLy;
 
 use App\Models\Hoadon;
 use App\Models\Ve;

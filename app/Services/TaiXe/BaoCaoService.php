@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Services\TaiXe;
+namespace App\Services\TaiXe;
 
 use App\Models\BaocaoSuco;
 use Illuminate\Support\Facades\DB;

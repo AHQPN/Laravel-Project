@@ -4,7 +4,9 @@
         <div class="row mb-3">
             <div class="col-md-6">
                 <p class="text-muted mb-1">Chuyến đi</p>
-                <p class="fw-semibold">{{ $tuyen }}</p>
+                <div class="mb-2">
+                    <x-route-badge :route="$tuyen" />
+                </div>
                 <p class="mb-0"><i class="fas fa-clock me-2 text-primary"></i>{{ \Carbon\Carbon::parse($ve->chuyendi->thoigiandi)->format('H:i d/m/Y') }}</p>
             </div>
             <div class="col-md-6">

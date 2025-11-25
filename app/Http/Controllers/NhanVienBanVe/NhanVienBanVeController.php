@@ -21,22 +21,17 @@ use App\Http\Requests\NhanVienBanVe\UpdatePasswordRequest;
 
 class NhanVienBanVeController extends Controller
 {
-    /**
-     * Tạo mã hóa đơn ngắn (tối đa 10 ký tự) phù hợp schema: string(10)
-     * Định dạng: HD + yymmdd + 2 random base36
-     */
+    // Tạo mã hóa đơn ngắn (HD + yymmdd + 2 ký tự random)
     private function generateShortMaHoaDon(): string
     {
         do {
-            $datePart = now()->format('ymd'); // 6
-            $randPart = strtoupper(substr(base_convert(rand(0, 1295), 10, 36), 0, 2)); // ~2
-            $ma = 'HD' . $datePart . $randPart; // 2 + 6 + 2 = 10
+            $datePart = now()->format('ymd');
+            $randPart = strtoupper(substr(base_convert(rand(0, 1295), 10, 36), 0, 2));
+            $ma = 'HD' . $datePart . $randPart;
         } while (\App\Models\Hoadon::where('mahd', $ma)->exists());
         return $ma;
     }
-    /**
-     * Display the dashboard for ticket sellers.
-     */
+
     public function dashboard()
     {
         $nhanvien = session('nhanvien');
@@ -48,7 +43,6 @@ class NhanVienBanVeController extends Controller
         })->get();
         
         $tongVeBan = $veThangNay->count();
-        // Tính doanh thu từ giá chuyến đi (Ve không có cột gia)
         $tongDoanhThu = $veThangNay->sum(function($ve) {
             return $ve->chuyendi ? $ve->chuyendi->gia : 0;
         });
@@ -56,7 +50,7 @@ class NhanVienBanVeController extends Controller
             $q->whereDate('thoigiandi', Carbon::today());
         })->count();
         
-        // Chuyến đi sắp tới (7 ngày) - chỉ lấy chuyến có thời gian khởi hành > hiện tại
+        // Chuyến đi sắp tới (7 ngày)
         $now = Carbon::now();
         $chuyenDiSapToi = Chuyendi::with(['lotrinhs.tinhthanh', 'xe'])
             ->where('thoigiandi', '>', $now)
@@ -76,10 +70,12 @@ class NhanVienBanVeController extends Controller
         
         // Thống kê vé theo ngày (7 ngày gần nhất)
         $veTheoNgay = [];
+        $today = Carbon::today();
+        
         for ($i = 6; $i >= 0; $i--) {
-            $date = Carbon::now()->subDays($i);
+            $date = $today->copy()->subDays($i);
             $count = Ve::whereHas('chuyendi', function($q) use ($date) {
-                $q->whereDate('thoigiandi', $date);
+                $q->whereDate('thoigiandi', $date->format('Y-m-d'));
             })->count();
             $veTheoNgay[] = [
                 'ngay' => $date->format('d/m'),
@@ -96,9 +92,6 @@ class NhanVienBanVeController extends Controller
         ));
     }
 
-    /**
-     * (A) List invoices handled by current ticket seller.
-     */
     public function indexHoadon(Request $request)
     {
         $nhanvien = session('nhanvien');
@@ -118,18 +111,11 @@ class NhanVienBanVeController extends Controller
         return view('NhanVienBanVe.HoaDon', compact('hoadons'));
     }
 
-    /**
-     * (B) Show the offline ticket booking page.
-     */
     public function createDatVe()
     {
-        // Logic to show the booking form will be added here.
-        return view('NhanVienBanVe.DatVeOffline');
+        return view('NhanVienBanVe.DatVe');
     }
 
-    /**
-     * (B) Store a new offline ticket.
-     */
     public function storeDatVe(Request $request)
     {
         $request->validate([
@@ -146,13 +132,12 @@ class NhanVienBanVeController extends Controller
         try {
             \DB::beginTransaction();
 
-            // Step 1: Find chuyendi
             $chuyendi = Chuyendi::where('machuyendi', $request->machuyendi)->first();
             if (!$chuyendi) {
                 throw new \Exception('Không tìm thấy chuyến đi.');
             }
 
-            // Step 2: Find or create customer
+            // Tìm hoặc tạo khách hàng
             $khach = Khach::firstOrCreate(
                 ['sdt' => $request->kh_sdt],
                 [
@@ -164,7 +149,6 @@ class NhanVienBanVeController extends Controller
                 ]
             );
 
-            // Step 3: Find or create payment method
             $mattMap = [
                 'tien-mat' => 'TM',
                 'chuyen-khoan' => 'CK',
@@ -172,18 +156,15 @@ class NhanVienBanVeController extends Controller
             ];
             $matt = $mattMap[$request->phuongthuc_thanhtoan] ?? 'TM';
 
-            // Ensure payment method exists
             $thanhtoan = \App\Models\Thanhtoan::firstOrCreate(
                 ['matt' => $matt],
                 ['ptthanhtoan' => ucfirst(str_replace('-', ' ', $request->phuongthuc_thanhtoan))]
             );
 
-            // Step 4: Create invoice
             $selectedSeats = explode(',', $request->seats);
             $soluong = count($selectedSeats);
             $thanhtien = $soluong * $request->gia_ve;
 
-            // Generate mahd max length 10 per migration (HD + 8 digits + 2 random)
             $hoadon = \App\Models\Hoadon::create([
                 'mahd' => $this->generateShortMaHoaDon(),
                 'makh' => $khach->makh,
@@ -192,10 +173,10 @@ class NhanVienBanVeController extends Controller
                 'matt' => $matt,
                 'soluong' => $soluong,
                 'thanhtien' => $thanhtien,
-                'trangthai' => 'Đã duyệt', // Auto-approve offline bookings
+                'trangthai' => 'Đã duyệt',
             ]);
 
-            // Step 5: Create tickets and CTHD
+            // Tạo vé và CTHD
             $createdTickets = [];
             foreach ($selectedSeats as $seatNumber) {
                 $datePartVe = now()->format('ymd');
@@ -237,7 +218,6 @@ class NhanVienBanVeController extends Controller
     {
         $query = Ve::with(['chuyendi.lotrinhs.tinhthanh', 'chuyendi.xe', 'hoadon.khach']);
 
-        // Filtering
         if ($request->filled('ngay_di')) {
             $query->whereHas('chuyendi', function ($q) use ($request) {
                 $q->whereDate('thoigiandi', $request->ngay_di);
@@ -252,7 +232,6 @@ class NhanVienBanVeController extends Controller
             });
         }
 
-        // Searching
         if ($request->filled('search')) {
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
@@ -266,7 +245,6 @@ class NhanVienBanVeController extends Controller
 
         $ves = $query->latest('mave')->get();
 
-        // Data for filters
         $chuyenDis = Chuyendi::with('lotrinhs.tinhthanh')
             ->whereDate('thoigiandi', '>=', today())
             ->get()
@@ -280,9 +258,6 @@ class NhanVienBanVeController extends Controller
         return view('NhanVienBanVe.QuanLyVe', compact('ves', 'chuyenDis'));
     }
 
-    /**
-     * (C) Show details of a specific ticket.
-     */
     public function showVe($id)
     {
         $ve = Ve::with(['chuyendi.lotrinhs.tinhthanh', 'chuyendi.xe', 'hoadon.khach'])
@@ -301,9 +276,6 @@ class NhanVienBanVeController extends Controller
         ]);
     }
 
-    /**
-     * (C) Cancel/delete a ticket.
-     */
     public function destroyVe($id)
     {
         $ve = Ve::where('mave', $id)->firstOrFail();
@@ -312,11 +284,10 @@ class NhanVienBanVeController extends Controller
             return back()->with('error', 'Vé này đã được hủy từ trước.');
         }
 
-        // Cập nhật trạng thái vé
         $ve->trangthai = 'Đã hủy';
         $ve->save();
 
-        // Cập nhật lại số ghế còn lại trong Chuyendi nếu có cột SLgheconlai
+        // Cập nhật lại số ghế còn lại
         $chuyendi = $ve->chuyendi;
         if ($chuyendi && isset($chuyendi->SLgheconlai)) {
             $chuyendi->SLgheconlai = max(0, ($chuyendi->SLgheconlai ?? 0) + 1);
@@ -326,12 +297,8 @@ class NhanVienBanVeController extends Controller
         return back()->with('success', 'Đã hủy vé ' . $ve->mave . ' thành công.');
     }
 
-    /**
-     * (D) Show the trip monitoring page.
-     */
     public function indexChuyenDi(Request $request)
     {
-        // If a specific date is provided, show trips of that date; otherwise only upcoming (now and future)
         if ($request->filled('date')) {
             $date = Carbon::parse($request->date);
             $query = Chuyendi::with(['xe.loaixe', 'lotrinhs.tinhthanh', 'ves'])
@@ -343,7 +310,6 @@ class NhanVienBanVeController extends Controller
                 ->orderBy('thoigiandi', 'asc');
         }
 
-        // Apply route filter if provided
         if ($request->filled('route')) {
             [$start, $end] = explode('-', $request->route);
             $query->whereHas('lotrinhs', function ($q) use ($start) {
@@ -354,23 +320,20 @@ class NhanVienBanVeController extends Controller
             });
         }
         
-        // Get all and process
         $chuyenDis = $query->get();
         
-        // Map through items to add computed properties
         $chuyenDis->transform(function ($chuyen) {
             $firstPoint = $chuyen->lotrinhs->sortBy('trinhtu')->first();
             $lastPoint = $chuyen->lotrinhs->sortBy('trinhtu')->last();
             $chuyen->tuyen_duong = ($firstPoint->tinhthanh->ten ?? 'N/A') . ' → ' . ($lastPoint->tinhthanh->ten ?? 'N/A');
             
-            // Số ghế đã đặt tính từ bảng Ve, bỏ qua vé đã hủy
             $chuyen->so_ghe_da_dat = $chuyen->ves
                 ->filter(function ($ve) {
                     return !isset($ve->trangthai) || $ve->trangthai !== 'Đã hủy';
                 })
                 ->count();
             
-            // Determine status based on thoigiandi
+            // Xác định trạng thái chuyến
             $thoiGianDi = Carbon::parse($chuyen->thoigiandi);
             if (now()->lt($thoiGianDi)) {
                 $chuyen->status_display = 'Sắp khởi hành';
@@ -386,7 +349,6 @@ class NhanVienBanVeController extends Controller
             return $chuyen;
         });
         
-        // Filter by status if provided
         if ($request->filled('status')) {
             $statusFilter = $request->status;
             $chuyenDis = $chuyenDis->filter(function($chuyen) use ($statusFilter) {
@@ -394,7 +356,6 @@ class NhanVienBanVeController extends Controller
             })->values();
         }
 
-        // Get unique routes for filter dropdown
         $routes = Chuyendi::with(['lotrinhs.tinhthanh'])
             ->whereDate('thoigiandi', '>=', now()->subDays(30))
             ->get()
@@ -425,8 +386,6 @@ class NhanVienBanVeController extends Controller
         $firstPoint = $chuyendi->lotrinhs->sortBy('trinhtu')->first();
         $lastPoint = $chuyendi->lotrinhs->sortBy('trinhtu')->last();
         
-        // Chỉ tính những vé thực sự đã được giữ/đặt (trạng thái khác "Đã hủy")
-        // Lấy danh sách ghế đã đặt giữ nguyên định dạng trong DB (chỉ chuẩn hóa uppercase & trim)
         $bookedSeats = $chuyendi->ves
             ->where('trangthai', '!=', 'Đã hủy')
             ->pluck('maghe')
@@ -434,12 +393,11 @@ class NhanVienBanVeController extends Controller
                 if (is_string($seat)) {
                     return strtoupper(trim($seat));
                 }
-                return (string)$seat; // nếu là số thì trả về chuỗi số
+                return (string)$seat;
             })
             ->toArray();
         
         $passengers = $chuyendi->ves->map(function($ve) {
-            // Giữ nguyên định dạng mã ghế (uppercase nếu là string)
             $seatCode = is_string($ve->maghe) ? strtoupper(trim($ve->maghe)) : (string)$ve->maghe;
             return [
                 'mave' => $ve->mave,
@@ -457,7 +415,6 @@ class NhanVienBanVeController extends Controller
                 'bien_so' => $chuyendi->xe->soxe ?? 'N/A',
             ],
             'loaixe' => [
-                // Tổng số ghế thực tế từ loại xe
                 'tong_so_ghe' => $chuyendi->xe->loaixe->tong_so_ghe ?? 0,
             ],
             'booked_seats' => $bookedSeats,
@@ -465,38 +422,75 @@ class NhanVienBanVeController extends Controller
         ]);
     }
 
-    // =================================================================
-    // ==                     API METHODS                             ==
-    // =================================================================
-
+    // API Methods
     public function getChuyenDiApi(Request $request)
     {
         $now = Carbon::now();
-        // Only routes that still have upcoming departures (thoigiandi >= now)
-        $chuyenDis = Chuyendi::with(['lotrinhs.tinhthanh'])
+        $chuyenDis = Chuyendi::with(['lotrinhs.tinhthanh', 'xe.loaixe', 'ves'])
             ->where('thoigiandi', '>=', $now)
+            ->orderBy('thoigiandi', 'asc')
             ->get();
         
-        // Group by route (first point -> last point)
-        $routes = [];
-        $routesMap = [];
-        
-        foreach ($chuyenDis as $cd) {
+        $trips = $chuyenDis->map(function($cd) {
             $firstPoint = $cd->lotrinhs->sortBy('trinhtu')->first();
             $lastPoint = $cd->lotrinhs->sortBy('trinhtu')->last();
-            $routeKey = ($firstPoint->matinh ?? '') . '-' . ($lastPoint->matinh ?? '');
             
-            if (!isset($routesMap[$routeKey])) {
-                $routesMap[$routeKey] = [
-                    'value' => $routeKey,
-                    'label' => ($firstPoint->tinhthanh->ten ?? 'N/A') . ' → ' . ($lastPoint->tinhthanh->ten ?? 'N/A'),
-                    'start' => $firstPoint->matinh ?? '',
-                    'end' => $lastPoint->matinh ?? '',
-                ];
-            }
+            $totalSeats = $cd->xe?->loaixe?->tong_so_ghe ?? 0;
+            $bookedSeats = $cd->ves->where('trangthai', '!=', 'Đã hủy')->count();
+            $availableSeats = max(0, $totalSeats - $bookedSeats);
+            
+            return [
+                'machuyendi' => $cd->machuyendi,
+                'tuyen' => ($firstPoint?->tinhthanh?->ten ?? 'N/A') . ' → ' . ($lastPoint?->tinhthanh?->ten ?? 'N/A'),
+                'gio_khoi_hanh' => Carbon::parse($cd->thoigiandi)->format('H:i d/m/Y'),
+                'bien_so' => $cd->xe?->soxe ?? 'N/A',
+                'gia_ve' => $cd->gia ?? 0,
+                'ghe_trong' => $availableSeats,
+                'tong_ghe' => $totalSeats,
+            ];
+        });
+        
+        return response()->json($trips);
+    }
+    
+    public function getSeatMapApi($machuyendi)
+    {
+        $chuyendi = Chuyendi::with(['xe.loaixe', 'ves'])
+            ->where('machuyendi', $machuyendi)
+            ->firstOrFail();
+        
+        $totalSeats = $chuyendi->xe?->loaixe?->tong_so_ghe ?? 0;
+        
+        // Lấy danh sách ghế đã đặt
+        $bookedSeats = $chuyendi->ves
+            ->where('trangthai', '!=', 'Đã hủy')
+            ->pluck('maghe')
+            ->map(function($seat) {
+                return strtoupper(trim($seat));
+            })
+            ->toArray();
+        
+        // Tạo danh sách tất cả ghế
+        $seats = [];
+        for ($i = 1; $i <= $totalSeats; $i++) {
+            $seatCode = 'A' . str_pad($i, 2, '0', STR_PAD_LEFT);
+            $seats[] = [
+                'ma_ghe' => $seatCode,
+                'gia' => $chuyendi->gia,
+                'trang_thai' => in_array($seatCode, $bookedSeats) ? 'Đã bán' : 'Trống'
+            ];
         }
         
-        return response()->json(array_values($routesMap));
+        // Xác định layout (4 cột cho xe 40 ghế, 5 cột cho xe lớn hơn)
+        $cols = $totalSeats > 40 ? 5 : 4;
+        
+        return response()->json([
+            'layout' => [
+                'cols' => $cols,
+                'rows' => ceil($totalSeats / $cols)
+            ],
+            'seats' => $seats
+        ]);
     }
     
     public function getGioKhoiHanhApi(Request $request)
@@ -508,7 +502,7 @@ class NhanVienBanVeController extends Controller
         $now = Carbon::now();
 
         $chuyenDis = Chuyendi::with(['lotrinhs.tinhthanh', 'xe.loaixe'])
-            ->where('thoigiandi', '>=', $now) // chỉ lấy chuyến từ thời điểm hiện tại trở đi
+            ->where('thoigiandi', '>=', $now)
             ->get()
             ->filter(function ($cd) use ($start, $end) {
                 $firstPoint = $cd->lotrinhs->sortBy('trinhtu')->first();
@@ -516,7 +510,6 @@ class NhanVienBanVeController extends Controller
                 return ($firstPoint->matinh ?? '') == $start && ($lastPoint->matinh ?? '') == $end;
             });
 
-        // Mỗi option giờ khởi hành gắn trực tiếp với một machuyendi
         $timeSlots = $chuyenDis->map(function ($cd) {
                 $datetime = Carbon::parse($cd->thoigiandi);
                 return [
@@ -540,7 +533,6 @@ class NhanVienBanVeController extends Controller
             ->where('machuyendi', $request->machuyendi)
             ->firstOrFail();
 
-        // Bỏ chuyến thiếu thông tin xe hoặc loại xe
         if (!($cd->xe && $cd->xe->loaixe && ($cd->xe->loaixe->tong_so_ghe ?? 0) > 0)) {
             return response()->json([]);
         }
@@ -551,7 +543,7 @@ class NhanVienBanVeController extends Controller
 
         $firstPoint = $cd->lotrinhs->sortBy('trinhtu')->first();
         $lastPoint = $cd->lotrinhs->sortBy('trinhtu')->last();
-        $tuyen = ($firstPoint?->tinhthanh?->ten ?? 'N/A') . '          ' . ($lastPoint?->tinhthanh?->ten ?? 'N/A');
+        $tuyen = ($firstPoint?->tinhthanh?->ten ?? 'N/A') . ' → ' . ($lastPoint?->tinhthanh?->ten ?? 'N/A');
 
         $vehicle = [
             'value' => $cd->machuyendi,
@@ -572,7 +564,6 @@ class NhanVienBanVeController extends Controller
             'machuyendi' => 'required|string',
         ]);
 
-        // Find the corresponding Chuyendi (match exactly the machuyendi returned in vehicles API)
         $chuyendi = Chuyendi::where('machuyendi', $request->machuyendi)->first();
 
         if (!$chuyendi) {
@@ -590,12 +581,11 @@ class NhanVienBanVeController extends Controller
             ->filter()
             ->map(function ($code) {
                 $code = strtoupper((string) $code);
-                // Nếu mã ghế dạng B10, P03... thì chỉ lấy phần số và map sang Axx
+                // Chuẩn hóa mã ghế sang dạng A01..An
                 if (preg_match('/^[A-Z](\d{1,2})$/', $code, $matches)) {
                     $num = (int) $matches[1];
                     return 'A' . str_pad($num, 2, '0', STR_PAD_LEFT);
                 }
-                // Nếu đã đúng dạng A01..An thì giữ nguyên
                 if (preg_match('/^A\d{2}$/', $code)) {
                     return $code;
                 }
@@ -606,11 +596,8 @@ class NhanVienBanVeController extends Controller
 
         $bookedSeats = array_values(array_unique($rawBookedSeats));
 
-        // Tổng số ghế lấy từ loaixe.soghe (hoặc accessor tong_so_ghe)
         $totalSeats = $xe->loaixe->soghe ?? ($xe->loaixe->tong_so_ghe ?? 0);
 
-        // Luôn sinh đầy đủ danh sách ghế dựa vào tổng số ghế của loại xe.
-        // Ở đây chuẩn hóa thành A01..An để phù hợp với sơ đồ hiện tại.
         $allSeatCodes = [];
         if ($totalSeats > 0) {
             for ($i = 1; $i <= $totalSeats; $i++) {
@@ -618,10 +605,8 @@ class NhanVienBanVeController extends Controller
             }
         }
 
-        // Lọc ra các ghế chưa được bán
         $unbookedSeatCodes = array_diff($allSeatCodes, $bookedSeats);
 
-        // Chuẩn hóa danh sách ghế trả về cho FE
         $seats = array_map(function ($code) use ($bookedSeats) {
             return [
                 'code' => $code,
@@ -636,15 +621,11 @@ class NhanVienBanVeController extends Controller
                 'tong_so_ghe' => $totalSeats,
             ],
             'booked_seats' => $bookedSeats,
-            // Trả về danh sách các ghế còn trống
             'unbooked_seats' => array_values($unbookedSeatCodes),
             'seats' => $seats,
         ]);
     }
 
-    /**
-     * Hiển thị trang hồ sơ cá nhân
-     */
     public function profile()
     {
         $nhanvien = Nhanvien::with('chucvu')->find(session('nhanvien')->manv);
@@ -652,17 +633,11 @@ class NhanVienBanVeController extends Controller
         return view('NhanVienBanVe.HoSo', compact('nhanvien'));
     }
 
-    /**
-     * Hiển thị form chỉnh sửa hồ sơ
-     */
     public function editProfile()
     {
         return view('NhanVienBanVe.HoSoChinhSua');
     }
 
-    /**
-     * Cập nhật thông tin cá nhân
-     */
     public function updateProfile(UpdateProfileRequest $request)
     {
         try {
@@ -673,9 +648,8 @@ class NhanVienBanVeController extends Controller
                     ->with('error', 'Không tìm thấy thông tin nhân viên');
             }
 
-            // Cập nhật thông tin (chỉ update field có giá trị)
             if ($request->filled('hoten')) {
-                $nhanvien->ten = $request->input('hoten'); // Form gửi 'hoten', DB dùng 'ten'
+                $nhanvien->ten = $request->input('hoten');
             }
             
             if ($request->filled('email')) {
@@ -696,7 +670,6 @@ class NhanVienBanVeController extends Controller
             
             $nhanvien->save();
 
-            // Cập nhật lại session với thông tin mới
             $updatedNhanvien = Nhanvien::with('chucvu')->find($nhanvien->manv);
             session(['nhanvien' => $updatedNhanvien]);
 
@@ -710,9 +683,6 @@ class NhanVienBanVeController extends Controller
         }
     }
 
-    /**
-     * Upload avatar
-     */
     public function uploadAvatar(Request $request)
     {
         try {
@@ -734,7 +704,7 @@ class NhanVienBanVeController extends Controller
                 ], 404);
             }
 
-            // Xóa ảnh cũ nếu có (trừ ảnh mặc định)
+            // Xóa ảnh cũ nếu có
             if ($nhanvien->hinhanh && $nhanvien->hinhanh !== 'default-avatar.jpg') {
                 $oldImagePath = public_path('storage/avatars/' . $nhanvien->hinhanh);
                 if (file_exists($oldImagePath)) {
@@ -742,11 +712,9 @@ class NhanVienBanVeController extends Controller
                 }
             }
 
-            // Lưu ảnh mới
             $image = $request->file('avatar');
             $filename = 'avatar_' . $nhanvien->manv . '_' . time() . '.' . $image->getClientOriginalExtension();
             
-            // Tạo thư mục nếu chưa tồn tại
             $avatarPath = public_path('storage/avatars');
             if (!file_exists($avatarPath)) {
                 mkdir($avatarPath, 0755, true);
@@ -754,11 +722,9 @@ class NhanVienBanVeController extends Controller
             
             $image->move($avatarPath, $filename);
 
-            // Cập nhật database
             $nhanvien->hinhanh = $filename;
             $nhanvien->save();
 
-            // Cập nhật session
             $updatedNhanvien = Nhanvien::with('chucvu')->find($nhanvien->manv);
             session(['nhanvien' => $updatedNhanvien]);
 
@@ -776,9 +742,6 @@ class NhanVienBanVeController extends Controller
         }
     }
 
-    /**
-     * Cập nhật mật khẩu
-     */
     public function updatePassword(UpdatePasswordRequest $request)
     {
         try {
@@ -789,13 +752,11 @@ class NhanVienBanVeController extends Controller
                     ->with('error', 'Không tìm thấy thông tin nhân viên');
             }
 
-            // Kiểm tra mật khẩu hiện tại
             if (!Hash::check($request->input('current_password'), $nhanvien->password)) {
                 return redirect()->back()
                     ->with('error', 'Mật khẩu hiện tại không đúng');
             }
 
-            // Cập nhật mật khẩu mới với Hash
             $nhanvien->password = Hash::make($request->input('new_password'));
             $nhanvien->save();
 

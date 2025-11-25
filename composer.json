@@ -13,7 +13,6 @@
         "barryvdh/laravel-dompdf": "^3.1",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
-        "pusher/pusher-php-server": "*",
         "simplesoftwareio/simple-qrcode": "^4.2"
     },
     "require-dev": {
@@ -31,7 +30,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/Helpers/RouteHelper.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

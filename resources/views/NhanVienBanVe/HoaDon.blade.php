@@ -1,39 +1,39 @@
 @extends('layouts.NhanVienLayout')
 
 @section('title', 'Hóa đơn của tôi')
-@section('page-title', 'Hóa đơn của tôi')
+@section('page-title', 'Danh sách hóa đơn')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid py-4">
     
     {{-- ====== FILTER CARD ====== --}}
-    <div class="card shadow-sm border-0 mb-4 animate-card">
-        <div class="card-header bg-gradient-primary text-white py-3">
-            <h5 class="mb-0 fw-semibold d-flex align-items-center">
-                <i class="fas fa-filter me-2"></i>
-                Bộ lọc hóa đơn
-            </h5>
+    <div class="card border shadow-sm mb-4">
+        <div class="card-header bg-white py-3 border-bottom">
+            <h6 class="mb-0 fw-bold text-dark d-flex align-items-center">
+                <i class="fas fa-filter me-2 text-secondary"></i>
+                Bộ lọc tìm kiếm
+            </h6>
         </div>
         <div class="card-body p-4">
             <form action="{{ route('nhan-vien-ban-ve.hoa-don.index') }}" method="GET">
-                <div class="row g-3 mb-3">
+                <div class="row g-3">
                     <!-- Ngày lập -->
                     <div class="col-lg-4 col-md-6">
-                        <label class="form-label fw-semibold text-secondary mb-2">
-                            <i class="far fa-calendar-alt me-1"></i> Ngày lập
+                        <label class="form-label fw-bold text-secondary small text-uppercase">
+                            Ngày lập
                         </label>
                         <input type="date" 
                                name="ngay_lap" 
                                value="{{ request('ngay_lap') }}" 
-                               class="form-control shadow-sm">
+                               class="form-control">
                     </div>
 
                     <!-- Trạng thái -->
                     <div class="col-lg-4 col-md-6">
-                        <label class="form-label fw-semibold text-secondary mb-2">
-                            <i class="fas fa-info-circle me-1"></i> Trạng thái
+                        <label class="form-label fw-bold text-secondary small text-uppercase">
+                            Trạng thái
                         </label>
-                        <select name="trang_thai" class="form-select shadow-sm">
+                        <select name="trang_thai" class="form-select">
                             <option value="">Tất cả trạng thái</option>
                             <option value="Đã duyệt" @selected(request('trang_thai')=='Đã duyệt')>Đã duyệt</option>
                             <option value="Chờ xử lý" @selected(request('trang_thai')=='Chờ xử lý')>Chờ xử lý</option>
@@ -44,11 +44,11 @@
                     <!-- Buttons -->
                     <div class="col-lg-4 col-md-12 d-flex align-items-end justify-content-end gap-2">
                         <a href="{{ route('nhan-vien-ban-ve.hoa-don.index') }}" 
-                           class="btn btn-outline-secondary px-4">
-                            <i class="fas fa-redo-alt me-2"></i> Đặt lại
+                           class="btn btn-light border">
+                            <i class="fas fa-undo me-2"></i> Đặt lại
                         </a>
-                        <button type="submit" class="btn btn-primary px-4 shadow-sm">
-                            <i class="fas fa-search me-2"></i> Lọc
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-filter me-2"></i> Lọc dữ liệu
                         </button>
                     </div>
                 </div>
@@ -57,38 +57,35 @@
     </div>
 
     {{-- ====== TABLE CARD ====== --}}
-    <div class="card shadow-sm border-0 animate-card">
-        <div class="card-header bg-white border-bottom py-3">
-            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <h5 class="mb-0 fw-semibold">
-                    <i class="fas fa-file-invoice me-2 text-primary"></i>
-                    Danh sách hóa đơn
-                </h5>
-                <span class="badge bg-primary-subtle text-primary px-3 py-2">
-                    <i class="fas fa-list me-1"></i> Tổng: <span data-pagination-info="invoice-table">{{ $hoadons->count() }} hóa đơn</span>
-                </span>
-            </div>
+    <div class="card border shadow-sm">
+        <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 fw-bold text-dark">
+                Danh sách hóa đơn
+            </h6>
+            <span class="badge bg-light text-dark border fw-normal">
+                Tổng số: <span class="fw-bold">{{ $hoadons->count() }}</span> hóa đơn
+            </span>
         </div>
 
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0" id="invoice-table">
-                    <thead class="table-light">
+                    <thead class="bg-light">
                         <tr>
-                            <th class="fw-semibold text-secondary">Mã hóa đơn</th>
-                            <th class="fw-semibold text-secondary">Khách hàng</th>
-                            <th class="fw-semibold text-secondary text-center">Số vé</th>
-                            <th class="fw-semibold text-secondary text-end">Tổng tiền</th>
-                            <th class="fw-semibold text-secondary text-center">Trạng thái</th>
-                            <th class="fw-semibold text-secondary">Thời gian</th>
+                            <th class="fw-bold text-secondary text-uppercase small py-3 ps-4 sortable" style="cursor: pointer;">Mã hóa đơn</th>
+                            <th class="fw-bold text-secondary text-uppercase small py-3 sortable" style="cursor: pointer;">Khách hàng</th>
+                            <th class="fw-bold text-secondary text-uppercase small py-3 text-center sortable" style="cursor: pointer;">Số vé</th>
+                            <th class="fw-bold text-secondary text-uppercase small py-3 text-end sortable" style="cursor: pointer;">Tổng tiền</th>
+                            <th class="fw-bold text-secondary text-uppercase small py-3 text-center sortable" style="cursor: pointer;">Trạng thái</th>
+                            <th class="fw-bold text-secondary text-uppercase small py-3 pe-4 sortable" style="cursor: pointer;">Thời gian</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($hoadons as $hd)
-                            <tr class="invoice-row">
+                            <tr class="invoice-row border-bottom">
                                 <!-- Mã hóa đơn -->
-                                <td>
-                                    <span class="badge bg-primary-subtle text-primary px-2 py-1 font-monospace fw-bold">
+                                <td class="ps-4">
+                                    <span class="fw-bold text-primary font-monospace">
                                         {{ $hd->mahd }}
                                     </span>
                                 </td>
@@ -96,20 +93,19 @@
                                 <!-- Khách hàng -->
                                 <td>
                                     @if($hd->khach)
-                                        <div class="customer-info">
-                                            <div class="fw-semibold text-dark">
+                                        <div class="d-flex flex-column">
+                                            <span class="fw-bold text-dark">
                                                 {{ $hd->khach->hoten ?? $hd->khach->tenkhach ?? 'Khách lẻ' }}
-                                            </div>
+                                            </span>
                                             @if($hd->khach->sdt)
                                                 <small class="text-muted">
-                                                    <i class="fas fa-phone-alt me-1"></i>
+                                                    <i class="fas fa-phone-alt me-1 text-secondary small"></i>
                                                     {{ $hd->khach->sdt }}
                                                 </small>
                                             @endif
                                         </div>
                                     @else
-                                        <span class="text-muted fst-italic">
-                                            <i class="fas fa-user-slash me-1"></i>
+                                        <span class="text-muted small fst-italic">
                                             Chưa có thông tin
                                         </span>
                                     @endif
@@ -117,14 +113,14 @@
 
                                 <!-- Số vé -->
                                 <td class="text-center">
-                                    <span class="badge bg-info-subtle text-info px-3 py-2 fs-6 fw-bold">
+                                    <span class="badge bg-light text-dark border fw-normal">
                                         {{ $hd->soluong }}
                                     </span>
                                 </td>
 
                                 <!-- Tổng tiền -->
                                 <td class="text-end">
-                                    <span class="fw-bold text-success fs-6">
+                                    <span class="fw-bold text-dark">
                                         {{ number_format($hd->thanhtien, 0, ',', '.') }}đ
                                     </span>
                                 </td>
@@ -133,28 +129,26 @@
                                 <td class="text-center">
                                     @php $status = $hd->trangthai; @endphp
                                     @if($status === 'Đã duyệt' || $status === 'Đã thanh toán')
-                                        <span class="badge bg-success px-3 py-2">
-                                            <i class="fas fa-check-circle me-1"></i>{{ $status }}
+                                        <span class="badge bg-success text-dark bg-opacity-10 border border-success px-2 py-1 fw-normal text-success">
+                                            {{ $status }}
                                         </span>
                                     @elseif($status === 'Đã hủy')
-                                        <span class="badge bg-danger px-3 py-2">
-                                            <i class="fas fa-times-circle me-1"></i>Đã hủy
+                                        <span class="badge bg-danger text-dark bg-opacity-10 border border-danger px-2 py-1 fw-normal text-danger">
+                                            Đã hủy
                                         </span>
                                     @else
-                                        <span class="badge bg-warning px-3 py-2">
-                                            <i class="fas fa-clock me-1"></i>{{ $status ?? 'Chờ xử lý' }}
+                                        <span class="badge bg-warning text-dark bg-opacity-10 border border-warning px-2 py-1 fw-normal text-warning">
+                                            {{ $status ?? 'Chờ xử lý' }}
                                         </span>
                                     @endif
                                 </td>
 
                                 <!-- Thời gian -->
-                                <td>
-                                    <div class="time-info">
-                                        <i class="far fa-calendar me-1 text-muted"></i>
-                                        <span class="text-dark">
+                                <td class="pe-4">
+                                    <div class="d-flex flex-column">
+                                        <span class="text-dark fw-semibold">
                                             {{ optional($hd->thoigian)->format('d/m/Y') }}
                                         </span>
-                                        <br>
                                         <small class="text-muted">
                                             <i class="far fa-clock me-1"></i>
                                             {{ optional($hd->thoigian)->format('H:i') }}
@@ -166,8 +160,8 @@
                             <tr>
                                 <td colspan="6" class="text-center py-5">
                                     <div class="text-muted">
-                                        <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
-                                        <p class="mb-0">Chưa có hóa đơn nào</p>
+                                        <i class="fas fa-file-invoice fa-3x mb-3 opacity-25"></i>
+                                        <p class="mb-0">Chưa có hóa đơn nào phù hợp</p>
                                     </div>
                                 </td>
                             </tr>
@@ -178,202 +172,68 @@
         </div>
 
         {{-- ====== PAGINATION ====== --}}
-        <div class="card-footer bg-white border-top" id="invoice-pagination"></div>
+        <div class="card-footer bg-white border-top py-3" id="invoice-pagination"></div>
     </div>
 </div>
 @endsection
 
 @push('styles')
 <style>
-/* ====== Gradient Background ====== */
-.bg-gradient-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+/* Enterprise UI Overrides */
+.card {
+    border-radius: 6px;
+    border-color: #e0e0e0;
 }
-
-/* ====== Card Animation ====== */
-.animate-card {
-    animation: fadeInUp 0.5s ease;
+.shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.05)!important;
 }
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* ====== Form Controls ====== */
-.form-control:focus,
-.form-select:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-}
-
-.form-control,
-.form-select {
-    border-radius: 0.5rem;
-    padding: 0.625rem 0.875rem;
-    transition: all 0.2s ease;
-}
-
-.form-control:hover,
-.form-select:hover {
-    border-color: #667eea;
-}
-
-/* ====== Table Styling ====== */
-#invoice-table {
-    font-size: 0.9rem;
-}
-
-#invoice-table thead th {
-    text-transform: uppercase;
+.form-label {
     font-size: 0.75rem;
     letter-spacing: 0.5px;
-    padding: 1rem 0.75rem;
-    border-bottom: 2px solid #e9ecef;
-    white-space: nowrap;
 }
-
-#invoice-table tbody td {
-    padding: 1rem 0.75rem;
-    vertical-align: middle;
+.form-select, .form-control {
+    border-radius: 4px;
+    border-color: #ced4da;
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
 }
-
-/* ====== Row Hover Effect ====== */
-.invoice-row {
-    transition: all 0.2s ease;
-    border-bottom: 1px solid #f1f3f5;
+.form-select:focus, .form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
 }
-
-.invoice-row:hover {
-    background-color: #f8f9fa;
-    transform: translateX(2px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+.btn {
+    border-radius: 4px;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
 }
-
-/* ====== Badge Styling ====== */
-.badge {
-    font-weight: 500;
-    font-size: 0.75rem;
-    border-radius: 0.375rem;
-    letter-spacing: 0.3px;
-}
-
-.font-monospace {
-    font-family: 'Courier New', monospace;
-}
-
-/* ====== Button Styling ====== */
 .btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    transition: all 0.3s ease;
+    background-color: #0d6efd;
+    border-color: #0d6efd;
 }
-
-.btn-primary:hover {
-    background: linear-gradient(135deg, #5568d3 0%, #65408b 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-/* ====== Pagination Styling ====== */
-.pagination-sm .page-link {
-    min-width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0.375rem;
-    margin: 0 2px;
-    border: 1px solid #dee2e6;
-    color: #495057;
-    transition: all 0.2s ease;
-    font-weight: 500;
-}
-
-.pagination-sm .page-link:hover {
-    background-color: #f8f9fa;
-    border-color: #667eea;
-    color: #667eea;
-    transform: translateY(-1px);
-}
-
-.pagination-sm .page-item.active .page-link {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-color: #667eea;
-    color: white;
+.table thead th {
     font-weight: 600;
-    box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
-}
-
-.pagination-sm .page-item.disabled .page-link {
     background-color: #f8f9fa;
-    border-color: #dee2e6;
-    color: #6c757d;
-    cursor: not-allowed;
+    border-bottom: 1px solid #dee2e6;
+}
+.font-monospace {
+    font-family: 'SFMono-Regular', Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
-/* ====== Customer & Time Info ====== */
-.customer-info,
-.time-info {
-    line-height: 1.5;
+/* Pagination Styles */
+.smart-pagination .pagination {
+    justify-content: flex-end;
+    margin-bottom: 0;
 }
-
-/* ====== Responsive ====== */
-@media (max-width: 992px) {
-    #invoice-table {
-        font-size: 0.85rem;
-    }
-    
-    .badge {
-        font-size: 0.7rem;
-        padding: 0.35rem 0.6rem !important;
-    }
+.smart-pagination .page-link {
+    border-radius: 4px;
+    margin: 0 2px;
+    color: #495057;
+    border: 1px solid #dee2e6;
 }
-
-@media (max-width: 768px) {
-    .card-body {
-        padding: 1rem !important;
-    }
-    
-    #invoice-table thead th {
-        font-size: 0.7rem;
-        padding: 0.75rem 0.5rem;
-    }
-    
-    #invoice-table tbody td {
-        padding: 0.75rem 0.5rem;
-    }
-    
-    .btn-sm {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.8rem;
-    }
-}
-
-@media (max-width: 576px) {
-    .card-footer {
-        padding: 0.75rem 1rem;
-    }
-    
-    .d-sm-none .btn {
-        min-width: 100px;
-    }
-}
-
-/* ====== Empty State ====== */
-.fa-inbox {
-    opacity: 0.3;
-}
-
-/* ====== Text Size ====== */
-.text-sm {
-    font-size: 0.875rem;
+.smart-pagination .page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: #fff;
 }
 </style>
 @endpush
@@ -391,14 +251,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Table sorting functionality
     const table = document.getElementById('invoice-table');
-    const headers = table.querySelectorAll('thead th');
+    const headers = table.querySelectorAll('thead th.sortable');
     let currentSort = { index: null, dir: 'asc' };
 
     headers.forEach((th, index) => {
-        // Make headers sortable (except the last column if needed)
-        th.style.cursor = 'pointer';
-        th.title = 'Click để sắp xếp';
-        
         th.addEventListener('click', () => {
             const tbody = table.querySelector('tbody');
             const rows = Array.from(tbody.querySelectorAll('tr:not(:last-child)')); // Exclude empty state row if exists
@@ -414,6 +270,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Remove all sort indicators
             headers.forEach(h => {
                 h.classList.remove('sort-asc', 'sort-desc');
+                // Reset icon if exists (not implemented in this view but good practice)
             });
 
             // Add sort indicator
@@ -440,17 +297,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Add sort indicator styles
+    // Add sort indicator styles via JS to avoid cluttering CSS
     const style = document.createElement('style');
     style.textContent = `
         thead th.sort-asc::after {
             content: " ↑";
-            color: #667eea;
+            color: #0d6efd;
             font-weight: bold;
         }
         thead th.sort-desc::after {
             content: " ↓";
-            color: #667eea;
+            color: #0d6efd;
             font-weight: bold;
         }
     `;

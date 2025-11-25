@@ -1,49 +1,48 @@
 @extends('layouts.NhanVienLayout')
 
-@section('title', 'Đặt vé')
-@section('page-title', 'Đặt vé')
+@section('title', 'Đặt vé tại quầy')
+@section('page-title', 'Bán vé')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid py-4">
     
     {{-- Step 1: Filters --}}
-    <div class="card shadow-sm border-0 mb-4 animate-card">
-        <div class="card-header bg-gradient-primary text-white py-3">
-            <h5 class="mb-0 fw-semibold d-flex align-items-center">
-                <span class="step-number me-3">1</span>
-                <i class="fas fa-search me-2"></i>
+    <div class="card border shadow-sm mb-4">
+        <div class="card-header bg-white py-3 border-bottom">
+            <h6 class="mb-0 fw-bold text-dark d-flex align-items-center">
+                <span class="step-badge bg-primary text-white me-2">1</span>
                 Tìm kiếm chuyến đi
-            </h5>
+            </h6>
         </div>
         <div class="card-body p-4">
             <div class="row g-3">
                 <div class="col-lg-4 col-md-6">
-                    <label for="filter-route" class="form-label fw-semibold text-secondary mb-2">
-                        <i class="fas fa-route me-1"></i> Chọn tuyến đường
+                    <label for="filter-route" class="form-label fw-bold text-secondary small text-uppercase">
+                        Tuyến đường
                     </label>
-                    <select id="filter-route" class="form-select shadow-sm" data-trigger name="filter-route">
+                    <select id="filter-route" class="form-select" data-trigger name="filter-route">
                         <option value="">Chọn tuyến...</option>
                     </select>
                 </div>
                 <div class="col-lg-4 col-md-6">
-                    <label for="filter-time" class="form-label fw-semibold text-secondary mb-2">
-                        <i class="far fa-clock me-1"></i> Chọn giờ khởi hành
+                    <label for="filter-time" class="form-label fw-bold text-secondary small text-uppercase">
+                        Giờ khởi hành
                     </label>
-                    <select id="filter-time" class="form-select shadow-sm" data-trigger name="filter-time" disabled>
+                    <select id="filter-time" class="form-select" data-trigger name="filter-time" disabled>
                         <option value="">Chọn tuyến trước...</option>
                     </select>
                 </div>
                 <div class="col-lg-4 col-md-6">
-                    <label for="filter-vehicle" class="form-label fw-semibold text-secondary mb-2">
-                        <i class="fas fa-bus me-1"></i> Chọn xe
+                    <label for="filter-vehicle" class="form-label fw-bold text-secondary small text-uppercase">
+                        Chọn xe
                     </label>
-                    <select id="filter-vehicle" class="form-select shadow-sm" data-trigger name="filter-vehicle" disabled>
+                    <select id="filter-vehicle" class="form-select" data-trigger name="filter-vehicle" disabled>
                         <option value="">Chọn giờ trước...</option>
                     </select>
                 </div>
             </div>
-            <div class="d-flex justify-content-end mt-4">
-                <button id="btn-find-seats" class="btn btn-primary btn-lg px-5 shadow-sm" disabled>
+            <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                <button id="btn-find-seats" class="btn btn-primary px-4 fw-bold" disabled>
                     <i class="fas fa-search me-2"></i>Tìm ghế trống
                 </button>
             </div>
@@ -51,57 +50,56 @@
     </div>
 
     {{-- Step 2: Vehicle & Trip Info --}}
-    <div class="card shadow-sm border-0 mb-4 animate-card" id="trip-info-card" style="display: none;">
-        <div class="card-header bg-gradient-info text-white py-3">
-            <h5 class="mb-0 fw-semibold d-flex align-items-center">
-                <span class="step-number me-3">2</span>
-                <i class="fas fa-info-circle me-2"></i>
+    <div class="card border shadow-sm mb-4" id="trip-info-card" style="display: none;">
+        <div class="card-header bg-white py-3 border-bottom">
+            <h6 class="mb-0 fw-bold text-dark d-flex align-items-center">
+                <span class="step-badge bg-primary text-white me-2">2</span>
                 Thông tin chuyến đi
-            </h5>
+            </h6>
         </div>
         <div class="card-body p-4">
             <div class="row g-4">
                 <div class="col-lg-3 col-md-6">
-                    <div class="info-box">
-                        <div class="info-icon bg-primary-subtle">
-                            <i class="fas fa-route text-primary"></i>
+                    <div class="d-flex align-items-center p-3 border rounded bg-light h-100">
+                        <div class="me-3 text-secondary">
+                            <i class="fas fa-route fa-2x"></i>
                         </div>
-                        <div class="info-content">
-                            <p class="info-label">Tuyến đường</p>
-                            <p class="info-value" id="trip-route">-</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="info-box">
-                        <div class="info-icon bg-success-subtle">
-                            <i class="far fa-clock text-success"></i>
-                        </div>
-                        <div class="info-content">
-                            <p class="info-label">Thời gian khởi hành</p>
-                            <p class="info-value" id="trip-time">-</p>
+                        <div>
+                            <div class="text-uppercase text-muted small fw-bold">Tuyến đường</div>
+                            <div class="fw-bold text-dark" id="trip-route">-</div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <div class="info-box">
-                        <div class="info-icon bg-info-subtle">
-                            <i class="fas fa-bus text-info"></i>
+                    <div class="d-flex align-items-center p-3 border rounded bg-light h-100">
+                        <div class="me-3 text-secondary">
+                            <i class="far fa-clock fa-2x"></i>
                         </div>
-                        <div class="info-content">
-                            <p class="info-label">Xe</p>
-                            <p class="info-value" id="trip-vehicle">-</p>
+                        <div>
+                            <div class="text-uppercase text-muted small fw-bold">Khởi hành</div>
+                            <div class="fw-bold text-dark" id="trip-time">-</div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
-                    <div class="info-box">
-                        <div class="info-icon bg-warning-subtle">
-                            <i class="fas fa-tag text-warning"></i>
+                    <div class="d-flex align-items-center p-3 border rounded bg-light h-100">
+                        <div class="me-3 text-secondary">
+                            <i class="fas fa-bus fa-2x"></i>
                         </div>
-                        <div class="info-content">
-                            <p class="info-label">Giá vé</p>
-                            <p class="info-value text-success" id="trip-price">-</p>
+                        <div>
+                            <div class="text-uppercase text-muted small fw-bold">Xe</div>
+                            <div class="fw-bold text-dark" id="trip-vehicle">-</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="d-flex align-items-center p-3 border rounded bg-light h-100">
+                        <div class="me-3 text-secondary">
+                            <i class="fas fa-tag fa-2x"></i>
+                        </div>
+                        <div>
+                            <div class="text-uppercase text-muted small fw-bold">Giá vé</div>
+                            <div class="fw-bold text-success fs-5" id="trip-price">-</div>
                         </div>
                     </div>
                 </div>
@@ -110,48 +108,42 @@
     </div>
 
     {{-- Step 3: Seat Map --}}
-    <div class="card shadow-sm border-0 mb-4 animate-card" id="seat-map-card" style="display: none;">
-        <div class="card-header bg-gradient-success text-white py-3">
-            <h5 class="mb-0 fw-semibold d-flex align-items-center">
-                <span class="step-number me-3">3</span>
-                <i class="fas fa-chair me-2"></i>
-                Chọn ghế ngồi
-            </h5>
+    <div class="card border shadow-sm mb-4" id="seat-map-card" style="display: none;">
+        <div class="card-header bg-white py-3 border-bottom">
+            <h6 class="mb-0 fw-bold text-dark d-flex align-items-center">
+                <span class="step-badge bg-primary text-white me-2">3</span>
+                Sơ đồ ghế
+            </h6>
         </div>
         <div class="card-body p-4">
             {{-- Seat Map Legend --}}
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="legend-container">
-                        <div class="legend-item">
-                            <span class="legend-box legend-available"></span>
-                            <span class="legend-text">Còn trống</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-box legend-sold"></span>
-                            <span class="legend-text">Đã bán</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-box legend-selected"></span>
-                            <span class="legend-text">Đang chọn</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-box legend-unavailable"></span>
-                            <span class="legend-text">Không khả dụng</span>
-                        </div>
-                    </div>
+            <div class="d-flex justify-content-center flex-wrap gap-4 mb-4 p-3 bg-light rounded border">
+                <div class="d-flex align-items-center">
+                    <span class="seat-legend available me-2"></span>
+                    <span class="small fw-bold text-secondary">Còn trống</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="seat-legend sold me-2"></span>
+                    <span class="small fw-bold text-secondary">Đã bán</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="seat-legend selected me-2"></span>
+                    <span class="small fw-bold text-secondary">Đang chọn</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="seat-legend unavailable me-2"></span>
+                    <span class="small fw-bold text-secondary">Không bán</span>
                 </div>
             </div>
             
             {{-- Seat Map --}}
-            <div class="row">
-                <div class="col-12">
-                    <div class="seat-map-wrapper">
-                        <div class="bus-header">
-                            <i class="fas fa-steering-wheel"></i>
-                            <span>Tài xế</span>
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="seat-map-container border rounded p-4">
+                        <div class="driver-seat mb-4 text-center p-2 bg-light border rounded text-muted fw-bold text-uppercase small">
+                            <i class="fas fa-steering-wheel me-2"></i>Tài xế
                         </div>
-                        <div id="seat-map-container">
+                        <div id="seat-map-container" class="d-grid gap-2">
                             {{-- JS will render seats here --}}
                         </div>
                     </div>
@@ -161,67 +153,47 @@
     </div>
 
     {{-- Step 4: Ticket Summary & Checkout --}}
-    <div class="card shadow-sm border-0 mb-4 animate-card" id="ticket-summary-card" style="display: none;">
-        <div class="card-header bg-gradient-warning text-dark py-3">
-            <h5 class="mb-0 fw-semibold d-flex align-items-center">
-                <span class="step-number-dark me-3">4</span>
-                <i class="fas fa-ticket-alt me-2"></i>
-                Thông tin vé
-            </h5>
+    <div class="card border shadow-sm mb-4" id="ticket-summary-card" style="display: none;">
+        <div class="card-header bg-white py-3 border-bottom">
+            <h6 class="mb-0 fw-bold text-dark d-flex align-items-center">
+                <span class="step-badge bg-primary text-white me-2">4</span>
+                Thanh toán
+            </h6>
         </div>
-        <div class="card-body p-4">
-            <div class="row align-items-center">
-                <div class="col-lg-7">
-                    <h5 class="mb-4 fw-bold">
-                        <i class="fas fa-clipboard-check me-2 text-primary"></i>
-                        Chi tiết vé đã chọn
-                    </h5>
-                    <div class="ticket-summary-box">
-                        <div class="summary-row">
-                            <span class="summary-label">
-                                <i class="fas fa-list-ol me-2 text-muted"></i>
-                                Số ghế đã chọn:
-                            </span>
-                            <span class="summary-value">
-                                <span id="selected-count" class="badge bg-primary px-3 py-2">0</span> ghế
-                            </span>
-                        </div>
-                        <div class="summary-row">
-                            <span class="summary-label">
-                                <i class="fas fa-chair me-2 text-muted"></i>
-                                Danh sách ghế:
-                            </span>
-                            <span class="summary-value fw-bold" id="selected-seats-info">-</span>
-                        </div>
-                        <div class="summary-row">
-                            <span class="summary-label">
-                                <i class="fas fa-tag me-2 text-muted"></i>
-                                Đơn giá:
-                            </span>
-                            <span class="summary-value fw-bold" id="unit-price">-</span>
-                        </div>
-                        <div class="summary-row-total">
-                            <span class="summary-label-total">
-                                <i class="fas fa-calculator me-2"></i>
-                                Tổng tiền:
-                            </span>
-                            <span class="summary-value-total" id="total-price-info">0đ</span>
-                        </div>
+        <div class="card-body p-0">
+            <div class="row g-0">
+                <div class="col-lg-8 border-end">
+                    <div class="p-4">
+                        <h6 class="fw-bold mb-3 text-secondary text-uppercase small">Chi tiết vé chọn</h6>
+                        <table class="table table-borderless mb-0">
+                            <tbody>
+                                <tr class="border-bottom">
+                                    <td class="text-muted ps-0">Số lượng ghế:</td>
+                                    <td class="text-end fw-bold pe-0"><span id="selected-count" class="badge bg-secondary">0</span></td>
+                                </tr>
+                                <tr class="border-bottom">
+                                    <td class="text-muted ps-0">Vị trí ghế:</td>
+                                    <td class="text-end fw-bold pe-0" id="selected-seats-info">-</td>
+                                </tr>
+                                <tr class="border-bottom">
+                                    <td class="text-muted ps-0">Đơn giá:</td>
+                                    <td class="text-end fw-bold pe-0" id="unit-price">-</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-dark fw-bold ps-0 fs-5 pt-3">Tổng cộng:</td>
+                                    <td class="text-end fw-bold text-success fs-4 pe-0 pt-3" id="total-price-info">0đ</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <div class="col-lg-5 text-center">
-                    <div class="checkout-box">
-                        <div class="checkout-icon mb-3">
-                            <i class="fas fa-money-check-alt"></i>
-                        </div>
-                        <button id="btn-show-customer-modal" class="btn btn-success btn-lg px-5 shadow">
-                            <i class="fas fa-arrow-right me-2"></i>
-                            Tiếp tục thanh toán
+                <div class="col-lg-4 bg-light">
+                    <div class="p-4 h-100 d-flex flex-column justify-content-center align-items-center text-center">
+                        <i class="fas fa-file-invoice-dollar fa-3x text-success mb-3 opacity-50"></i>
+                        <p class="text-muted small mb-4">Vui lòng kiểm tra kỹ thông tin trước khi xuất vé.</p>
+                        <button id="btn-show-customer-modal" class="btn btn-success w-100 py-3 fw-bold text-uppercase">
+                            <i class="fas fa-check-circle me-2"></i>Tiếp tục thanh toán
                         </button>
-                        <p class="text-muted mt-3 mb-0 small">
-                            <i class="fas fa-shield-alt me-1"></i>
-                            Thanh toán an toàn và bảo mật
-                        </p>
                     </div>
                 </div>
             </div>
@@ -232,409 +204,125 @@
 
 @push('styles')
 <style>
-/* ====== Gradient Backgrounds ====== */
-.bg-gradient-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+/* Enterprise UI Styles */
+.card {
+    border-radius: 6px;
+    border-color: #e0e0e0;
 }
-
-.bg-gradient-info {
-    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+.shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.05)!important;
 }
-
-.bg-gradient-success {
-    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
-}
-
-.bg-gradient-warning {
-    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-}
-
-/* ====== Card Animation ====== */
-.animate-card {
-    animation: fadeInUp 0.5s ease;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* ====== Step Numbers ====== */
-.step-number {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.3);
+.step-badge {
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-    font-weight: 700;
-    font-size: 1.25rem;
-}
-
-.step-number-dark {
-    width: 40px;
-    height: 40px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 50%;
-    font-weight: 700;
-    font-size: 1.25rem;
+    font-size: 12px;
+    font-weight: bold;
 }
-
-/* ====== Form Controls ====== */
-.form-select:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-}
-
-.form-select {
-    border-radius: 0.5rem;
-    padding: 0.625rem 0.875rem;
-    transition: all 0.2s ease;
-}
-
-.form-select:hover:not(:disabled) {
-    border-color: #667eea;
-}
-
-/* ====== Info Boxes ====== */
-.info-box {
-    display: flex;
-    align-items: center;
-    padding: 1.5rem;
-    background: #f8f9fa;
-    border-radius: 0.75rem;
-    border-left: 4px solid #667eea;
-    transition: all 0.3s ease;
-}
-
-.info-box:hover {
-    transform: translateX(4px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.info-icon {
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0.5rem;
-    font-size: 1.5rem;
-    margin-right: 1rem;
-    flex-shrink: 0;
-}
-
-.info-content {
-    flex-grow: 1;
-}
-
-.info-label {
+.form-label {
     font-size: 0.75rem;
-    color: #6c757d;
-    text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 0.25rem;
-    font-weight: 600;
+}
+.form-select, .form-control {
+    border-radius: 4px;
+    border-color: #ced4da;
+    font-size: 0.9rem;
+    padding: 0.6rem 0.75rem;
+}
+.form-select:focus, .form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+.btn {
+    border-radius: 4px;
+    font-size: 0.9rem;
+    padding: 0.6rem 1.2rem;
+}
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+.btn-success {
+    background-color: #198754;
+    border-color: #198754;
 }
 
-.info-value {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #172B4D;
-    margin-bottom: 0;
+/* Seat Map Styles */
+.seat-map-container {
+    background-color: #fff;
 }
-
-/* ====== Seat Map Styles ====== */
-.seat-map-wrapper {
-    background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
-    border: 2px solid #e9ecef;
-    border-radius: 1rem;
-    padding: 2rem;
-    max-width: 700px;
-    margin: 0 auto;
-}
-
-.bus-header {
-    text-align: center;
-    padding: 1rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-radius: 0.75rem 0.75rem 0 0;
-    margin-bottom: 1.5rem;
-    font-weight: 600;
-}
-
-.bus-header i {
-    font-size: 1.5rem;
-    margin-right: 0.5rem;
-}
-
-#seat-map-container {
-    display: grid;
-    gap: 10px;
-    padding: 1.5rem;
-    background: white;
-    border-radius: 0.75rem;
-    box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
-}
-
 .seat {
-    width: 50px;
-    height: 50px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid;
-    border-radius: 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.85rem;
     cursor: pointer;
-    font-weight: 700;
-    font-size: 0.875rem;
-    transition: all 0.2s ease;
-    position: relative;
+    transition: all 0.2s;
+    border: 1px solid #dee2e6;
+    background-color: #fff;
+    color: #495057;
 }
-
-.seat::after {
-    content: '';
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    bottom: -2px;
-    left: -2px;
-    border-radius: 0.5rem;
-    transition: all 0.2s ease;
+.seat:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-
 .seat.available {
-    background: white;
-    border-color: #28a745;
-    color: #28a745;
+    border-color: #198754;
+    color: #198754;
+    background-color: #f8fff9;
 }
-
 .seat.available:hover {
-    background: #28a745;
-    color: white;
-    transform: scale(1.1);
-    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    background-color: #198754;
+    color: #fff;
 }
-
 .seat.sold {
-    background: #dc3545;
+    background-color: #dc3545;
     border-color: #dc3545;
-    color: white;
+    color: #fff;
     cursor: not-allowed;
-    opacity: 0.7;
+    opacity: 0.8;
 }
-
 .seat.selected {
-    background: #ffc107;
+    background-color: #ffc107;
     border-color: #ffc107;
     color: #000;
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.5);
-    animation: pulse 0.5s ease;
+    font-weight: bold;
 }
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1.1); }
-    50% { transform: scale(1.15); }
-}
-
 .seat.unavailable {
-    background: #e9ecef;
-    border-color: #adb5bd;
-    color: #6c757d;
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+    color: #adb5bd;
     cursor: not-allowed;
 }
-
-/* ====== Legend Styles ====== */
-.legend-container {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 2rem;
-    padding: 1.5rem;
-    background: #f8f9fa;
-    border-radius: 0.75rem;
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.legend-box {
-    width: 28px;
-    height: 28px;
-    border-radius: 0.375rem;
-    border: 2px solid;
+.seat-legend {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
     display: inline-block;
+    border: 1px solid transparent;
 }
+.seat-legend.available { border-color: #198754; background-color: #f8fff9; }
+.seat-legend.sold { background-color: #dc3545; }
+.seat-legend.selected { background-color: #ffc107; }
+.seat-legend.unavailable { background-color: #e9ecef; border-color: #dee2e6; }
 
-.legend-available {
-    background-color: white;
-    border-color: #28a745 !important;
+/* Modal Styles */
+.swal2-popup {
+    border-radius: 8px;
+    font-family: inherit;
 }
-
-.legend-sold {
-    background-color: #dc3545;
-    border-color: #dc3545 !important;
-}
-
-.legend-selected {
-    background-color: #ffc107;
-    border-color: #ffc107 !important;
-}
-
-.legend-unavailable {
-    background-color: #e9ecef;
-    border-color: #adb5bd !important;
-}
-
-.legend-text {
-    font-weight: 500;
-    color: #495057;
-    font-size: 0.875rem;
-}
-
-/* ====== Ticket Summary Box ====== */
-.ticket-summary-box {
-    background: #f8f9fa;
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    border: 2px solid #e9ecef;
-}
-
-.summary-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 0;
-    border-bottom: 1px solid #dee2e6;
-}
-
-.summary-row:last-of-type {
-    border-bottom: none;
-}
-
-.summary-label {
-    color: #6c757d;
-    font-size: 0.9rem;
-}
-
-.summary-value {
-    color: #172B4D;
-    font-size: 1rem;
-}
-
-.summary-row-total {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 0 0;
-    margin-top: 1rem;
-    border-top: 2px solid #667eea;
-}
-
-.summary-label-total {
+.swal2-title {
     font-size: 1.25rem;
-    font-weight: 700;
-    color: #172B4D;
+    color: #333;
 }
-
-.summary-value-total {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: #28a745;
-}
-
-/* ====== Checkout Box ====== */
-.checkout-box {
-    padding: 2rem;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-radius: 0.75rem;
-    border: 2px dashed #dee2e6;
-}
-
-.checkout-icon {
-    font-size: 3rem;
-    color: #28a745;
-}
-
-/* ====== Button Styles ====== */
-.btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    transition: all 0.3s ease;
-}
-
-.btn-primary:hover:not(:disabled) {
-    background: linear-gradient(135deg, #5568d3 0%, #65408b 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
-}
-
-.btn-success {
-    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
-    border: none;
-    transition: all 0.3s ease;
-}
-
-.btn-success:hover {
-    background: linear-gradient(135deg, #218838 0%, #155724 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
-}
-
-/* ====== Responsive ====== */
-@media (max-width: 992px) {
-    .info-box {
-        padding: 1rem;
-    }
-    
-    .info-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 1.25rem;
-    }
-    
-    .seat {
-        width: 45px;
-        height: 45px;
-        font-size: 0.8rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .step-number, .step-number-dark {
-        width: 35px;
-        height: 35px;
-        font-size: 1rem;
-    }
-    
-    .seat {
-        width: 40px;
-        height: 40px;
-    }
-    
-    .legend-container {
-        gap: 1rem;
-    }
-    
-    .checkout-box {
-        padding: 1.5rem;
-        margin-top: 2rem;
-    }
+.swal2-html-container {
+    text-align: left !important;
 }
 </style>
 @endpush
@@ -644,9 +332,11 @@
 document.addEventListener('DOMContentLoaded', function () {
     const choicesConfig = {
         searchEnabled: true,
-        itemSelectText: 'Chọn',
+        itemSelectText: '',
         shouldSort: false,
-        allowHTML: true
+        allowHTML: true,
+        placeholder: true,
+        placeholderValue: 'Chọn...'
     };
     const routeSelect = new Choices('#filter-route', choicesConfig);
     const timeSelect = new Choices('#filter-time', choicesConfig);
@@ -707,7 +397,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (data.length === 0) {
                     timeSelect.setChoices([{value: '', label: 'Không có chuyến'}], 'value', 'label', true);
                 } else {
-                    // value now is machuyendi
                     timeSelect.setChoices([{value: '', label: 'Chọn giờ khởi hành...'}], 'value', 'label', true);
                     timeSelect.setChoices(data, 'value', 'label', false);
                 }
@@ -785,7 +474,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         findSeatsBtn.disabled = true;
-        findSeatsBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang tìm...`;
+        findSeatsBtn.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang tải...`;
 
         fetch(`{{ route('nhan-vien-ban-ve.api.so-do-ghe') }}?machuyendi=${encodeURIComponent(currentMachuyendi)}`)
             .then(response => {
@@ -800,13 +489,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 renderSeatMap(data);
                 tripInfoCard.style.display = 'block';
                 seatMapCard.style.display = 'block';
+                // Scroll to seat map
+                seatMapCard.scrollIntoView({ behavior: 'smooth' });
             })
             .catch(error => {
                 showToast(error.message || 'Có lỗi xảy ra, vui lòng thử lại.', 'error');
             })
             .finally(() => {
                 findSeatsBtn.disabled = false;
-                findSeatsBtn.innerHTML = `<i class="fas fa-search me-2"></i>Tìm ghế`;
+                findSeatsBtn.innerHTML = `<i class="fas fa-search me-2"></i>Tìm ghế trống`;
             });
     });
 
@@ -891,9 +582,10 @@ document.addEventListener('DOMContentLoaded', function () {
             content(reference) {
                 const seatCode = reference.dataset.seatCode;
                 const status = reference.classList.contains('sold') ? 'Đã bán' : 'Còn trống';
-                return `Ghế ${seatCode}<br>Trạng thái: ${status}<br>Giá: ${number_format(data.gia_ve)}đ`;
+                return `<div class="text-center small">Ghế <b>${seatCode}</b><br>${status}</div>`;
             },
             allowHTML: true,
+            theme: 'light-border'
         });
     }
 
@@ -931,70 +623,73 @@ document.addEventListener('DOMContentLoaded', function () {
     // 10. Show customer info modal
     showCustomerModalBtn.addEventListener('click', function() {
         Swal.fire({
-            title: 'Thông tin khách hàng & Thanh toán',
+            title: 'Thông tin khách hàng',
             html: `
-                <form id="form-customer-info" method="POST" action="{{ route('nhan-vien-ban-ve.dat-ve.store') }}">
+                <form id="form-customer-info" method="POST" action="{{ route('nhan-vien-ban-ve.dat-ve.store') }}" class="text-start">
                     @csrf
                     <input type="hidden" name="machuyendi" value="${currentMachuyendi}">
                     <input type="hidden" name="seats" value="${selectedSeats.join(',')}">
                     <input type="hidden" name="gia_ve" value="${tripData.gia_ve}">
                     
-                    <h5 class="text-start mb-3">Thông tin khách hàng</h5>
-                    <div class="form-group text-start mb-3">
-                        <label for="kh_hoten" class="form-label">Họ tên khách hàng <span class="text-danger">*</span></label>
-                        <input type="text" name="kh_hoten" id="kh_hoten" class="form-control" required>
+                    <div class="mb-3">
+                        <label for="kh_hoten" class="form-label fw-bold">Họ tên <span class="text-danger">*</span></label>
+                        <input type="text" name="kh_hoten" id="kh_hoten" class="form-control" required placeholder="Nhập họ tên khách hàng">
                     </div>
-                    <div class="form-group text-start mb-3">
-                        <label for="kh_sdt" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
-                        <input type="tel" name="kh_sdt" id="kh_sdt" class="form-control" required pattern="[0-9]{10,11}">
-                    </div>
-                    <div class="form-group text-start mb-3">
-                        <label for="kh_email" class="form-label">Email</label>
-                        <input type="email" name="kh_email" id="kh_email" class="form-control">
-                    </div>
-
-                    <h5 class="text-start mb-3 mt-4">Phương thức thanh toán</h5>
-                    <div class="form-group text-start mb-3">
-                        <div class="btn-group w-100" role="group">
-                            <input type="radio" class="btn-check" name="phuongthuc_thanhtoan" id="pt_tienmat" value="tien-mat" checked>
-                            <label class="btn btn-outline-success" for="pt_tienmat">
-                                <i class="fas fa-money-bill-wave me-2"></i>Tiền mặt
-                            </label>
-                            
-                            <input type="radio" class="btn-check" name="phuongthuc_thanhtoan" id="pt_chuyenkhoan" value="chuyen-khoan">
-                            <label class="btn btn-outline-primary" for="pt_chuyenkhoan">
-                                <i class="fas fa-university me-2"></i>Chuyển khoản
-                            </label>
-                            
-                            <input type="radio" class="btn-check" name="phuongthuc_thanhtoan" id="pt_the" value="the">
-                            <label class="btn btn-outline-info" for="pt_the">
-                                <i class="fas fa-credit-card me-2"></i>Thẻ
-                            </label>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="kh_sdt" class="form-label fw-bold">Số điện thoại <span class="text-danger">*</span></label>
+                            <input type="tel" name="kh_sdt" id="kh_sdt" class="form-control" required pattern="[0-9]{10,11}" placeholder="09xxxxxxxxx">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="kh_email" class="form-label fw-bold">Email</label>
+                            <input type="email" name="kh_email" id="kh_email" class="form-control" placeholder="email@example.com">
                         </div>
                     </div>
 
-                    <div class="form-group text-start mb-3">
-                        <label for="ghi_chu" class="form-label">Ghi chú</label>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Thanh toán</label>
+                        <div class="d-flex gap-2">
+                            <div class="form-check border rounded p-2 px-4 flex-fill cursor-pointer">
+                                <input class="form-check-input" type="radio" name="phuongthuc_thanhtoan" id="pt_tienmat" value="tien-mat" checked>
+                                <label class="form-check-label w-100 cursor-pointer" for="pt_tienmat">
+                                    <i class="fas fa-money-bill-wave text-success me-1"></i> Tiền mặt
+                                </label>
+                            </div>
+                            <div class="form-check border rounded p-2 px-4 flex-fill cursor-pointer">
+                                <input class="form-check-input" type="radio" name="phuongthuc_thanhtoan" id="pt_chuyenkhoan" value="chuyen-khoan">
+                                <label class="form-check-label w-100 cursor-pointer" for="pt_chuyenkhoan">
+                                    <i class="fas fa-university text-primary me-1"></i> Chuyển khoản
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="ghi_chu" class="form-label fw-bold">Ghi chú</label>
                         <textarea name="ghi_chu" id="ghi_chu" class="form-control" rows="2"></textarea>
                     </div>
 
-                    <div class="alert alert-info text-start mt-3">
-                        <strong>Tổng thanh toán:</strong> <span class="fs-5 text-success">${number_format(selectedSeats.length * Number(tripData.gia_ve || 0))}đ</span>
+                    <div class="bg-light p-3 rounded border">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold text-secondary">Tổng thanh toán:</span>
+                            <span class="fw-bold text-success fs-5">${number_format(selectedSeats.length * Number(tripData.gia_ve || 0))}đ</span>
+                        </div>
                     </div>
                 </form>
             `,
-            width: '600px',
+            width: '550px',
             showCancelButton: true,
-            confirmButtonText: '<i class="fas fa-check me-2"></i>Xác nhận đặt vé',
-            cancelButtonText: '<i class="fas fa-times me-2"></i>Hủy',
-            confirmButtonColor: '#00875A',
-            cancelButtonColor: '#FF5630',
+            confirmButtonText: 'Xác nhận đặt vé',
+            cancelButtonText: 'Hủy bỏ',
+            confirmButtonColor: '#198754',
+            cancelButtonColor: '#6c757d',
+            focusConfirm: false,
             preConfirm: () => {
                 const form = document.getElementById('form-customer-info');
                 if (form.checkValidity()) {
                     return true;
                 } else {
-                    Swal.showValidationMessage('Vui lòng điền đầy đủ thông tin bắt buộc.');
+                    form.reportValidity();
                     return false;
                 }
             }
@@ -1011,31 +706,5 @@ document.addEventListener('DOMContentLoaded', function () {
 
     window.currentTripIdForRealtime = currentMachuyendi;
 });
-</script>
-
-<script>
-if (typeof window.currentTripIdForRealtime !== 'undefined' && window.currentTripIdForRealtime) {
-    if (typeof window.Echo !== 'undefined') {
-        window.Echo.channel('trip.' + window.currentTripIdForRealtime)
-            .listen('.seat.booked', (event) => {
-                const seatElement = document.querySelector(`[data-seat-code="${event.seat_number}"]`);
-                if (seatElement && seatElement.classList.contains('available')) {
-                    seatElement.classList.remove('available');
-                    seatElement.classList.add('sold');
-                    seatElement.style.cursor = 'not-allowed';
-                    
-                    if (window.Toastify) {
-                        Toastify({
-                            text: `Ghế ${event.seat_number} vừa được đặt`,
-                            duration: 3000,
-                            gravity: 'top',
-                            position: 'right',
-                            backgroundColor: 'linear-gradient(to right, #ff5f6d, #ffc371)',
-                        }).showToast();
-                    }
-                }
-            });
-    }
-}
 </script>
 @endpush

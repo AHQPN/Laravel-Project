@@ -664,12 +664,4 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
-{{-- Real-time seat updates --}}
-<script src="{{ asset('js/real-time-seat-updates.js') }}"></script>
-<script>
-    @if(isset($trip))
-        initSeatUpdates('{{ $trip->machuyendi }}');
-    @endif
-</script>
-
 @endsection

@@ -72,17 +72,13 @@
                             <table class="table table-hover align-middle mb-0" id="khach-table">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="px-3 py-3 sortable" data-sort="makh"
-                                            style="width: 100px; cursor: pointer;">Mã KH <i
-                                                class="fas fa-sort ms-1 text-muted"></i></th>
-                                        <th class="px-3 py-3 sortable" data-sort="ten"
-                                            style="width: 180px; cursor: pointer;">Họ tên <i
-                                                class="fas fa-sort ms-1 text-muted"></i></th>
-                                        <th class="px-3 py-3 sortable" data-sort="sdt"
-                                            style="width: 130px; cursor: pointer;">Số điện thoại <i
-                                                class="fas fa-sort ms-1 text-muted"></i></th>
-                                        <th class="px-3 py-3 sortable d-none d-lg-table-cell" data-sort="email"
-                                            style="cursor: pointer;">Email <i class="fas fa-sort ms-1 text-muted"></i></th>
+                                        <th class="px-3 py-3"
+                                            style="width: 100px;">Mã KH</th>
+                                        <th class="px-3 py-3"
+                                            style="width: 180px;">Họ tên</th>
+                                        <th class="px-3 py-3"
+                                            style="width: 130px;">Số điện thoại</th>
+                                        <th class="px-3 py-3 d-none d-lg-table-cell">Email</th>
                                         <th class="px-3 py-3 d-none d-xl-table-cell" style="width: auto;">Địa chỉ</th>
                                         <th class="px-3 py-3 text-center" style="width: 150px;">Thao tác</th>
                                     </tr>
@@ -244,20 +240,15 @@
                             <table class="table table-hover align-middle mb-0" id="nhanvien-table">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="px-3 py-3 sortable" data-sort="manv"
-                                            style="width: 100px; cursor: pointer;">Mã NV <i
-                                                class="fas fa-sort ms-1 text-muted"></i></th>
-                                        <th class="px-3 py-3 sortable" data-sort="ten"
-                                            style="width: 180px; cursor: pointer;">Họ tên <i
-                                                class="fas fa-sort ms-1 text-muted"></i></th>
-                                        <th class="px-3 py-3 sortable" data-sort="chucvu"
-                                            style="width: 140px; cursor: pointer;">Chức vụ <i
-                                                class="fas fa-sort ms-1 text-muted"></i></th>
-                                        <th class="px-3 py-3 sortable" data-sort="sdt"
-                                            style="width: 130px; cursor: pointer;">Số điện thoại <i
-                                                class="fas fa-sort ms-1 text-muted"></i></th>
-                                        <th class="px-3 py-3 sortable d-none d-lg-table-cell" data-sort="email"
-                                            style="cursor: pointer;">Email <i class="fas fa-sort ms-1 text-muted"></i></th>
+                                        <th class="px-3 py-3"
+                                            style="width: 100px;">Mã NV</th>
+                                        <th class="px-3 py-3"
+                                            style="width: 180px;">Họ tên</th>
+                                        <th class="px-3 py-3"
+                                            style="width: 140px;">Chức vụ</th>
+                                        <th class="px-3 py-3"
+                                            style="width: 130px;">Số điện thoại</th>
+                                        <th class="px-3 py-3 d-none d-lg-table-cell">Email</th>
                                         <th class="px-3 py-3 text-center" style="width: 150px;">Thao tác</th>
                                     </tr>
                                 </thead>
@@ -525,29 +516,6 @@
 @endsection
 
 @push('styles')
-    <style>
-        #khach-table thead th.sortable,
-        #nhanvien-table thead th.sortable {
-            cursor: pointer;
-            user-select: none;
-            transition: all 0.2s ease;
-        }
-
-        #khach-table thead th.sortable:hover,
-        #nhanvien-table thead th.sortable:hover {
-            background-color: #e9ecef;
-            color: #667eea;
-        }
-
-        #khach-table thead th.sort-asc,
-        #khach-table thead th.sort-desc,
-        #nhanvien-table thead th.sort-asc,
-        #nhanvien-table thead th.sort-desc {
-            background-color: #e9ecef;
-            color: #667eea;
-            font-weight: 600;
-        }
-    </style>
 @endpush
 
 @push('scripts')
@@ -566,90 +534,6 @@
                 paginationId: 'nhanvien-pagination',
                 itemsPerPage: 10
             });
-
-            // Sorting for Khach table
-            initTableSorting('khach-table', khachPagination);
-
-            // Sorting for Nhanvien table
-            initTableSorting('nhanvien-table', nhanvienPagination);
-
-            function initTableSorting(tableId, pagination) {
-                const table = document.getElementById(tableId);
-                const headers = table.querySelectorAll('th.sortable');
-                let currentSort = { column: null, direction: 'asc' };
-
-                headers.forEach(header => {
-                    header.addEventListener('click', () => {
-                        const sortType = header.getAttribute('data-sort');
-                        const tbody = table.querySelector('tbody');
-                        const rows = Array.from(tbody.querySelectorAll('tr'));
-
-                        if (currentSort.column === sortType) {
-                            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-                        } else {
-                            currentSort.column = sortType;
-                            currentSort.direction = 'asc';
-                        }
-
-                        // Remove previous sort indicators
-                        headers.forEach(h => {
-                            h.classList.remove('sort-asc', 'sort-desc');
-                            const icon = h.querySelector('i');
-                            if (icon) {
-                                icon.className = 'fas fa-sort ms-1 text-muted';
-                            }
-                        });
-
-                        // Add sort indicator to current header
-                        header.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
-                        const icon = header.querySelector('i');
-                        if (icon) {
-                            icon.className = `fas fa-sort-${currentSort.direction === 'asc' ? 'up' : 'down'} ms-1 text-primary`;
-                        }
-
-                        // Sort rows
-                        rows.sort((a, b) => {
-                            let aValue, bValue;
-                            let cellIndex = 0;
-
-                            switch (sortType) {
-                                case 'makh':
-                                case 'manv':
-                                    cellIndex = 0;
-                                    break;
-                                case 'ten':
-                                    cellIndex = 1;
-                                    break;
-                                case 'sdt':
-                                    cellIndex = tableId === 'khach-table' ? 2 : 3;
-                                    break;
-                                case 'chucvu':
-                                    cellIndex = 2;
-                                    break;
-                                case 'email':
-                                    cellIndex = tableId === 'khach-table' ? 3 : 4;
-                                    break;
-                                default:
-                                    return 0;
-                            }
-
-                            aValue = a.cells[cellIndex]?.textContent.trim() || '';
-                            bValue = b.cells[cellIndex]?.textContent.trim() || '';
-
-                            return currentSort.direction === 'asc'
-                                ? aValue.localeCompare(bValue, 'vi')
-                                : bValue.localeCompare(aValue, 'vi');
-                        });
-
-                        // Re-render table
-                        rows.forEach(row => tbody.appendChild(row));
-
-                        // Reset pagination
-                        pagination.currentPage = 1;
-                        pagination.render();
-                    });
-                });
-            }
         });
 
         // Auto dismiss alerts after 5 seconds

@@ -114,23 +114,23 @@
                     <table class="table table-hover align-middle mb-0" id="hoadon-table">
                         <thead class="table-light">
                             <tr>
-                                <th class="px-3 py-3 sortable" data-sort="mahd" style="width: 120px; cursor: pointer;">
-                                    Mã HĐ <i class="fas fa-sort ms-1 text-muted"></i>
+                                <th class="px-3 py-3" style="width: 120px;">
+                                    Mã HĐ
                                 </th>
-                                <th class="px-3 py-3 sortable" data-sort="ten" style="width: 200px; cursor: pointer;">
-                                    Khách hàng <i class="fas fa-sort ms-1 text-muted"></i>
+                                <th class="px-3 py-3" style="width: 200px;">
+                                    Khách hàng
                                 </th>
-                                <th class="px-3 py-3 sortable d-none d-md-table-cell" data-sort="thoigian"
-                                    style="width: 130px; cursor: pointer;">
-                                    Ngày đặt <i class="fas fa-sort ms-1 text-muted"></i>
+                                <th class="px-3 py-3 d-none d-md-table-cell"
+                                    style="width: 130px;">
+                                    Ngày đặt
                                 </th>
                                 <th class="px-3 py-3 sortable text-end" data-sort="thanhtien"
                                     style="width: 140px; cursor: pointer;">
                                     Tổng tiền <i class="fas fa-sort ms-1 text-muted"></i>
                                 </th>
-                                <th class="px-3 py-3 sortable text-center" data-sort="trangthai"
-                                    style="width: 130px; cursor: pointer;">
-                                    Trạng thái <i class="fas fa-sort ms-1 text-muted"></i>
+                                <th class="px-3 py-3 text-center"
+                                    style="width: 130px;">
+                                    Trạng thái
                                 </th>
                                 <th class="px-3 py-3 text-center" style="width: 180px;">Thao tác</th>
                             </tr>
@@ -499,76 +499,31 @@
                 itemsPerPage: 10
             });
 
-            // Table Sorting
+            // Table Sorting for thanhtien only
             const table = document.getElementById('hoadon-table');
-            const headers = table.querySelectorAll('th.sortable');
-            let currentSort = { column: null, direction: 'asc' };
+            const header = table.querySelector('th.sortable[data-sort="thanhtien"]');
+            let currentSort = { direction: 'asc' };
 
-            headers.forEach(header => {
+            if (header) {
                 header.addEventListener('click', () => {
-                    const sortType = header.getAttribute('data-sort');
                     const tbody = table.querySelector('tbody');
                     const rows = Array.from(tbody.querySelectorAll('tr'));
 
-                    if (currentSort.column === sortType) {
-                        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-                    } else {
-                        currentSort.column = sortType;
-                        currentSort.direction = 'asc';
-                    }
+                    currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
 
-                    // Remove previous sort indicators
-                    headers.forEach(h => {
-                        h.classList.remove('sort-asc', 'sort-desc');
-                        const icon = h.querySelector('i');
-                        if (icon) {
-                            icon.className = 'fas fa-sort ms-1 text-muted';
-                        }
-                    });
-
-                    // Add sort indicator to current header
-                    header.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+                    // Update sort indicator
                     const icon = header.querySelector('i');
                     if (icon) {
                         icon.className = `fas fa-sort-${currentSort.direction === 'asc' ? 'up' : 'down'} ms-1 text-primary`;
                     }
+                    header.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+                    header.classList.remove(currentSort.direction === 'asc' ? 'sort-desc' : 'sort-asc');
 
-                    // Sort rows
+                    // Sort rows by thanhtien
                     rows.sort((a, b) => {
-                        let aValue, bValue;
-
-                        switch (sortType) {
-                            case 'mahd':
-                                aValue = a.cells[0]?.textContent.trim() || '';
-                                bValue = b.cells[0]?.textContent.trim() || '';
-                                break;
-                            case 'ten':
-                                aValue = a.cells[1]?.querySelector('.fw-medium')?.textContent.trim() || '';
-                                bValue = b.cells[1]?.querySelector('.fw-medium')?.textContent.trim() || '';
-                                break;
-                            case 'thoigian':
-                                aValue = new Date(a.cells[2]?.textContent || '').getTime();
-                                bValue = new Date(b.cells[2]?.textContent || '').getTime();
-                                break;
-                            case 'thanhtien':
-                                aValue = parseInt(a.cells[3]?.textContent.replace(/\D/g, '')) || 0;
-                                bValue = parseInt(b.cells[3]?.textContent.replace(/\D/g, '')) || 0;
-                                break;
-                            case 'trangthai':
-                                aValue = a.cells[4]?.textContent.trim() || '';
-                                bValue = b.cells[4]?.textContent.trim() || '';
-                                break;
-                            default:
-                                return 0;
-                        }
-
-                        if (typeof aValue === 'string') {
-                            return currentSort.direction === 'asc'
-                                ? aValue.localeCompare(bValue, 'vi')
-                                : bValue.localeCompare(aValue, 'vi');
-                        } else {
-                            return currentSort.direction === 'asc' ? aValue - bValue : bValue - aValue;
-                        }
+                        const aValue = parseInt(a.cells[3]?.textContent.replace(/\D/g, '')) || 0;
+                        const bValue = parseInt(b.cells[3]?.textContent.replace(/\D/g, '')) || 0;
+                        return currentSort.direction === 'asc' ? aValue - bValue : bValue - aValue;
                     });
 
                     // Re-render table
@@ -578,7 +533,7 @@
                     hoadonPagination.currentPage = 1;
                     hoadonPagination.render();
                 });
-            });
+            }
         });
 
         // Auto dismiss alerts after 5 seconds

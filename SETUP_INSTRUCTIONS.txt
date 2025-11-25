@@ -56,8 +56,7 @@ php artisan key:generate
 BƯỚC 4: TẠO DATABASE / STEP 4: CREATE DATABASE
 ================================================================================
 
-Copilot gen guide dài vl. tóm tắt: mang cái file sql lên mysql admin trong xxamp 
-chạy cho lẹ
+Mang cái file sql lên mysql admin trong xxamp chạy cho lẹ
 
 ================================================================================
 BƯỚC 5: CLEAR CACHE / STEP 7: CLEAR CACHE
@@ -74,7 +73,6 @@ BƯỚC 6: CHẠY SERVER / STEP 8: RUN SERVER
 php artisan serve
 
 # Server sẽ chạy tại: http://localhost:8000
-# Server will run at: http://localhost:8000
 
 ================================================================================
 THÔNG TIN ĐĂNG NHẬP MẪU / SAMPLE LOGIN CREDENTIALS

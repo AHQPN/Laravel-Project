@@ -97,20 +97,20 @@
                        data-sort-direction="{{ $sortParams['direction'] ?? 'desc' }}">
                     <thead class="table-light">
                         <tr>
-                            <th class="sortable" data-sort="machuyendi" style="min-width: 120px;">
-                                Mã chuyến <i class="fas fa-sort ms-1 text-muted"></i>
+                            <th style="min-width: 120px;">
+                                Mã chuyến
                             </th>
-                            <th class="sortable" data-sort="maxe" style="min-width: 150px;">
-                                Xe <i class="fas fa-sort ms-1 text-muted"></i>
+                            <th style="min-width: 150px;">
+                                Xe
                             </th>
-                            <th class="sortable" data-sort="thoigiandi" style="min-width: 140px;">
-                                Thời gian <i class="fas fa-sort ms-1 text-muted"></i>
+                            <th style="min-width: 140px;">
+                                Thời gian
                             </th>
-                            <th class="sortable text-end" data-sort="gia" style="min-width: 120px;">
-                                Giá vé <i class="fas fa-sort ms-1 text-muted"></i>
+                            <th class="text-end" style="min-width: 120px;">
+                                Giá vé
                             </th>
-                            <th class="sortable text-center" data-sort="SLgheconlai" style="min-width: 110px;">
-                                Ghế trống <i class="fas fa-sort ms-1 text-muted"></i>
+                            <th class="text-center" style="min-width: 110px;">
+                                Ghế trống
                             </th>
                             <th class="text-center d-none d-lg-table-cell" style="min-width: 100px;">
                                 Trạng thái
@@ -398,23 +398,7 @@ html, body {
     background: #f8f9fa;
 }
 
-#chuyendi-table thead th.sortable {
-    cursor: pointer;
-    user-select: none;
-}
 
-#chuyendi-table thead th.sortable:hover {
-    background: #e9ecef;
-    color: #667eea;
-    transition: all 0.2s ease;
-}
-
-#chuyendi-table thead th.sort-asc,
-#chuyendi-table thead th.sort-desc {
-    background-color: #e9ecef;
-    color: #667eea;
-    font-weight: 600;
-}
 
 #chuyendi-table tbody td {
     padding: 1rem 0.75rem;
@@ -576,87 +560,6 @@ document.addEventListener('DOMContentLoaded', function() {
         tableId: 'chuyendi-table',
         paginationId: 'chuyendi-pagination',
         itemsPerPage: 10
-    });
-
-    // Table Sorting
-    const table = document.getElementById('chuyendi-table');
-    const headers = table.querySelectorAll('th.sortable');
-    let currentSort = { column: null, direction: 'asc' };
-
-    headers.forEach(header => {
-        header.addEventListener('click', () => {
-            const sortType = header.getAttribute('data-sort');
-            const tbody = table.querySelector('tbody');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-
-            if (currentSort.column === sortType) {
-                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-            } else {
-                currentSort.column = sortType;
-                currentSort.direction = 'asc';
-            }
-
-            // Remove previous sort indicators
-            headers.forEach(h => {
-                h.classList.remove('sort-asc', 'sort-desc');
-                const icon = h.querySelector('i');
-                if (icon) {
-                    icon.className = 'fas fa-sort ms-1 text-muted';
-                }
-            });
-
-            // Add sort indicator to current header
-            header.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
-            const icon = header.querySelector('i');
-            if (icon) {
-                icon.className = `fas fa-sort-${currentSort.direction === 'asc' ? 'up' : 'down'} ms-1 text-primary`;
-            }
-
-            // Sort rows
-            rows.sort((a, b) => {
-                let aValue, bValue;
-
-                switch(sortType) {
-                    case 'machuyendi':
-                        aValue = a.cells[0].textContent.trim();
-                        bValue = b.cells[0].textContent.trim();
-                        break;
-                    case 'maxe':
-                        aValue = a.cells[1].textContent.trim();
-                        bValue = b.cells[1].textContent.trim();
-                        break;
-                    case 'thoigiandi':
-                        aValue = new Date(a.cells[2]?.querySelector('.fw-semibold')?.textContent || '').getTime();
-                        bValue = new Date(b.cells[2]?.querySelector('.fw-semibold')?.textContent || '').getTime();
-                        break;
-                    case 'gia':
-                        aValue = parseInt(a.cells[3]?.textContent.replace(/\D/g, '')) || 0;
-                        bValue = parseInt(b.cells[3]?.textContent.replace(/\D/g, '')) || 0;
-                        break;
-                    case 'SLgheconlai':
-                        aValue = parseInt(a.cells[4]?.querySelector('.fw-bold')?.textContent) || 0;
-                        bValue = parseInt(b.cells[4]?.querySelector('.fw-bold')?.textContent) || 0;
-                        break;
-                    default:
-                        return 0;
-                }
-
-                if (typeof aValue === 'string') {
-                    return currentSort.direction === 'asc'
-                        ? aValue.localeCompare(bValue, 'vi')
-                        : bValue.localeCompare(aValue, 'vi');
-                } else {
-                    return currentSort.direction === 'asc' ? aValue - bValue : bValue - aValue;
-                }
-            });
-
-            // Re-render table
-            rows.forEach(row => tbody.appendChild(row));
-
-            // Reset pagination
-            chuyendiPagination.currentPage = 1;
-            chuyendiPagination.render();
-        });
     });
 
     let deleteId = null;

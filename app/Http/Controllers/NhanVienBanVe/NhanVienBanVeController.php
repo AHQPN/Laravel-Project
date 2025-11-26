@@ -127,6 +127,7 @@ class NhanVienBanVeController extends Controller
             'kh_email' => 'nullable|email|max:255',
             'phuongthuc_thanhtoan' => 'required|in:tien-mat,chuyen-khoan,the',
             'ghi_chu' => 'nullable|string|max:500',
+            'tien_khach_dua' => 'nullable|numeric|min:0',
         ]);
 
         try {
@@ -152,7 +153,7 @@ class NhanVienBanVeController extends Controller
             $mattMap = [
                 'tien-mat' => 'TM',
                 'chuyen-khoan' => 'CK',
-                'the' => 'THE',
+                'the' => 'TH',
             ];
             $matt = $mattMap[$request->phuongthuc_thanhtoan] ?? 'TM';
 
@@ -165,6 +166,10 @@ class NhanVienBanVeController extends Controller
             $soluong = count($selectedSeats);
             $thanhtien = $soluong * $request->gia_ve;
 
+            // Tất cả đều tạo với trạng thái "Đã duyệt" ngay
+            $hoadonTrangthai = 'Đã duyệt';
+            $veTrangthai = 'Booked';
+
             $hoadon = \App\Models\Hoadon::create([
                 'mahd' => $this->generateShortMaHoaDon(),
                 'makh' => $khach->makh,
@@ -173,7 +178,7 @@ class NhanVienBanVeController extends Controller
                 'matt' => $matt,
                 'soluong' => $soluong,
                 'thanhtien' => $thanhtien,
-                'trangthai' => 'Đã duyệt',
+                'trangthai' => $hoadonTrangthai, // Chờ thanh toán nếu online
             ]);
 
             // Tạo vé và CTHD
@@ -189,10 +194,8 @@ class NhanVienBanVeController extends Controller
                     'mave' => $mave,
                     'machuyendi' => $chuyendi->machuyendi,
                     'maghe' => $seatCode,
-                    'trangthai' => 'Booked',
+                    'trangthai' => $veTrangthai, // Pending nếu online payment
                 ]);
-
-                // event(new \App\Events\SeatBooked($chuyendi->machuyendi, $seatCode, 'Booked'));
 
                 \App\Models\CTHD::create([
                     'mahd' => $hoadon->mahd,
@@ -212,6 +215,8 @@ class NhanVienBanVeController extends Controller
                     'success' => true,
                     'message' => $message,
                     'mahd' => $hoadon->mahd,
+                    'order_id' => $hoadon->mahd,
+                    've_ids' => implode(',', $createdTickets),
                     'redirect_url' => route('nhan-vien-ban-ve.ve.index')
                 ]);
             }

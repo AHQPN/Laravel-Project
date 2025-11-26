@@ -134,7 +134,7 @@
                                 </div>
                             </div>
                             <button type="button" id="btn-proceed-checkout" class="btn btn-primary w-100 mt-3" disabled>
-                                <i class="fas fa-arrow-right me-2"></i> Tiếp tục thanh toán
+                                Tiếp tục thanh toán
                             </button>
                         </div>
                     </div>
@@ -207,20 +207,33 @@
                                     <i class="fas fa-wallet me-2"></i>Thanh toán
                                 </h6>
 
+                                <!-- Tiền mặt -->
                                 <div class="p-3 rounded-3 border border-success bg-success-subtle mb-3">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="phuongthuc_thanhtoan" id="payment-cash" value="tien-mat" checked>
+                                        <input class="form-check-input payment-method-radio" type="radio" name="phuongthuc_thanhtoan" id="payment-cash" value="tien-mat" checked>
                                         <label class="form-check-label fw-bold text-success d-flex align-items-center" for="payment-cash">
                                             <i class="fas fa-money-bill-wave me-2 fs-5"></i> Tiền mặt
                                         </label>
                                     </div>
                                 </div>
 
+                                <!-- VNPay -->
+                                <div class="p-3 rounded-3 border border-primary bg-primary-subtle mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input payment-method-radio" type="radio" name="phuongthuc_thanhtoan" id="payment-vnpay" value="vnpay">
+                                        <label class="form-check-label fw-bold text-primary d-flex align-items-center" for="payment-vnpay">
+                                            <i class="fas fa-credit-card me-2 fs-5"></i> VNPay
+                                        </label>
+                                    </div>
+                                    <small class="text-muted d-block mt-2 ms-4">Thanh toán qua cổng VNPay (ATM, Visa, MasterCard, QR Code)</small>
+                                </div>
+
+                                <!-- Chi tiết thanh toán tiền mặt -->
                                 <div id="cash-payment-details">
                                     <div class="mb-3">
                                         <label class="form-label small fw-bold text-muted">Tiền khách đưa <span class="text-danger">*</span></label>
                                         <div class="input-group input-group-lg">
-                                            <input type="number" class="form-control fw-bold text-end" id="tien_khach_dua" name="tien_khach_dua" min="0" step="1000" placeholder="0" required>
+                                            <input type="number" class="form-control fw-bold text-end" id="tien_khach_dua" name="tien_khach_dua" min="0" step="1000" placeholder="0">
                                             <span class="input-group-text bg-white text-muted">₫</span>
                                         </div>
                                     </div>
@@ -229,9 +242,6 @@
                                         <span class="text-muted fw-medium">Tiền thừa trả khách</span>
                                         <span class="h4 mb-0 fw-bold text-success" id="cash-change">0₫</span>
                                     </div>
-                                    
-                                    <!-- Hidden total for JS calculation reference if needed, though we use checkout-total -->
-                                    <div class="d-none" id="cash-total"></div>
                                 </div>
                             </div>
                         </div>
@@ -397,6 +407,9 @@
 }
 .bg-success-subtle {
     background-color: #d1e7dd !important;
+}
+.bg-primary-subtle {
+    background-color: #cfe2ff !important;
 }
 
 .btn {
@@ -622,7 +635,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const totalAmount = selectedSeats.length * selectedTrip.gia_ve;
         document.getElementById('checkout-total').textContent = formatCurrency(totalAmount);
         
-        document.getElementById('cash-total').textContent = formatCurrency(totalAmount);
+        document.getElementById('payment-cash').checked = true;
+        document.getElementById('cash-payment-details').style.display = 'block';
         document.getElementById('tien_khach_dua').value = '';
         document.getElementById('cash-change').textContent = '0₫';
 
@@ -648,18 +662,79 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Payment method toggle
+    document.querySelectorAll('.payment-method-radio').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const cashDetails = document.getElementById('cash-payment-details');
+            const cashInput = document.getElementById('tien_khach_dua');
+            
+            if (this.value === 'tien-mat') {
+                cashDetails.style.display = 'block';
+                cashInput.setAttribute('required', 'required');
+            } else {
+                cashDetails.style.display = 'none';
+                cashInput.removeAttribute('required');
+                cashInput.value = '';
+                document.getElementById('cash-change').textContent = '0₫';
+            }
+        });
+    });
+
     function handleCheckout(e) {
         e.preventDefault();
         const formData = new FormData(e.target);
+        const paymentMethod = formData.get('phuongthuc_thanhtoan');
         
         const totalAmount = selectedSeats.length * selectedTrip.gia_ve;
-        const cashGiven = parseFloat(formData.get('tien_khach_dua') || 0);
         
-        if (!cashGiven || cashGiven < totalAmount) {
-            showError('Số tiền khách đưa phải lớn hơn hoặc bằng tổng tiền vé');
+        // Validate cash payment
+        if (paymentMethod === 'tien-mat') {
+            const cashGiven = parseFloat(formData.get('tien_khach_dua') || 0);
+            
+            if (!cashGiven || cashGiven < totalAmount) {
+                showError('Số tiền khách đưa phải lớn hơn hoặc bằng tổng tiền vé');
+                return;
+            }
+        }
+        
+        // Nếu chọn VNPay, submit form trực tiếp để redirect
+        if (paymentMethod === 'vnpay') {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ route("nhan-vien-ban-ve.vnpay.create") }}';
+            
+            // Add CSRF token
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_token';
+            csrfInput.value = '{{ csrf_token() }}';
+            form.appendChild(csrfInput);
+            
+            // Add form data
+            const fields = {
+                'machuyendi': selectedTrip.machuyendi,
+                'seats': selectedSeats.join(','),
+                'gia_ve': selectedTrip.gia_ve,
+                'kh_hoten': formData.get('ten_khach'),
+                'kh_sdt': formData.get('sdt'),
+                'kh_email': formData.get('email') || '',
+                'ghi_chu': formData.get('ghi_chu') || ''
+            };
+            
+            for (const [key, value] of Object.entries(fields)) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = value;
+                form.appendChild(input);
+            }
+            
+            document.body.appendChild(form);
+            form.submit();
             return;
         }
         
+        // Xử lý thanh toán tiền mặt qua AJAX
         const payload = new FormData();
         payload.append('_token', '{{ csrf_token() }}');
         payload.append('machuyendi', selectedTrip.machuyendi);
@@ -668,7 +743,7 @@ document.addEventListener('DOMContentLoaded', function() {
         payload.append('kh_hoten', formData.get('ten_khach'));
         payload.append('kh_sdt', formData.get('sdt'));
         payload.append('kh_email', formData.get('email') || '');
-        payload.append('phuongthuc_thanhtoan', formData.get('phuongthuc_thanhtoan'));
+        payload.append('phuongthuc_thanhtoan', paymentMethod);
         payload.append('ghi_chu', formData.get('ghi_chu') || '');
         payload.append('tien_khach_dua', formData.get('tien_khach_dua'));
 

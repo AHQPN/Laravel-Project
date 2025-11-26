@@ -1,12 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
-/*
-|--------------------------------------------------------------------------
-| Controllers
-|--------------------------------------------------------------------------
-*/
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\TinhThanhController;
@@ -27,27 +21,15 @@ use App\Http\Controllers\Customer\TicketController;
 use App\Http\Controllers\Customer\TripController;
 use App\Http\Controllers\Customer\BillController;
 use App\Http\Controllers\Customer\AuthController;
+use App\Http\Controllers\VnpayController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
+Route::get('/payment/vnpay/return', [VnpayController::class, 'vnpayReturn'])->name('vnpay.return');
 
 Route::get('/', function () {
     return view('landing');
 })->name('landing');
 
-// Test Suite Route (Development only)
-Route::get('/test-suite', function () {
-    return view('test-suite');
-})->name('test.suite');
-
-/*
-|-------------------------
-| CUSTOMER ROUTES (TRANG NGƯỜI DÙNG)
-|-------------------------
-*/
+// CUSTOMER ROUTES (TRANG NGƯỜI DÙNG)
 Route::get('/home', [HomeController::class, 'index'])->name('home.index');
 
 // Customer Auth (ĐĂNG NHẬP / ĐĂNG KÝ)
@@ -83,11 +65,7 @@ Route::prefix('bill')->name('bill.')->group(function () {
     Route::get('download-pdf/{id}', [BillController::class, 'downloadPDF'])->name('downloadPDF');
 });
 
-/*
-|-------------------------
-| ADMIN ROUTES (TRANG QUẢN TRỊ)
-|-------------------------
-*/
+// ADMIN ROUTES (TRANG QUẢN TRỊ)
 Route::prefix('quan-ly')->name('quan-ly.')->group(function () {
     Route::get('dang-nhap', [AdminAuthController::class, 'showLogin'])->name('dang-nhap');
     Route::post('dang-nhap', [AdminAuthController::class, 'login'])
@@ -143,6 +121,9 @@ Route::prefix('nhan-vien-ban-ve')->name('nhan-vien-ban-ve.')->group(function () 
 
         Route::get('dat-ve', [NhanVienBanVeController::class, 'createDatVe'])->name('dat-ve.create');
         Route::post('dat-ve', [NhanVienBanVeController::class, 'storeDatVe'])->name('dat-ve.store');
+        
+        // VNPay payment route (requires auth)
+        Route::post('/payment/vnpay', [VnpayController::class, 'createPayment'])->name('vnpay.create');
 
         Route::get('ve', [NhanVienBanVeController::class, 'indexVe'])->name('ve.index');
         Route::get('ve/{id}', [NhanVienBanVeController::class, 'showVe'])->name('ve.show');
@@ -160,29 +141,6 @@ Route::prefix('nhan-vien-ban-ve')->name('nhan-vien-ban-ve.')->group(function () 
         Route::get('api/vehicles', [NhanVienBanVeController::class, 'getVehiclesApi'])->name('api.vehicles');
         Route::get('api/so-do-ghe', [NhanVienBanVeController::class, 'getSoDoGheApi'])->name('api.so-do-ghe');
     });
-});
-
-// Check seeder stats (Development)
-Route::get('/check-seeder-stats', function () {
-    $stats = [
-        'total_trips' => DB::table('Chuyendi')->count(),
-        'total_tickets' => DB::table('Ve')->count(),
-        'total_invoices' => DB::table('Hoadon')->count(),
-        'trips_by_date' => [],
-    ];
-
-    for ($d = 10; $d <= 22; $d++) {
-        $date = '2025-11-' . str_pad($d, 2, '0', STR_PAD_LEFT);
-        $count = DB::table('Chuyendi')->whereDate('thoigiandi', $date)->count();
-        $stats['trips_by_date'][$date] = $count;
-    }
-
-    $stats['sample_trips_nov17'] = DB::table('Chuyendi')
-        ->whereDate('thoigiandi', '2025-11-17')
-        ->select('machuyendi', 'tenchuyen', 'thoigiandi', 'gia', 'SLgheconlai', 'trangthai')
-        ->get();
-
-    return response()->json($stats, 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 });
 
 // Tài xế Routes

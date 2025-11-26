@@ -153,51 +153,94 @@
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
-                    <form id="checkout-form" method="POST">
+                <div class="modal-body p-4">
+                    <form id="checkout-form" onsubmit="handleCheckout(event)">
                         @csrf
-                        <div class="card border mb-3">
-                            <div class="card-body">
-                                <h6 class="fw-bold mb-3">Thông tin chuyến đi</h6>
-                                <div class="mb-2">
-                                    <span class="small text-secondary">Tuyến:</span>
-                                    <span class="fw-semibold" id="checkout-trip"></span>
+                        
+                        <!-- Thông tin chuyến đi -->
+                        <div class="trip-summary-card mb-4 p-3 rounded-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="fw-bold mb-1 text-primary" id="checkout-trip"></h6>
+                                    <div class="small text-muted">
+                                        <i class="fas fa-couch me-1"></i> <span id="checkout-seats"></span>
+                                    </div>
                                 </div>
-                                <div class="mb-2">
-                                    <span class="small text-secondary">Ghế:</span>
-                                    <span class="fw-semibold" id="checkout-seats"></span>
-                                </div>
-                                <div class="border-top pt-2 mt-2">
-                                    <span class="small text-secondary">Tổng tiền:</span>
-                                    <span class="fw-bold text-primary fs-5" id="checkout-total"></span>
+                                <div class="text-end">
+                                    <div class="small text-muted">Tổng tiền</div>
+                                    <h5 class="fw-bold text-primary mb-0" id="checkout-total"></h5>
                                 </div>
                             </div>
                         </div>
 
-                        <h6 class="fw-bold mb-3">Thông tin khách hàng</h6>
-                        <div class="mb-3">
-                            <label for="ten_khach" class="form-label">Họ và tên <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="ten_khach" name="ten_khach" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="sdt" class="form-label">Số điện thoại <span class="text-danger">*</span></label>
-                            <input type="tel" class="form-control" id="sdt" name="sdt" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email">
-                        </div>
-                        <div class="mb-3">
-                            <label for="ghi_chu" class="form-label">Ghi chú</label>
-                            <textarea class="form-control" id="ghi_chu" name="ghi_chu" rows="2"></textarea>
+                        <div class="row g-4">
+                            <!-- Cột trái: Thông tin khách hàng -->
+                            <div class="col-lg-6">
+                                <h6 class="fw-bold mb-3 text-secondary text-uppercase small ls-1">
+                                    <i class="fas fa-user me-2"></i>Thông tin khách hàng
+                                </h6>
+                                
+                                <div class="form-floating mb-2">
+                                    <input type="text" class="form-control" id="ten_khach" name="ten_khach" placeholder="Họ tên" required>
+                                    <label for="ten_khach">Họ và tên <span class="text-danger">*</span></label>
+                                </div>
+                                
+                                <div class="form-floating mb-2">
+                                    <input type="tel" class="form-control" id="sdt" name="sdt" placeholder="Số điện thoại" required>
+                                    <label for="sdt">Số điện thoại <span class="text-danger">*</span></label>
+                                </div>
+                                
+                                <div class="form-floating mb-2">
+                                    <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+                                    <label for="email">Email</label>
+                                </div>
+                                
+                                <div class="form-floating">
+                                    <textarea class="form-control" id="ghi_chu" name="ghi_chu" placeholder="Ghi chú" style="height: 80px"></textarea>
+                                    <label for="ghi_chu">Ghi chú</label>
+                                </div>
+                            </div>
+
+                            <!-- Cột phải: Thanh toán -->
+                            <div class="col-lg-6">
+                                <h6 class="fw-bold mb-3 text-secondary text-uppercase small ls-1">
+                                    <i class="fas fa-wallet me-2"></i>Thanh toán
+                                </h6>
+
+                                <div class="p-3 rounded-3 border border-success bg-success-subtle mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="phuongthuc_thanhtoan" id="payment-cash" value="tien-mat" checked>
+                                        <label class="form-check-label fw-bold text-success d-flex align-items-center" for="payment-cash">
+                                            <i class="fas fa-money-bill-wave me-2 fs-5"></i> Tiền mặt
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div id="cash-payment-details">
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold text-muted">Tiền khách đưa <span class="text-danger">*</span></label>
+                                        <div class="input-group input-group-lg">
+                                            <input type="number" class="form-control fw-bold text-end" id="tien_khach_dua" name="tien_khach_dua" min="0" step="1000" placeholder="0" required>
+                                            <span class="input-group-text bg-white text-muted">₫</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center p-3 rounded-3 bg-light border border-dashed">
+                                        <span class="text-muted fw-medium">Tiền thừa trả khách</span>
+                                        <span class="h4 mb-0 fw-bold text-success" id="cash-change">0₫</span>
+                                    </div>
+                                    
+                                    <!-- Hidden total for JS calculation reference if needed, though we use checkout-total -->
+                                    <div class="d-none" id="cash-total"></div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-success btn-lg">
-                                <i class="fas fa-check-circle me-2"></i> Xác nhận đặt vé
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                                Quay lại
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                            <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Hủy bỏ</button>
+                            <button type="submit" class="btn btn-success px-4 fw-bold">
+                                <i class="fas fa-check me-2"></i> Xác nhận đặt vé
                             </button>
                         </div>
                     </form>
@@ -248,7 +291,6 @@
     font-weight: 600;
 }
 
-/* Seat Map Styles */
 .seat-map-container {
     display: grid;
     gap: 8px;
@@ -330,6 +372,33 @@
     font-size: 0.9rem;
     padding: 0.6rem 0.75rem;
 }
+
+.payment-option-compact {
+    padding: 0.5rem;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    background-color: #f8f9fa;
+}
+.payment-option-compact .form-check-input:checked ~ .form-check-label {
+    font-weight: 600;
+}
+
+.trip-summary-card {
+    background-color: #f8f9fa;
+    border-left: 4px solid #0d6efd;
+    transition: all 0.3s ease;
+}
+.trip-summary-card:hover {
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.border-dashed {
+    border-style: dashed !important;
+}
+.bg-success-subtle {
+    background-color: #d1e7dd !important;
+}
+
 .btn {
     border-radius: 4px;
     font-size: 0.9rem;
@@ -346,7 +415,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let selectedSeats = [];
     let seatData = {};
 
-    // City name mapping for shortening
     const cityMap = {
         'TP. Ho Chi Minh': 'HCM',
         'TP. Hồ Chí Minh': 'HCM',
@@ -365,17 +433,14 @@ document.addEventListener('DOMContentLoaded', function() {
         return cityMap[name.trim()] || name;
     }
 
-    // Initialize Choices.js for filters
     const routeSelect = new Choices('#filter-route', {
         searchEnabled: true,
         itemSelectText: '',
         shouldSort: false
     });
 
-    // Load initial data
     loadTrips();
 
-    // Filter handlers
     document.getElementById('btn-apply-filter').addEventListener('click', applyFilters);
     document.getElementById('btn-reset-filter').addEventListener('click', resetFilters);
 
@@ -472,12 +537,11 @@ document.addEventListener('DOMContentLoaded', function() {
         selectedTrip = allTrips.find(t => t.machuyendi === tripId);
         if (!selectedTrip) return;
 
-        // Load seat data
         fetch(`{{ url('nhan-vien-ban-ve/api/chuyen-di') }}/${tripId}/ghe`)
             .then(res => res.json())
             .then(data => {
                 seatData = data;
-                selectedSeats = []; // Reset selected seats
+                selectedSeats = [];
                 openSeatModal();
             })
             .catch(err => {
@@ -515,7 +579,6 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
         }).join('');
         
-        // Add click handlers to seats
         container.querySelectorAll('.seat.available').forEach(seat => {
             seat.addEventListener('click', function() {
                 toggleSeat(this.getAttribute('data-seat-code'));
@@ -556,17 +619,46 @@ document.addEventListener('DOMContentLoaded', function() {
     function openCheckout() {
         document.getElementById('checkout-trip').textContent = selectedTrip.tuyen;
         document.getElementById('checkout-seats').textContent = selectedSeats.join(', ');
-        document.getElementById('checkout-total').textContent = 
-            document.getElementById('total-price').textContent;
+        const totalAmount = selectedSeats.length * selectedTrip.gia_ve;
+        document.getElementById('checkout-total').textContent = formatCurrency(totalAmount);
+        
+        document.getElementById('cash-total').textContent = formatCurrency(totalAmount);
+        document.getElementById('tien_khach_dua').value = '';
+        document.getElementById('cash-change').textContent = '0₫';
 
         bootstrap.Modal.getInstance(document.getElementById('seatModal')).hide();
         const modal = new bootstrap.Modal(document.getElementById('checkoutModal'));
         modal.show();
     }
 
+    document.getElementById('tien_khach_dua')?.addEventListener('input', function() {
+        const totalAmount = selectedSeats.length * (selectedTrip?.gia_ve || 0);
+        const cashGiven = parseFloat(this.value || 0);
+        const change = cashGiven - totalAmount;
+        
+        const changeEl = document.getElementById('cash-change');
+        changeEl.textContent = formatCurrency(Math.max(0, change));
+        
+        if (cashGiven > 0 && cashGiven < totalAmount) {
+            changeEl.classList.add('text-danger');
+            changeEl.classList.remove('text-success');
+        } else {
+            changeEl.classList.remove('text-danger');
+            changeEl.classList.add('text-success');
+        }
+    });
+
     function handleCheckout(e) {
         e.preventDefault();
         const formData = new FormData(e.target);
+        
+        const totalAmount = selectedSeats.length * selectedTrip.gia_ve;
+        const cashGiven = parseFloat(formData.get('tien_khach_dua') || 0);
+        
+        if (!cashGiven || cashGiven < totalAmount) {
+            showError('Số tiền khách đưa phải lớn hơn hoặc bằng tổng tiền vé');
+            return;
+        }
         
         const payload = new FormData();
         payload.append('_token', '{{ csrf_token() }}');
@@ -576,8 +668,9 @@ document.addEventListener('DOMContentLoaded', function() {
         payload.append('kh_hoten', formData.get('ten_khach'));
         payload.append('kh_sdt', formData.get('sdt'));
         payload.append('kh_email', formData.get('email') || '');
-        payload.append('phuongthuc_thanhtoan', 'tien-mat');
+        payload.append('phuongthuc_thanhtoan', formData.get('phuongthuc_thanhtoan'));
         payload.append('ghi_chu', formData.get('ghi_chu') || '');
+        payload.append('tien_khach_dua', formData.get('tien_khach_dua'));
 
         fetch('{{ route("nhan-vien-ban-ve.dat-ve.store") }}', {
             method: 'POST',
@@ -593,10 +686,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error(data.message || 'Có lỗi xảy ra khi đặt vé');
             }
             
-            // Close the modal first
             bootstrap.Modal.getInstance(document.getElementById('checkoutModal')).hide();
             
-            // Show success message
             Swal.fire({
                 icon: 'success',
                 title: 'Đặt vé thành công!',

@@ -5,8 +5,7 @@
 ])
 
 <aside class="layout-sidebar collapsed" id="sidebar">
-    <!-- Toggle Button -->
-    <div class="sidebar-toggle" onclick="toggleSidebar()">
+    <div class="sidebar-toggle" id="sidebar-toggle-btn">
         <i class="fas fa-chevron-left"></i>
     </div>
 
@@ -41,28 +40,71 @@
 
 <script>
 function toggleSidebar() {
+    console.log('toggleSidebar() function called!');
     const sidebar = document.getElementById('sidebar');
-    const isCollapsed = sidebar.classList.contains('collapsed');
     
-    if (isCollapsed) {
+    if (!sidebar) {
+        console.error('ERROR: Sidebar element not found!');
+        return;
+    }
+    
+    const wasCollapsed = sidebar.classList.contains('collapsed');
+    
+    console.log('Toggle - Before:', wasCollapsed ? 'collapsed' : 'expanded');
+    console.log('Toggle - classList:', sidebar.classList.toString());
+    
+    if (wasCollapsed) {
         sidebar.classList.remove('collapsed');
         localStorage.setItem('sidebarCollapsed', 'false');
+        console.log('Toggle - After: expanded');
+        console.log('Toggle - New classList:', sidebar.classList.toString());
     } else {
         sidebar.classList.add('collapsed');
         localStorage.setItem('sidebarCollapsed', 'true');
+        console.log('Toggle - After: collapsed');
+        console.log('Toggle - New classList:', sidebar.classList.toString());
     }
 }
 
-// Restore sidebar state from localStorage
 document.addEventListener('DOMContentLoaded', function() {
     const sidebar = document.getElementById('sidebar');
-    const isCollapsed = localStorage.getItem('sidebarCollapsed');
+    const toggleBtn = document.getElementById('sidebar-toggle-btn');
+    const savedState = localStorage.getItem('sidebarCollapsed');
     
-    // Default to collapsed if no preference is saved
-    if (isCollapsed === null || isCollapsed === 'true') {
-        sidebar.classList.add('collapsed');
-    } else {
+    if (savedState === 'false') {
         sidebar.classList.remove('collapsed');
+    } else {
+        sidebar.classList.add('collapsed');
     }
+
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            const wasCollapsed = sidebar.classList.contains('collapsed');
+            
+            if (wasCollapsed) {
+                sidebar.classList.remove('collapsed');
+                localStorage.setItem('sidebarCollapsed', 'false');
+            } else {
+                sidebar.classList.add('collapsed');
+                localStorage.setItem('sidebarCollapsed', 'true');
+            }
+        });
+    }
+
+    sidebar.addEventListener('click', function(e) {
+        if (e.target.closest('a')) {
+            return;
+        }
+        if (e.target.closest('.sidebar-toggle')) {
+            return;
+        }
+        
+        if (this.classList.contains('collapsed')) {
+            this.classList.remove('collapsed');
+            localStorage.setItem('sidebarCollapsed', 'false');
+        }
+    });
 });
 </script>

@@ -115,7 +115,7 @@ class TicketController extends Controller
                                 'pending_expires_at' => $pendingTime
                             ]
                         );
-                        
+
                         $bookedSeats[] = $seat;
                     }
                 }
@@ -199,7 +199,7 @@ class TicketController extends Controller
 
             $calculatedTotal = $bookedTickets->count() * $trip->gia;
 
-            if($bookedTickets->count() != count($seatList)) {
+            if ($bookedTickets->count() != count($seatList)) {
                 session()->forget('booking_temp');
                 return redirect()->route('ticket.book', ['tripID' => $trip->machuyendi])
                     ->with('message', 'Vé của bạn đã hết hạn hoặc bị đặt bởi người khác. Vui lòng đặt lại.')
@@ -272,7 +272,7 @@ class TicketController extends Controller
                 $total = $tickets->count() * $trip->gia;
 
                 $bill = Hoadon::create([
-                    'mahd' => 'HD'.Str::upper(Str::random(8)),
+                    'mahd' => 'HD' . Str::upper(Str::random(8)),
                     'makh' => $userID ?? 'GUEST',
                     'manv' => null,
                     'matt' => 'CK',
@@ -360,6 +360,60 @@ class TicketController extends Controller
             return response()->json(['success' => true, 'message' => 'Đã hủy các ghế pending.']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'Lỗi server'], 500);
+        }
+    }
+
+    /**
+     * Show ticket lookup form
+     */
+    public function lookupForm()
+    {
+        return view('ticket.lookup_form');
+    }
+
+    /**
+     * Lookup ticket by ticket code
+     */
+    public function lookupTicket(Request $request)
+    {
+        $request->validate([
+            'mave' => 'required|string'
+        ], [
+            'mave.required' => 'Vui lòng nhập mã vé'
+        ]);
+
+        $mave = trim($request->input('mave'));
+
+        try {
+            // Find ticket with all related information
+            $ticket = Ve::with([
+                'chuyendi.xe.loaixe',
+                'chuyendi.lotrinhs.tinhthanh',
+                'cthds.hoadon.khach',
+                'cthds.hoadon.thanhtoan'
+            ])->where('mave', $mave)->first();
+
+            if (!$ticket) {
+                return view('ticket.lookup_result', [
+                    'ticket' => null,
+                    'message' => 'Không tìm thấy vé với mã: ' . $mave
+                ]);
+            }
+
+            // Get invoice information if exists
+            $hoadon = $ticket->cthds->first()?->hoadon;
+
+            return view('ticket.lookup_result', [
+                'ticket' => $ticket,
+                'hoadon' => $hoadon,
+                'message' => null
+            ]);
+
+        } catch (\Exception $e) {
+            return view('ticket.lookup_result', [
+                'ticket' => null,
+                'message' => 'Lỗi tra cứu vé: ' . $e->getMessage()
+            ]);
         }
     }
 }

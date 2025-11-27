@@ -21,6 +21,7 @@ use App\Http\Controllers\Customer\TicketController;
 use App\Http\Controllers\Customer\TripController;
 use App\Http\Controllers\Customer\BillController;
 use App\Http\Controllers\Customer\AuthController;
+use App\Http\Controllers\Customer\ProfileController as CustomerProfileController;
 use App\Http\Controllers\VnpayController;
 
 Route::get('/payment/vnpay/return', [VnpayController::class, 'vnpayReturn'])->name('vnpay.return');
@@ -55,6 +56,10 @@ Route::prefix('ticket')->name('ticket.')->group(function () {
     Route::post('payment-confirm', [TicketController::class, 'paymentConfirm'])->name('paymentConfirm');
     Route::get('payment-success', [TicketController::class, 'paymentSuccess'])->name('paymentSuccess');
     Route::post('rollback', [TicketController::class, 'rollbackBooking'])->name('rollback');
+
+    // Ticket Lookup Routes
+    Route::get('lookup', [TicketController::class, 'lookupForm'])->name('lookupForm');
+    Route::post('lookup', [TicketController::class, 'lookupTicket'])->name('lookup');
 });
 
 // Bill Controller
@@ -63,6 +68,14 @@ Route::prefix('bill')->name('bill.')->group(function () {
     Route::post('search', [BillController::class, 'search'])->name('search');
     Route::get('detail/{id}', [BillController::class, 'chiTietHoaDon'])->name('detail');
     Route::get('download-pdf/{id}', [BillController::class, 'downloadPDF'])->name('downloadPDF');
+});
+
+// Customer Profile Routes
+Route::prefix('profile')->name('customer.')->group(function () {
+    Route::get('/', [CustomerProfileController::class, 'show'])->name('profile');
+    Route::get('edit', [CustomerProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('update', [CustomerProfileController::class, 'update'])->name('profile.update');
+    Route::post('password', [CustomerProfileController::class, 'updatePassword'])->name('profile.password');
 });
 
 // ADMIN ROUTES (TRANG QUẢN TRỊ)
@@ -121,7 +134,7 @@ Route::prefix('nhan-vien-ban-ve')->name('nhan-vien-ban-ve.')->group(function () 
 
         Route::get('dat-ve', [NhanVienBanVeController::class, 'createDatVe'])->name('dat-ve.create');
         Route::post('dat-ve', [NhanVienBanVeController::class, 'storeDatVe'])->name('dat-ve.store');
-        
+
         // VNPay payment route (requires auth)
         Route::post('/payment/vnpay', [VnpayController::class, 'createPayment'])->name('vnpay.create');
 

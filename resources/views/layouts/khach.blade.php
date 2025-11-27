@@ -70,7 +70,7 @@
                                         </a>
                                     </li>
                                     <li class="nav-menu-item">
-                                        <a class="nav-menu-link" href="{{ route('ticket.find') }}">
+                                        <a class="nav-menu-link" href="{{ route('ticket.lookupForm') }}">
                                             <i class="bi bi-search me-2"></i>
                                             Tra cứu vé
                                         </a>
@@ -105,7 +105,7 @@
                                     </button>
                                     <ul class="dropdown-menu-custom">
                                         <li>
-                                            <a class="dropdown-item-custom" href="#">
+                                            <a class="dropdown-item-custom" href="{{ route('customer.profile') }}">
                                                 <i class="bi bi-person-fill"></i>
                                                 Thông tin cá nhân
                                             </a>
@@ -165,7 +165,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('ticket.find') }}" class="mobile-nav-link">
+                            <a href="{{ route('ticket.lookupForm') }}" class="mobile-nav-link">
                                 <i class="bi bi-search"></i>
                                 <span>Tra cứu vé</span>
                             </a>

@@ -1,6 +1,4 @@
-@extends('layouts.guest')
-
-@section('title','Tìm chuyến')
+@extends('layouts.khach')
 
 @section('content')
     <h3>Tìm chuyến</h3>
@@ -14,9 +12,9 @@
     </form>
 
     <script>
-        document.getElementById('go').addEventListener('click', function(){
+        document.getElementById('go').addEventListener('click', function () {
             const id = document.getElementById('tripID').value.trim();
-            if(!id) { alert('Nhập mã chuyến'); return; }
+            if (!id) { alert('Nhập mã chuyến'); return; }
             window.location = '/ticket/book/' + encodeURIComponent(id);
         });
     </script>

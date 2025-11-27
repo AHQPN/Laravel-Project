@@ -10,6 +10,20 @@ use App\Models\Nhanvien;
 
 class XeController extends Controller
 {
+    private function generateMaXe(): string
+    {
+        $lastXe = Xe::orderBy('maxe', 'desc')->first();
+        
+        if (!$lastXe) {
+            return 'X1';
+        }
+        
+        $lastNumber = (int) substr($lastXe->maxe, 1);
+        $newNumber = $lastNumber + 1;
+        
+        return 'X' . $newNumber;
+    }
+
     public function index(Request $request)
     {
         $search = $request->get('search');
@@ -35,19 +49,21 @@ class XeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'maxe' => 'required|max:5|unique:xe,maxe',
             'maloai' => 'required|exists:loaixe,maloai',
             'soxe' => 'required|max:10',
             'manv' => 'required|exists:nhanvien,manv',
         ], [
-            'maxe.required' => 'Vui lòng nhập mã xe',
-            'maxe.unique' => 'Mã xe đã tồn tại',
             'maloai.required' => 'Vui lòng chọn loại xe',
             'soxe.required' => 'Vui lòng nhập biển số xe',
             'manv.required' => 'Vui lòng chọn tài xế',
         ]);
 
-        Xe::create($request->all());
+        Xe::create([
+            'maxe' => $this->generateMaXe(),
+            'maloai' => $request->maloai,
+            'soxe' => $request->soxe,
+            'manv' => $request->manv,
+        ]);
 
         return redirect()->route('quan-ly.xe.index')
             ->with('success', 'Thêm xe thành công!');

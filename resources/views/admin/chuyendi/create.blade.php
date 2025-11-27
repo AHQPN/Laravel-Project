@@ -16,16 +16,7 @@
             <form action="{{ route('quan-ly.chuyendi.store') }}" method="POST">
                 @csrf
                 <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="machuyendi" class="form-label">Mã chuyến đi <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control @error('machuyendi') is-invalid @enderror" id="machuyendi" name="machuyendi" value="{{ old('machuyendi') }}" required>
-                            @error('machuyendi')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                    </div>
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                         <div class="mb-3">
                             <label for="tenchuyen" class="form-label">Tên chuyến <span class="text-danger">*</span></label>
                             <input type="text" class="form-control @error('tenchuyen') is-invalid @enderror" id="tenchuyen" name="tenchuyen" value="{{ old('tenchuyen') }}" required>

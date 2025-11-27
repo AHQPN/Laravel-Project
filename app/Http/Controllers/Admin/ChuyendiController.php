@@ -11,6 +11,19 @@ use App\Models\Lotrinh;
 
 class ChuyendiController extends Controller
 {
+    private function generateMaChuyenDi(): string
+    {
+        $lastChuyendi = Chuyendi::orderBy('machuyendi', 'desc')->first();
+        
+        if (!$lastChuyendi) {
+            return 'CD1';
+        }
+        
+        $lastNumber = (int) substr($lastChuyendi->machuyendi, 2);
+        $newNumber = $lastNumber + 1;
+        
+        return 'CD' . $newNumber;
+    }
 
     public function index(Request $request)
     {
@@ -37,7 +50,6 @@ class ChuyendiController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'machuyendi' => 'required|max:15|unique:chuyendi,machuyendi',
             'tenchuyen' => 'required|max:100',
             'maxe' => 'required|exists:xe,maxe',
             'thoigiandi' => 'required|date',
@@ -45,19 +57,28 @@ class ChuyendiController extends Controller
             'gia' => 'required|integer|min:0',
             'lotrinh' => 'required|array|min:2',
         ], [
-            'machuyendi.required' => 'Vui lòng nhập mã chuyến đi',
-            'machuyendi.unique' => 'Mã chuyến đi đã tồn tại',
             'tenchuyen.required' => 'Vui lòng nhập tên chuyến',
             'maxe.required' => 'Vui lòng chọn xe',
             'thoigiandi.required' => 'Vui lòng chọn thời gian đi',
             'lotrinh.required' => 'Vui lòng chọn ít nhất 2 điểm trong lộ trình',
         ]);
 
+        // Kiểm tra xem xe đã có chuyến đi nào trong ngày này chưa
+        $existingTrip = Chuyendi::where('maxe', $request->maxe)
+            ->whereDate('thoigiandi', date('Y-m-d', strtotime($request->thoigiandi)))
+            ->first();
+
+        if ($existingTrip) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Xe này đã có chuyến đi trong ngày này. Mỗi xe chỉ được phép có một chuyến đi mỗi ngày.');
+        }
+
         // Lấy số ghế từ loại xe
         $xe = Xe::with('loaixe')->findOrFail($request->maxe);
         
         $chuyendi = Chuyendi::create([
-            'machuyendi' => $request->machuyendi,
+            'machuyendi' => $this->generateMaChuyenDi(),
             'tenchuyen' => $request->tenchuyen,
             'maxe' => $request->maxe,
             'SLgheconlai' => $xe->loaixe->soghe,
@@ -99,6 +120,19 @@ class ChuyendiController extends Controller
         ]);
 
         $chuyendi = Chuyendi::findOrFail($id);
+
+        // Kiểm tra xem xe đã có chuyến đi nào trong ngày này chưa (trừ chuyến đi hiện tại)
+        $existingTrip = Chuyendi::where('maxe', $request->maxe)
+            ->whereDate('thoigiandi', date('Y-m-d', strtotime($request->thoigiandi)))
+            ->where('machuyendi', '!=', $id)
+            ->first();
+
+        if ($existingTrip) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Xe này đã có chuyến đi trong ngày này. Mỗi xe chỉ được phép có một chuyến đi mỗi ngày.');
+        }
+
         $chuyendi->update($request->only(['tenchuyen', 'maxe', 'thoigiandi', 'thoigiandichuyen', 'gia']));
 
         // Cập nhật lộ trình

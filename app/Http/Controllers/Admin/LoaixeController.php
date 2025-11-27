@@ -8,6 +8,20 @@ use App\Models\Loaixe;
 
 class LoaixeController extends Controller
 {
+    private function generateMaLoai(): string
+    {
+        $lastLoaixe = Loaixe::orderBy('maloai', 'desc')->first();
+        
+        if (!$lastLoaixe) {
+            return 'LX1';
+        }
+        
+        $lastNumber = (int) substr($lastLoaixe->maloai, 2);
+        $newNumber = $lastNumber + 1;
+        
+        return 'LX' . $newNumber;
+    }
+
     public function index(Request $request)
     {
         $search = $request->get('search');
@@ -27,18 +41,19 @@ class LoaixeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'maloai' => 'required|max:3|unique:loaixe,maloai',
             'tenloai' => 'required|max:100',
             'soghe' => 'required|integer|min:1',
         ], [
-            'maloai.required' => 'Vui lòng nhập mã loại xe',
-            'maloai.unique' => 'Mã loại xe đã tồn tại',
             'tenloai.required' => 'Vui lòng nhập tên loại xe',
             'soghe.required' => 'Vui lòng nhập số ghế',
             'soghe.min' => 'Số ghế phải lớn hơn 0',
         ]);
 
-        Loaixe::create($request->all());
+        Loaixe::create([
+            'maloai' => $this->generateMaLoai(),
+            'tenloai' => $request->tenloai,
+            'soghe' => $request->soghe,
+        ]);
 
         return redirect()->route('quan-ly.loaixe.index')
             ->with('success', 'Thêm loại xe thành công!');

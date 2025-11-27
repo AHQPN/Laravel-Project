@@ -16,14 +16,6 @@
             <form action="{{ route('quan-ly.loaixe.store') }}" method="POST">
                 @csrf
                 <div class="mb-3">
-                    <label for="maloai" class="form-label">Mã Loại xe <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control @error('maloai') is-invalid @enderror" id="maloai" name="maloai" value="{{ old('maloai') }}" required>
-                    @error('maloai')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="mb-3">
                     <label for="tenloai" class="form-label">Tên Loại xe <span class="text-danger">*</span></label>
                     <input type="text" class="form-control @error('tenloai') is-invalid @enderror" id="tenloai" name="tenloai" value="{{ old('tenloai') }}" required>
                     @error('tenloai')
